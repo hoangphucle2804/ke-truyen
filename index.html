@@ -107,9 +107,11 @@ html.paged,html.paged body{overflow:hidden;height:100%;overscroll-behavior:none}
 /* Chế độ lật trang: mỗi chương là một khối nhiều cột, mỗi cột rộng đúng một màn hình */
 .pager{position:fixed;top:0;left:0;right:0;height:100vh;height:100lvh;background:var(--rbg);color:var(--rink);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .pg-head,.pg-foot{position:absolute;left:0;right:0;text-align:center;font:500 12.5px/1.2 var(--f-ui);color:var(--rmuted);padding:0 72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
-.pg-head{top:calc(env(safe-area-inset-top,0px) + 16px)}
-.pg-foot{bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
-.pg-view{position:absolute;left:env(safe-area-inset-left,0px);right:env(safe-area-inset-right,0px);top:calc(env(safe-area-inset-top,0px) + 46px);bottom:calc(env(safe-area-inset-bottom,0px) + 44px);overflow:hidden;touch-action:none}
+.pg-head{top:calc(env(safe-area-inset-top,0px) + 18px)}
+#reader:not(.chrome-off) .pg-head,#reader:not(.chrome-off) .pg-foot{opacity:0}
+.pg-head,.pg-foot{transition:opacity .2s}
+.pg-foot{bottom:calc(env(safe-area-inset-bottom,0px) + 22px)}
+.pg-view{position:absolute;left:env(safe-area-inset-left,0px);right:env(safe-area-inset-right,0px);top:calc(env(safe-area-inset-top,0px) + 62px);bottom:calc(env(safe-area-inset-bottom,0px) + 76px);overflow:hidden;touch-action:none}
 .pg-track{position:absolute;inset:0;will-change:transform}
 .pager .chap.pg-chap{position:absolute;top:0;padding:0;column-fill:auto}
 .pager .chap-label{padding:0 0 1.4em}
@@ -131,7 +133,7 @@ html.rd{background:var(--rbg)}
 .rc-top,.rc-bot{position:fixed;left:0;right:0;z-index:20;display:flex;align-items:center;gap:12px;transition:opacity .2s ease,transform .22s ease;pointer-events:none}
 .rc-top>*,.rc-bot>*{pointer-events:auto}
 .rc-top{top:0;padding:calc(env(safe-area-inset-top,0px) + 8px) var(--gutter-r) 18px var(--gutter-l);background:linear-gradient(var(--rbg) 55%,transparent)}
-.rc-bot{bottom:0;padding:18px var(--gutter-r) calc(env(safe-area-inset-bottom,0px) + 10px) var(--gutter-l);background:linear-gradient(transparent,var(--rbg) 45%)}
+.rc-bot{bottom:0;padding:18px var(--gutter-r) calc(env(safe-area-inset-bottom,0px) + 10px) var(--gutter-l);background:linear-gradient(transparent,var(--rbg) 30%)}
 #reader.chrome-off .rc-top{opacity:0;transform:translateY(-12px)}
 #reader.chrome-off .rc-bot{opacity:0;transform:translateY(12px)}
 #reader.chrome-off .rc-top>*,#reader.chrome-off .rc-bot>*{pointer-events:none}
@@ -786,6 +788,7 @@ const S = (() => {
   }
   return d;
 })();
+S.dim = 0;
 function themeCfg(id = S.theme, over = S.over[id] || {}) {
   const t = themeOf(id), c = { font: over.font || t.font, bold: over.bold ?? t.bold };
   for (const k of LAYOUT) c[k] = over.custom && over[k] != null ? over[k] : t[k];
@@ -794,8 +797,14 @@ function themeCfg(id = S.theme, over = S.over[id] || {}) {
 const darkMQ = matchMedia('(prefers-color-scheme: dark)');
 const isDark = () => S.appearance === 'dark' || (S.appearance === 'auto' && darkMQ.matches);
 const palette = id => { const t = themeOf(id); return isDark() ? t.dark : t.light; };
+function mixHex(a, b, t) {
+  const h = x => [1, 3, 5].map(i => parseInt(x.slice(i, i + 2), 16)), A = h(a), B = h(b);
+  return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join('');
+}
 function styleVars(id = S.theme, over) {
-  const c = themeCfg(id, over), p = palette(id);
+  const c = themeCfg(id, over), p0 = palette(id), d = clamp(S.dim || 0, 0, 1);
+  // Độ sáng: làm tối chính màu nền/màu chữ (không phủ lớp đen), để thanh trạng thái iOS cùng màu với trang
+  const p = { bg: mixHex(p0.bg, '#000000', d * 0.72), ink: mixHex(p0.ink, '#000000', d * 0.38), muted: mixHex(p0.muted, '#000000', d * 0.5) };
   return { '--rbg': p.bg, '--rink': p.ink, '--rmuted': p.muted, '--rf': fontStack(c.font), '--fw': c.bold ? '600' : '400', '--fs': S.fs + 'px',
     '--lh': String(c.lh), '--ls': c.ls / 100 + 'em', '--ws': c.ws / 100 + 'em', '--mg': c.mg + 'px', '--ta': c.justify ? 'justify' : 'start' };
 }
@@ -808,7 +817,7 @@ function applySettings() {
     ? { '--rs-bg': 'rgba(28,28,30,.97)', '--rs-ink': '#f2f2f7', '--rs-muted': '#98989f', '--rs-card': '#2c2c2e', '--rs-line': 'rgba(255,255,255,.1)', '--rs-track': 'rgba(255,255,255,.2)', '--rs-okink': '#1c1c1e' }
     : { '--rs-bg': 'rgba(242,242,247,.97)', '--rs-ink': '#1c1c1e', '--rs-muted': '#6e6e73', '--rs-card': '#ffffff', '--rs-line': 'rgba(0,0,0,.08)', '--rs-track': 'rgba(0,0,0,.13)', '--rs-okink': '#ffffff' });
   setVars(document.documentElement, v);
-  $('#dim').style.opacity = (S.dim * 0.75).toFixed(3);
+  $('#dim').style.opacity = comic ? (S.dim * 0.7).toFixed(3) : '0';
   $('#r-look').style.visibility = comic ? 'hidden' : '';
   if (R.book) $('meta[name="theme-color"]').setAttribute('content', v['--rbg']);
   lsSet('kt-reader', S);
@@ -1335,8 +1344,6 @@ function lookMain() {
   modeBtn.onclick = () => popover(modeBtn, MODES, S.mode, v => { setReadMode(v); lookMain(); });
   const lookBtn = el('button', { type: 'button', 'aria-label': 'Sáng hoặc tối', html: ICON.sunset });
   lookBtn.onclick = () => popover(lookBtn, LOOKS, S.appearance, v => { S.appearance = v; keepPlace(applySettings); lookMain(); });
-  const br = el('input', { type: 'range', class: 'rg', min: 0, max: 100, step: 1, value: Math.round((1 - S.dim) * 100), 'aria-label': 'Độ sáng màn hình đọc' });
-  br.addEventListener('input', () => { S.dim = 1 - br.value / 100; fill(br); applySettings(); }); fill(br);
   const grid = el('div', { class: 'tgrid' });
   for (const t of THEMES) {
     const c = themeCfg(t.id), p = palette(t.id);
@@ -1350,7 +1357,6 @@ function lookMain() {
     el('div', { class: 'rs-row' },
       el('div', { class: 'pill' }, fsBtn('a-sm', -1, 'Chữ nhỏ hơn'), fsBtn('a-lg', 1, 'Chữ lớn hơn')),
       el('div', { class: 'pill' }, modeBtn, lookBtn)),
-    el('div', { class: 'rs-bright' }, el('span', { html: ICON.sun }), br, el('span', { class: 'big', html: ICON.sun })),
     grid,
     el('button', { type: 'button', class: 'rs-wide', onclick: () => lookCustom(true) }, el('span', { html: ICON.gear }), el('span', { text: 'Tuỳ chỉnh' }))));
 }
