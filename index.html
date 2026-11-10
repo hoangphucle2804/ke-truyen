@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kệ Truyện">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<title>Kệ Truyện</title>
+<style>
+/* Layout: kệ sách dạng lưới 2–4 cột; trình đọc toàn màn hình, thanh trên/dưới ẩn hiện khi chạm */
+:root{
+  --bg:#f3f4f7; --surface:#ffffff; --ink:#161a22; --muted:#5d6676; --line:#dde1e8;
+  --accent:#2457d6; --accent-ink:#ffffff; --danger:#c2352b; --shade:rgba(10,14,22,.45);
+  --f-ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --f-serif:"New York",ui-serif,Georgia,"Times New Roman",serif;
+  --f-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  --gutter-l:max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r:max(16px, env(safe-area-inset-right, 0px));
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1115; --surface:#181b22; --ink:#e8ebf1; --muted:#9099a8; --line:#2a2f3a;
+    --accent:#7da2ff; --accent-ink:#0f1115; --danger:#ff7b70; --shade:rgba(0,0,0,.6); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1115; --surface:#181b22; --ink:#e8ebf1; --muted:#9099a8; --line:#2a2f3a;
+  --accent:#7da2ff; --accent-ink:#0f1115; --danger:#ff7b70; --shade:rgba(0,0,0,.6); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%;overflow-anchor:none}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+svg{display:block}
+
+/* ---------- Kệ sách ---------- */
+body.in-lib::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1100px;margin:0 auto;padding-left:var(--gutter-l);padding-right:var(--gutter-r)}
+.lib-head{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid transparent}
+.lib-head.scrolled{border-bottom-color:var(--line)}
+.lib-head .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px}
+.brand{display:flex;align-items:baseline;gap:10px;min-width:0}
+.brand h1{margin:0;font-size:26px;font-weight:750;letter-spacing:-.02em}
+.brand span{color:var(--muted);font-size:13px;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:999px;font-weight:600;font-size:15px;white-space:nowrap}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:var(--surface);border:1px solid var(--line)}
+.btn.danger{background:var(--danger);color:#fff}
+.btn svg{width:18px;height:18px}
+main.lib{padding-block:8px 48px}
+.note{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:6px 0 18px;font-size:13.5px;color:var(--muted)}
+.note b{color:var(--ink)}
+.note button{margin-left:auto;color:var(--muted);font-size:20px;line-height:1;padding:0 2px}
+.section-label{font-size:12px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 0 12px}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:22px 14px}
+.card{position:relative;display:flex;flex-direction:column;gap:8px;min-width:0;text-align:left}
+.cover{position:relative;aspect-ratio:3/4;width:100%;max-width:100%;border-radius:8px;overflow:hidden;background:var(--line);box-shadow:0 1px 2px rgba(0,0,0,.08),0 6px 18px -8px rgba(0,0,0,.35)}
+.cover img{width:100%;height:100%;object-fit:cover;object-position:top}
+.cover.gen{display:flex;flex-direction:column;justify-content:space-between;padding:14px 12px;background:linear-gradient(160deg,var(--c1),var(--c2));color:#fff}
+.cover.gen b{font-size:16px;line-height:1.2;font-weight:700;text-wrap:balance;overflow:hidden;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical}
+.cover.gen small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.8}
+.cover .bar{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(0,0,0,.35)}
+.cover .bar i{display:block;height:100%;background:var(--accent)}
+.card-title{font-weight:650;font-size:14.5px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
+.card-meta{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.card-more{position:absolute;top:6px;right:6px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center}
+.card-more svg{width:18px;height:18px}
+.empty{display:grid;gap:22px;grid-template-columns:minmax(0,1fr);max-width:640px;padding-top:12px}
+.empty h2{margin:0;font-size:22px;letter-spacing:-.01em;text-wrap:balance}
+.empty p{margin:0;color:var(--muted)}
+.steps{display:grid;gap:10px;margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.steps li::before{counter-increment:s;content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:13px;display:grid;place-items:center}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.formats{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;font-weight:650;padding:4px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+.storage{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 16px;font-variant-numeric:tabular-nums}
+
+/* ---------- Trình đọc ---------- */
+body.reading{--rbg:#000;--rink:#e9e9e9;--rmuted:#8a8f99;--bar:rgba(18,20,26,.94);--bar-ink:#f1f3f7;--bar-line:rgba(255,255,255,.12);background:var(--rbg)}
+body.reading.t-light{--rbg:#ffffff;--rink:#1b1d22;--rmuted:#6b7280;--bar:rgba(255,255,255,.96);--bar-ink:#15181d;--bar-line:rgba(0,0,0,.1)}
+body.reading.t-paper{--rbg:#f4ecd8;--rink:#3b2f22;--rmuted:#8a7a63;--bar:rgba(244,236,216,.97);--bar-ink:#3b2f22;--bar-line:rgba(59,47,34,.15)}
+body.reading.t-dark{--rbg:#121316;--rink:#d5d7dc;--rmuted:#7d838f;--bar:rgba(24,26,31,.96);--bar-ink:#eef0f4;--bar-line:rgba(255,255,255,.1)}
+.seg .val{display:grid;place-items:center;min-width:52px;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+.flow{max-width:820px;margin:0 auto;min-height:100vh;overflow-anchor:none}
+.chap-label{color:var(--rmuted);font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 22px) 16px 14px}
+.chap.comic img{display:block;width:100%;max-width:100%;height:auto;background:#15161a}
+.chap.comic + .chap.comic .chap-label{padding-top:28px}
+.chap.text{color:var(--rink);font-family:var(--rf,var(--f-serif));font-size:var(--fs,19px);line-height:var(--lh,1.7);
+  padding:0 max(20px, env(safe-area-inset-right, 0px)) 36px max(20px, env(safe-area-inset-left, 0px));overflow-wrap:break-word}
+.chap.text .content{max-width:38em;margin:0 auto}
+.chap.text p{margin:0 0 .85em}
+.chap.text h1,.chap.text h2,.chap.text h3{font-family:var(--f-sans);line-height:1.3;text-wrap:balance;margin:1.2em 0 .8em;font-size:1.25em}
+.chap.text img{max-width:100%;height:auto;display:block;margin:1em auto}
+.chap.text a{color:inherit}
+.chap.text .verse p{margin:0}
+.flow-end{color:var(--rmuted);text-align:center;font-size:14px;padding:48px 16px calc(env(safe-area-inset-bottom,0px) + 96px)}
+.bar-top,.bar-bot{position:fixed;left:0;right:0;z-index:20;background:var(--bar);color:var(--bar-ink);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);transition:transform .22s ease}
+.bar-top{top:0;padding:env(safe-area-inset-top,0px) var(--gutter-r) 0 var(--gutter-l);border-bottom:1px solid var(--bar-line)}
+.bar-bot{bottom:0;padding:0 var(--gutter-r) env(safe-area-inset-bottom,0px) var(--gutter-l);border-top:1px solid var(--bar-line)}
+#reader.chrome-off .bar-top{transform:translateY(-100%)}
+#reader.chrome-off .bar-bot{transform:translateY(100%)}
+.bar-top .in{display:flex;align-items:center;gap:6px;height:52px;max-width:900px;margin:0 auto}
+.bar-top .titles{min-width:0;flex:1;line-height:1.25}
+.bar-top .titles b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-top .titles small{display:block;font-size:12.5px;opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ibtn{width:44px;height:44px;flex:none;border-radius:12px;display:grid;place-items:center}
+.ibtn svg{width:22px;height:22px}
+.ibtn:disabled{opacity:.3}
+.ibtn.txt{font-family:var(--f-serif);font-size:19px;font-weight:600}
+.bar-bot .in{display:flex;align-items:center;justify-content:space-between;gap:4px;height:56px;max-width:900px;margin:0 auto}
+.bar-bot .pos{flex:1;text-align:center;font-size:13px;font-variant-numeric:tabular-nums;line-height:1.25;min-width:0}
+.bar-bot .pos small{display:block;opacity:.65;font-size:11.5px}
+
+/* ---------- Bảng trượt, lớp phủ, thông báo ---------- */
+.sheet-wrap{position:fixed;inset:0;z-index:50;background:var(--shade);display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:560px;max-height:86%;display:flex;flex-direction:column;background:var(--surface);color:var(--ink);border-radius:18px 18px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.25);padding-bottom:env(safe-area-inset-bottom,0px)}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px var(--gutter-r) 10px var(--gutter-l)}
+.sheet-head h3{margin:0;font-size:17px}
+.sheet-head button{color:var(--muted);font-weight:600}
+.sheet-body{overflow:auto;-webkit-overflow-scrolling:touch;padding:0 var(--gutter-r) 18px var(--gutter-l);display:grid;gap:12px;min-height:0}
+.sheet-body p{margin:0;color:var(--muted)}
+.sheet-actions{display:grid;gap:8px}
+.sheet-actions .btn{width:100%;height:48px;border-radius:12px}
+.field{width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:16px;padding:0 14px}
+.toc{display:grid;gap:2px;margin:0;padding:0;list-style:none}
+.toc button{width:100%;text-align:left;padding:12px 12px;border-radius:10px;display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+.toc button span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toc button small{color:var(--muted);flex:none}
+.toc button.cur{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);font-weight:650}
+.setrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.setrow:last-child{border-bottom:0}
+.seg{display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+.seg button{min-width:44px;height:34px;padding:0 10px;border-radius:8px;font-size:14px;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.overlay{position:fixed;inset:0;z-index:60;background:var(--shade);display:grid;place-items:center;padding:0 var(--gutter-r) 0 var(--gutter-l)}
+.ov-card{width:100%;max-width:380px;background:var(--surface);border-radius:16px;padding:20px;display:grid;gap:10px}
+.ov-card b{font-size:16px}
+.ov-card small{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-variant-numeric:tabular-nums}
+.meter{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 84px);transform:translateX(-50%);z-index:70;max-width:calc(100% - 32px);background:#1d2129;color:#f4f6fa;padding:10px 16px;border-radius:12px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+@media (prefers-reduced-motion: reduce){.bar-top,.bar-bot,.meter i{transition:none}}
+</style>
+</head>
+<body>
+
+
+<div id="lib-view">
+  <header class="lib-head" id="lib-head">
+    <div class="wrap">
+      <div class="brand"><h1>Kệ Truyện</h1><span id="lib-count"></span></div>
+      <button class="btn primary" id="btn-import" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Thêm truyện
+      </button>
+    </div>
+  </header>
+  <main class="lib wrap" id="lib-main">
+    <div class="note" id="install-note" hidden>
+      <div><b>Đọc offline như app thật:</b> trong Safari bấm nút Chia sẻ, chọn <b>Thêm vào MH chính</b>, rồi mở Kệ Truyện từ biểu tượng ngoài màn hình.</div>
+      <button type="button" aria-label="Ẩn" data-close-note>×</button>
+    </div>
+    <div class="note" id="frame-note" hidden>
+      <div><b>Bản chạy thử.</b> Truyện bạn thêm được lưu trong trình duyệt này. Để đọc offline lâu dài, hãy cài Kệ Truyện từ trang web riêng của bạn.</div>
+      <button type="button" aria-label="Ẩn" data-close-note>×</button>
+    </div>
+    <div id="shelf-area"></div>
+    <div class="storage" id="storage"></div>
+  </main>
+</div>
+
+<div id="reader" hidden>
+  <div class="flow" id="flow"></div>
+  <div class="bar-top">
+    <div class="in">
+      <button class="ibtn" id="r-back" type="button" aria-label="Về kệ sách"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="titles"><b id="r-title"></b><small id="r-chap"></small></div>
+      <button class="ibtn txt" id="r-settings" type="button" aria-label="Cỡ chữ và giao diện">Aa</button>
+    </div>
+  </div>
+  <div class="bar-bot">
+    <div class="in">
+      <button class="ibtn" id="r-toc" type="button" aria-label="Mục lục"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2" fill="currentColor"/><circle cx="4.5" cy="12" r="1.2" fill="currentColor"/><circle cx="4.5" cy="18" r="1.2" fill="currentColor"/></svg></button>
+      <button class="ibtn" id="r-prev" type="button" aria-label="Chương trước"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg></button>
+      <div class="pos"><span id="r-pos"></span><small id="r-pct"></small></div>
+      <button class="ibtn" id="r-next" type="button" aria-label="Chương sau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5-5 5M6 7l5 5-5 5"/></svg></button>
+      <button class="ibtn" id="r-jump" type="button" aria-label="Lên đầu chương"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6M6 5h12"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<div id="sheet" class="sheet-wrap" hidden></div>
+<div id="overlay" class="overlay" hidden>
+  <div class="ov-card"><b id="ov-title">Đang thêm truyện…</b><div class="meter"><i id="ov-bar"></i></div><small id="ov-sub"></small></div>
+</div>
+<div id="toast" class="toast" hidden></div>
+<input type="file" id="file-pick" multiple hidden>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const el = (tag, props = {}, ...kids) => { const e = document.createElement(tag); for (const [k, v] of Object.entries(props)) { if (k === 'class') e.className = v; else if (k === 'text') e.textContent = v; else if (k === 'html') e.innerHTML = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else if (v != null) e.setAttribute(k, v); } for (const c of kids) if (c != null) e.append(c); return e; };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const fmtBytes = n => n >= 1e9 ? (n / 1e9).toFixed(2).replace('.', ',') + ' GB' : n >= 1e6 ? Math.round(n / 1e6) + ' MB' : Math.max(1, Math.round(n / 1e3)) + ' KB';
+const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+
+/* ---------------- Lưu trữ (IndexedDB) ---------------- */
+let dbp;
+function db() {
+  return dbp ||= new Promise((res, rej) => {
+    const r = indexedDB.open('ke-truyen', 1);
+    r.onupgradeneeded = () => { const d = r.result; d.createObjectStore('books', { keyPath: 'id' }); d.createObjectStore('files'); d.createObjectStore('progress', { keyPath: 'id' }); };
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+async function idb(store, mode, fn) {
+  const d = await db();
+  return new Promise((res, rej) => { const t = d.transaction(store, mode); let out; const r = fn(t.objectStore(store)); if (r) r.onsuccess = () => { out = r.result; }; t.oncomplete = () => res(out); t.onerror = t.onabort = () => rej(t.error || new Error('Lỗi lưu trữ')); });
+}
+const Store = {
+  books: () => idb('books', 'readonly', s => s.getAll()),
+  book: id => idb('books', 'readonly', s => s.get(id)),
+  putBook: b => idb('books', 'readwrite', s => s.put(b)),
+  delBook: id => idb('books', 'readwrite', s => s.delete(id)),
+  file: k => idb('files', 'readonly', s => s.get(k)),
+  putFile: (k, v) => idb('files', 'readwrite', s => s.put(v, k)),
+  delFiles: p => idb('files', 'readwrite', s => s.delete(IDBKeyRange.bound(p, p + '￿'))),
+  allProgress: () => idb('progress', 'readonly', s => s.getAll()),
+  progress: id => idb('progress', 'readonly', s => s.get(id)),
+  putProgress: p => idb('progress', 'readwrite', s => s.put(p)),
+  delProgress: id => idb('progress', 'readwrite', s => s.delete(id)),
+};
+
+/* ---------------- Đọc file ZIP (EPUB/CBZ) trực tiếp từ Blob ---------------- */
+const MIME = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp', avif: 'image/avif', svg: 'image/svg+xml', bmp: 'image/bmp' };
+const extOf = n => (n.match(/\.([a-z0-9]+)$/i) || [, ''])[1].toLowerCase();
+const isImg = n => /^(jpe?g|png|gif|webp|avif|bmp)$/.test(extOf(n));
+async function openZip(blob) {
+  const tailLen = Math.min(blob.size, 65557);
+  const tail = new DataView(await blob.slice(blob.size - tailLen).arrayBuffer());
+  let p = -1;
+  for (let i = tailLen - 22; i >= 0; i--) if (tail.getUint32(i, true) === 0x06054b50) { p = i; break; }
+  if (p < 0) throw new Error('file bị hỏng hoặc không phải EPUB/CBZ');
+  const count = tail.getUint16(p + 10, true), cdSize = tail.getUint32(p + 12, true), cdOff = tail.getUint32(p + 16, true);
+  const cd = new DataView(await blob.slice(cdOff, cdOff + cdSize).arrayBuffer());
+  const utf8 = new TextDecoder('utf-8');
+  const entries = new Map(), lower = new Map();
+  let o = 0;
+  for (let i = 0; i < count && o + 46 <= cd.byteLength; i++) {
+    if (cd.getUint32(o, true) !== 0x02014b50) break;
+    const method = cd.getUint16(o + 10, true), csize = cd.getUint32(o + 20, true), size = cd.getUint32(o + 24, true);
+    const nl = cd.getUint16(o + 28, true), xl = cd.getUint16(o + 30, true), cl = cd.getUint16(o + 32, true), lho = cd.getUint32(o + 42, true);
+    const name = utf8.decode(new Uint8Array(cd.buffer, cd.byteOffset + o + 46, nl));
+    if (!name.endsWith('/')) { const e = { name, method, csize, size, lho }; entries.set(name, e); lower.set(name.toLowerCase(), e); }
+    o += 46 + nl + xl + cl;
+  }
+  const find = n => entries.get(n) || lower.get(String(n).toLowerCase());
+  async function raw(e) {
+    const h = new DataView(await blob.slice(e.lho, e.lho + 30).arrayBuffer());
+    const start = e.lho + 30 + h.getUint16(26, true) + h.getUint16(28, true);
+    const data = blob.slice(start, start + e.csize);
+    if (e.method === 0) return data;
+    if (e.method === 8) {
+      if (typeof DecompressionStream === 'undefined') throw new Error('trình duyệt quá cũ, hãy cập nhật iOS');
+      return new Response(data.stream().pipeThrough(new DecompressionStream('deflate-raw'))).blob();
+    }
+    throw new Error('kiểu nén chưa hỗ trợ');
+  }
+  return {
+    names: [...entries.keys()],
+    has: n => !!find(n),
+    async blob(n) { const e = find(n); if (!e) throw new Error('thiếu ' + n); const b = await raw(e); return new Blob([b], { type: MIME[extOf(n)] || '' }); },
+    async text(n) { const e = find(n); if (!e) throw new Error('thiếu ' + n); return decodeText(await (await raw(e)).arrayBuffer()); },
+  };
+}
+function decodeText(buf) {
+  const u = new Uint8Array(buf);
+  if (u[0] === 0xff && u[1] === 0xfe) return new TextDecoder('utf-16le').decode(buf);
+  if (u[0] === 0xfe && u[1] === 0xff) return new TextDecoder('utf-16be').decode(buf);
+  try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); } catch { try { return new TextDecoder('windows-1258').decode(buf); } catch { return new TextDecoder('utf-8').decode(buf); } }
+}
+const dirOf = p => { const i = p.lastIndexOf('/'); return i < 0 ? '' : p.slice(0, i + 1); };
+function resolvePath(base, href) {
+  if (!href) return null;
+  href = href.split('#')[0];
+  if (!href || /^[a-z][a-z0-9+.-]*:/i.test(href)) return null;
+  try { href = decodeURIComponent(href); } catch {}
+  const out = [];
+  for (const part of (href.startsWith('/') ? href.slice(1) : base + href).split('/')) { if (part === '..') out.pop(); else if (part && part !== '.') out.push(part); }
+  return out.join('/');
+}
+const parseXml = s => new DOMParser().parseFromString(s, 'application/xml');
+const parseHtml = s => new DOMParser().parseFromString(s, 'text/html');
+
+/* ---------------- Kích thước ảnh (đọc phần đầu file, không cần giải mã) ---------------- */
+async function imgSize(blob) {
+  const b = new Uint8Array(await blob.slice(0, 262144).arrayBuffer());
+  const be16 = i => b[i] << 8 | b[i + 1], be32 = i => (b[i] << 24 >>> 0) + (b[i + 1] << 16) + (b[i + 2] << 8) + b[i + 3];
+  if (b[0] === 0x89 && b[1] === 0x50) return { w: be32(16), h: be32(20) };
+  if (b[0] === 0x47 && b[1] === 0x49) return { w: b[6] | b[7] << 8, h: b[8] | b[9] << 8 };
+  if (b[0] === 0x52 && b[1] === 0x49 && b[8] === 0x57) {
+    const f = String.fromCharCode(b[12], b[13], b[14], b[15]);
+    if (f === 'VP8 ') return { w: (b[26] | b[27] << 8) & 0x3fff, h: (b[28] | b[29] << 8) & 0x3fff };
+    if (f === 'VP8L') { const v = b[21] | b[22] << 8 | b[23] << 16 | b[24] << 24; return { w: (v & 0x3fff) + 1, h: ((v >> 14) & 0x3fff) + 1 }; }
+    if (f === 'VP8X') return { w: 1 + (b[24] | b[25] << 8 | b[26] << 16), h: 1 + (b[27] | b[28] << 8 | b[29] << 16) };
+  }
+  if (b[0] === 0xff && b[1] === 0xd8) {
+    let i = 2;
+    while (i + 9 < b.length) {
+      if (b[i] !== 0xff) { i++; continue; }
+      const m = b[i + 1];
+      if (m === 0xff) { i++; continue; }
+      if (m === 0xd8 || m === 0x01 || (m >= 0xd0 && m <= 0xd7)) { i += 2; continue; }
+      if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) return { h: be16(i + 5), w: be16(i + 7) };
+      i += 2 + be16(i + 2);
+    }
+  }
+  return null;
+}
+function sizeByLoad(url) { return new Promise(res => { const im = new Image(); im.onload = () => res({ w: im.naturalWidth || 1, h: im.naturalHeight || 1 }); im.onerror = () => res({ w: 3, h: 4 }); im.src = url; }); }
+
+/* ---------------- Tên chương, sắp xếp tự nhiên ---------------- */
+const baseName = n => n.replace(/^.*[\\/]/, '').replace(/\.[^.]+$/, '');
+const nkey = n => (baseName(n).match(/\d+/g) || []).map(Number);
+function ncmp(a, b) {
+  const x = nkey(a), y = nkey(b);
+  for (let i = 0; i < Math.min(x.length, y.length); i++) if (x[i] !== y[i]) return x[i] - y[i];
+  if (x.length !== y.length) return x.length - y.length;
+  return a.localeCompare(b, 'vi', { numeric: true });
+}
+function prettyName(n) {
+  const base = baseName(n);
+  const m = base.match(/^(?:ch(?:apter|ap|uong|ương)?|chương|chuong|ep(?:isode)?)[\s._-]*0*(\d+(?:\.\d+)?)(.*)$/i);
+  if (m) { const rest = m[2].replace(/^[\s._:-]+/, '').trim(); return 'Chương ' + m[1] + (rest ? ' – ' + rest : ''); }
+  return base.replace(/_+/g, ' ').trim();
+}
+
+/* ---------------- Phân tích EPUB / CBZ / TXT ---------------- */
+async function parseEpub(zip, fname) {
+  const container = await zip.text('META-INF/container.xml');
+  const opfPath = (container.match(/full-path\s*=\s*"([^"]+)"/) || [])[1];
+  if (!opfPath) throw new Error('EPUB thiếu mục lục gốc');
+  const opfDir = dirOf(opfPath), opf = parseXml(await zip.text(opfPath));
+  const byId = new Map();
+  for (const it of opf.getElementsByTagNameNS('*', 'item')) byId.set(it.getAttribute('id'), { href: resolvePath(opfDir, it.getAttribute('href')), type: it.getAttribute('media-type') || '', props: it.getAttribute('properties') || '' });
+  const spine = [...opf.getElementsByTagNameNS('*', 'itemref')].map(r => byId.get(r.getAttribute('idref'))).filter(Boolean);
+  const title = (opf.getElementsByTagNameNS('*', 'title')[0]?.textContent || '').trim();
+  const creator = (opf.getElementsByTagNameNS('*', 'creator')[0]?.textContent || '').trim();
+  // Mục lục gốc của sách
+  const toc = new Map();
+  try {
+    const nav = [...byId.values()].find(i => /\bnav\b/.test(i.props));
+    if (nav && zip.has(nav.href)) {
+      const d = parseHtml(await zip.text(nav.href));
+      const navEl = [...d.querySelectorAll('nav')].find(n => (n.getAttribute('epub:type') || '').includes('toc')) || d.querySelector('nav');
+      for (const a of navEl ? navEl.querySelectorAll('a[href]') : []) { const p = resolvePath(dirOf(nav.href), a.getAttribute('href')); if (p && !toc.has(p)) toc.set(p, a.textContent.replace(/\s+/g, ' ').trim()); }
+    }
+    if (!toc.size) {
+      const ncx = [...byId.values()].find(i => /ncx/.test(i.type));
+      if (ncx && zip.has(ncx.href)) {
+        const d = parseXml(await zip.text(ncx.href));
+        for (const np of d.getElementsByTagNameNS('*', 'navPoint')) {
+          const t = np.getElementsByTagNameNS('*', 'text')[0]?.textContent.trim(); const c = np.getElementsByTagNameNS('*', 'content')[0]?.getAttribute('src');
+          const p = resolvePath(dirOf(ncx.href), c); if (p && t && !toc.has(p)) toc.set(p, t);
+        }
+      }
+    }
+  } catch {}
+  // Duyệt từng trang trong spine
+  const docs = [];
+  for (const it of spine) {
+    if (/^image\//.test(it.type)) { docs.push({ path: it.href, imgs: [it.href], textLen: 0 }); continue; }
+    if (!zip.has(it.href)) continue;
+    const d = parseHtml(await zip.text(it.href));
+    const base = dirOf(it.href);
+    const imgs = [...d.querySelectorAll('img, image')].map(i => resolvePath(base, i.getAttribute('src') || i.getAttribute('xlink:href') || i.getAttribute('href'))).filter(p => p && zip.has(p));
+    const heading = d.querySelector('h1, h2, h3')?.textContent.replace(/\s+/g, ' ').trim() || d.querySelector('title')?.textContent.trim() || '';
+    docs.push({ path: it.href, imgs, textLen: (d.body?.textContent || '').replace(/\s+/g, '').length, heading });
+  }
+  if (!docs.length) throw new Error('EPUB không có nội dung');
+  // Tìm ảnh bìa
+  let coverPath = null;
+  const cv = [...byId.values()].find(i => /cover-image/.test(i.props));
+  const metaCover = [...opf.getElementsByTagNameNS('*', 'meta')].find(m => m.getAttribute('name') === 'cover');
+  if (cv) coverPath = cv.href; else if (metaCover && byId.get(metaCover.getAttribute('content'))) coverPath = byId.get(metaCover.getAttribute('content')).href;
+  const imageDocs = docs.filter(d => d.imgs.length && d.textLen < 40).length;
+  if (imageDocs / docs.length >= 0.8) {
+    const pages = [];
+    for (const d of docs) for (const p of d.imgs) if (pages[pages.length - 1] !== p) pages.push(p);
+    return { kind: 'comic', title, creator, coverPath: coverPath || pages[0], chapters: [{ type: 'images', title: prettyName(fname), pages }] };
+  }
+  const chapters = [];
+  for (const d of docs) {
+    if (!d.textLen && !d.imgs.length) continue;
+    const t = toc.get(d.path);
+    if (t || !chapters.length || !toc.size) chapters.push({ type: 'html', title: t || d.heading || 'Phần ' + (chapters.length + 1), entries: [d.path] });
+    else chapters[chapters.length - 1].entries.push(d.path);
+  }
+  return { kind: 'novel', title, creator, coverPath, chapters };
+}
+async function parseCbz(zip, fname) {
+  const pages = zip.names.filter(n => isImg(n) && !/(^|\/)(__MACOSX|\.)/.test(n)).sort((a, b) => ncmp(a.replace(/\.[^.]+$/, ''), b.replace(/\.[^.]+$/, '')) || a.localeCompare(b));
+  if (!pages.length) throw new Error('không có ảnh nào trong file');
+  return { kind: 'comic', title: '', coverPath: pages[0], chapters: [{ type: 'images', title: prettyName(fname), pages }] };
+}
+function splitText(text, fname) {
+  text = text.replace(/\r\n?/g, '\n');
+  const re = /^[ \t]*((?:chương|chuong|chapter|hồi|hoi|quyển|quyen|phần|phan|tiết)[ \t]+[0-9ivxlcdm]+\b[^\n]{0,80})$/gim;
+  const marks = []; let m;
+  while ((m = re.exec(text))) marks.push({ at: m.index, title: m[1].trim(), end: re.lastIndex });
+  const chapters = [];
+  if (marks.length >= 2) {
+    const pre = text.slice(0, marks[0].at).trim();
+    if (pre.length > 40) chapters.push({ title: 'Mở đầu', body: pre });
+    marks.forEach((mk, i) => chapters.push({ title: mk.title, body: text.slice(mk.end, i + 1 < marks.length ? marks[i + 1].at : text.length).trim() }));
+  } else {
+    let i = 0, n = 1;
+    while (i < text.length) {
+      let j = Math.min(text.length, i + 16000);
+      if (j < text.length) { const k = text.indexOf('\n\n', j); j = k < 0 || k - j > 6000 ? (text.indexOf('\n', j) < 0 ? text.length : text.indexOf('\n', j)) : k; }
+      chapters.push({ title: marks.length === 1 && n === 1 ? marks[0].title : 'Phần ' + n, body: text.slice(i, j).trim() });
+      i = j; n++;
+    }
+  }
+  return { kind: 'novel', title: baseName(fname).replace(/_+/g, ' '), chapters: chapters.filter(c => c.body) };
+}
+
+/* ---------------- Thêm truyện ---------------- */
+const SUPPORTED = /\.(epub|cbz|zip|txt)$/i;
+async function makeThumb(blob) {
+  let src;
+  try { src = await createImageBitmap(blob); }
+  catch { const url = URL.createObjectURL(blob); src = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; }); }
+  const sw = src.width, sh = Math.min(src.height, Math.round(sw * 4 / 3));
+  const c = document.createElement('canvas'); c.width = 300; c.height = Math.round(300 * sh / sw);
+  c.getContext('2d').drawImage(src, 0, 0, sw, sh, 0, 0, c.width, c.height);
+  src.close?.();
+  return new Promise(res => c.toBlob(res, 'image/jpeg', 0.82));
+}
+function guessTitle(files, firstMeta) {
+  if (files.length === 1) return firstMeta?.title || prettyName(files[0].name);
+  const names = files.map(f => baseName(f.name));
+  let pre = names[0];
+  for (const n of names) while (!n.startsWith(pre)) pre = pre.slice(0, -1);
+  pre = pre.replace(/[\s._\-–(\[]*(ch(apter|ap|ương|uong)?|chương|tập|tap|vol(ume)?)?[\s._\-]*\d*$/i, '').trim();
+  if (pre.length >= 3) return pre;
+  const t = firstMeta?.title || '';
+  return t && !/^(ch|chương|chapter)[\s._-]*\d/i.test(t) ? t : '';
+}
+async function importFiles(fileList, target) {
+  const files = [...fileList].filter(f => SUPPORTED.test(f.name)).sort((a, b) => ncmp(a.name, b.name));
+  const skipped = fileList.length - files.length;
+  if (!files.length) { toast('Chưa hỗ trợ loại file này. Hãy chọn file EPUB, CBZ hoặc TXT.'); return; }
+  try { await navigator.storage?.persist?.(); } catch {}
+  const isNew = !target;
+  const book = target || { id: uid(), title: '', created: Date.now(), lastRead: Date.now(), chapters: [], files: [], hasCover: false };
+  let n = book.files.reduce((m, f) => Math.max(m, f.n + 1), 0);
+  const errors = []; let firstMeta = null, coverSource = null, added = 0;
+  showOverlay(isNew ? 'Đang thêm truyện…' : 'Đang thêm chương…');
+  for (let idx = 0; idx < files.length; idx++) {
+    const f = files[idx];
+    updateOverlay(idx / files.length, `${idx + 1}/${files.length} · ${f.name}`);
+    try {
+      const ext = extOf(f.name);
+      let meta;
+      const key = `${book.id}/f${n}`;
+      if (ext === 'txt') {
+        meta = splitText(decodeText(await f.arrayBuffer()), f.name);
+        for (let j = 0; j < meta.chapters.length; j++) {
+          const c = meta.chapters[j]; c.type = 'text'; c.textKey = `${key}_t${j}`;
+          await Store.putFile(c.textKey, new Blob([c.body], { type: 'text/plain' })); delete c.body;
+        }
+      } else {
+        const zip = await openZip(f);
+        meta = ext === 'epub' ? await parseEpub(zip, f.name) : await parseCbz(zip, f.name);
+        await Store.putFile(key, new Blob([f], { type: 'application/zip' }));
+        if (!coverSource && meta.coverPath && zip.has(meta.coverPath)) coverSource = () => zip.blob(meta.coverPath);
+      }
+      meta.chapters.forEach((c, j) => { c.id = `c${n}_${j}`; c.file = key; c.src = f.name; c.sub = j; });
+      book.files.push({ n, key, name: f.name, size: f.size });
+      book.chapters.push(...meta.chapters);
+      if (!firstMeta) firstMeta = meta;
+      n++; added++;
+      if (idx % 8 === 7) await sleep(0);
+    } catch (e) { errors.push(`${f.name}: ${e.message || e}`); }
+  }
+  updateOverlay(1, 'Đang lưu…');
+  if (!added) { hideOverlay(); showErrors(errors, 'Không thêm được file nào'); return; }
+  book.chapters.sort((a, b) => ncmp(a.src, b.src) || a.sub - b.sub);
+  const types = new Set(book.chapters.map(c => c.type));
+  book.kind = types.size === 1 && types.has('images') ? 'comic' : types.has('images') ? 'mixed' : 'novel';
+  if (isNew) { book.title = guessTitle(files, firstMeta) || 'Truyện mới'; book.author = firstMeta?.creator || ''; }
+  if (!book.hasCover && coverSource) { try { const t = await makeThumb(await coverSource()); if (t) { await Store.putFile(`${book.id}/cover`, t); book.hasCover = true; } } catch {} }
+  await Store.putBook(book);
+  hideOverlay();
+  await renderLibrary();
+  const msg = `${isNew ? 'Đã thêm' : 'Đã bổ sung'} ${added} file${skipped ? ` (bỏ qua ${skipped} file không hỗ trợ)` : ''}.`;
+  if (errors.length) showErrors(errors, msg);
+  else if (isNew && files.length > 1 && book.title === 'Truyện mới') renameSheet(book, 'Đặt tên cho bộ truyện');
+  else toast(msg);
+}
+
+/* ---------------- Kệ sách ---------------- */
+let libUrls = [];
+const PALETTES = [['#2457d6', '#14306f'], ['#0f766e', '#073b37'], ['#9a3412', '#4a1a08'], ['#6d28d9', '#30115f'], ['#be123c', '#5a0a1d'], ['#1e3a5f', '#0b1a2c']];
+async function renderLibrary() {
+  libUrls.forEach(u => URL.revokeObjectURL(u)); libUrls = [];
+  let books = [], progress = [];
+  try { [books, progress] = await Promise.all([Store.books(), Store.allProgress()]); } catch (e) { $('#shelf-area').replaceChildren(el('p', { text: 'Trình duyệt đang chặn bộ nhớ của trang này (có thể do chế độ riêng tư). Hãy mở bằng Safari thường.' })); return; }
+  const pmap = new Map(progress.map(p => [p.id, p]));
+  books.sort((a, b) => (pmap.get(b.id)?.at || b.lastRead || 0) - (pmap.get(a.id)?.at || a.lastRead || 0));
+  $('#lib-count').textContent = books.length ? `${books.length} truyện` : '';
+  const area = $('#shelf-area');
+  if (!books.length) { area.replaceChildren(emptyState()); renderStorage(); return; }
+  const grid = el('div', { class: 'shelf' });
+  for (const b of books) {
+    const p = pmap.get(b.id);
+    const ci = p ? Math.max(0, b.chapters.findIndex(c => c.id === p.chId)) : -1;
+    const total = b.chapters.length;
+    const pct = ci < 0 ? 0 : clamp((ci + (p.frac || 0)) / total, 0, 1);
+    const pal = PALETTES[[...b.id].reduce((s, c) => s + c.charCodeAt(0), 0) % PALETTES.length];
+    const cover = el('div', { class: 'cover' + (b.hasCover ? '' : ' gen'), style: b.hasCover ? null : `--c1:${pal[0]};--c2:${pal[1]}` });
+    if (b.hasCover) { const img = el('img', { alt: '', loading: 'lazy' }); cover.append(img); Store.file(`${b.id}/cover`).then(bl => { if (bl) { const u = URL.createObjectURL(bl); libUrls.push(u); img.src = u; } }); }
+    else cover.append(el('small', { text: b.kind === 'comic' ? 'Truyện tranh' : 'Truyện chữ' }), el('b', { text: b.title }));
+    if (pct > 0) cover.append(el('div', { class: 'bar' }, el('i', { style: `width:${(pct * 100).toFixed(1)}%` })));
+    const meta = ci < 0 ? `${b.kind === 'comic' ? 'Truyện tranh' : b.kind === 'mixed' ? 'Tranh + chữ' : 'Truyện chữ'} · ${total} chương` : `Đang đọc ${shortTitle(b.chapters[ci].title)} · ${ci + 1}/${total}`;
+    const card = el('div', { class: 'card' },
+      el('button', { type: 'button', class: 'card', style: 'gap:8px', 'aria-label': `Đọc ${b.title}`, onclick: () => openBook(b.id) }, cover, el('div', { class: 'card-title', text: b.title }), el('div', { class: 'card-meta', text: meta })),
+      el('button', { type: 'button', class: 'card-more', 'aria-label': `Tuỳ chọn cho ${b.title}`, html: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>', onclick: () => bookMenu(b) }));
+    grid.append(card);
+  }
+  area.replaceChildren(el('div', { class: 'section-label', text: 'Đọc gần đây' }), grid);
+  renderStorage();
+}
+const shortTitle = t => t.length > 28 ? t.slice(0, 27) + '…' : t;
+function emptyState() {
+  return el('div', { class: 'empty' },
+    el('div', {}, el('h2', { text: 'Kệ đang trống. Thêm bộ truyện đầu tiên của bạn.' })),
+    el('p', { text: 'Truyện được lưu ngay trong điện thoại nên đọc được cả khi không có mạng. Kệ Truyện nhớ chỗ bạn đang đọc, kể cả khi thoát ra.' }),
+    el('ol', { class: 'steps' },
+      el('li', {}, el('div', { html: 'Bấm <b>Thêm truyện</b>, mở thư mục chứa truyện trong ứng dụng Tệp.' })),
+      el('li', {}, el('div', { html: 'Bấm <b>Chọn</b> ở góc trên, chọn tất cả các chương (ví dụ 209 file EPUB). Các file chọn cùng lúc được gộp thành <b>một bộ truyện</b>, xếp đúng thứ tự chương.' })),
+      el('li', {}, el('div', { html: 'Chạm vào bìa để đọc. Truyện tranh cuộn dọc liền mạch qua các chương, chạm giữa màn hình để hiện mục lục.' }))),
+    el('div', { class: 'formats' }, ...['EPUB truyện tranh', 'EPUB truyện chữ', 'CBZ / ZIP ảnh', 'TXT'].map(t => el('span', { class: 'chip', text: t }))),
+    el('div', { class: 'row' },
+      el('button', { class: 'btn primary', type: 'button', text: 'Thêm truyện', onclick: () => pickFiles(null) }),
+      el('button', { class: 'btn ghost', type: 'button', text: 'Đọc thử sách mẫu', onclick: addSample })));
+}
+async function renderStorage() {
+  const box = $('#storage'); box.replaceChildren();
+  try {
+    const est = await navigator.storage?.estimate?.();
+    if (est) box.append(el('span', { text: `Đã dùng ${fmtBytes(est.usage || 0)}${est.quota ? ' / ' + fmtBytes(est.quota) : ''}` }));
+    const persisted = await navigator.storage?.persisted?.();
+    if (persisted != null) box.append(el('span', { text: persisted ? 'Bộ nhớ: được giữ cố định' : 'Bộ nhớ: iOS có thể dọn khi máy đầy' }));
+  } catch {}
+}
+function bookMenu(b) {
+  openSheet(b.title, body => {
+    const acts = el('div', { class: 'sheet-actions' },
+      el('button', { class: 'btn primary', type: 'button', text: 'Đọc tiếp', onclick: () => { closeSheet(); openBook(b.id); } }),
+      el('button', { class: 'btn ghost', type: 'button', text: 'Thêm chương / file vào bộ này', onclick: () => { closeSheet(); pickFiles(b); } }),
+      el('button', { class: 'btn ghost', type: 'button', text: 'Đổi tên', onclick: () => renameSheet(b, 'Đổi tên truyện') }),
+      el('button', { class: 'btn ghost', type: 'button', text: 'Đọc lại từ đầu', onclick: async () => { await Store.delProgress(b.id); closeSheet(); renderLibrary(); toast('Đã đưa về chương đầu.'); } }),
+      el('button', { class: 'btn ghost', type: 'button', style: 'color:var(--danger)', text: 'Xoá khỏi kệ', onclick: () => confirmDelete(b) }));
+    const size = b.files.reduce((s, f) => s + (f.size || 0), 0);
+    body.append(el('p', { text: `${b.chapters.length} chương · ${b.files.length} file · ${fmtBytes(size)}` }), acts);
+  });
+}
+function renameSheet(b, heading) {
+  openSheet(heading, body => {
+    const input = el('input', { class: 'field', id: 'rename-input', value: b.title === 'Truyện mới' ? '' : b.title, placeholder: 'Ví dụ: Solo Leveling', autocomplete: 'off' });
+    const save = async () => { const v = input.value.trim(); if (!v) { input.focus(); return; } b.title = v; await Store.putBook(b); closeSheet(); renderLibrary(); toast('Đã lưu tên truyện.'); };
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') save(); });
+    body.append(input, el('div', { class: 'sheet-actions' }, el('button', { class: 'btn primary', type: 'button', text: 'Lưu tên', onclick: save })));
+    setTimeout(() => input.focus(), 60);
+  });
+}
+function confirmDelete(b) {
+  openSheet('Xoá truyện này?', body => {
+    body.append(el('p', { text: `“${b.title}” và chỗ bạn đang đọc sẽ bị xoá khỏi điện thoại. File gốc trong ứng dụng Tệp không bị ảnh hưởng.` }),
+      el('div', { class: 'sheet-actions' },
+        el('button', { class: 'btn danger', type: 'button', text: 'Xoá truyện', onclick: async () => { await Store.delFiles(b.id + '/'); await Store.delBook(b.id); await Store.delProgress(b.id); closeSheet(); renderLibrary(); toast('Đã xoá truyện.'); } }),
+        el('button', { class: 'btn ghost', type: 'button', text: 'Giữ lại', onclick: closeSheet })));
+  });
+}
+function showErrors(errors, heading) {
+  openSheet(heading, body => {
+    body.append(el('p', { text: `${errors.length} file không đọc được. Các file này có thể bị hỏng khi tải về; hãy tải lại rồi thêm lại vào bộ truyện.` }),
+      el('ul', { style: 'margin:0;padding-left:18px;font-size:13px;color:var(--muted);display:grid;gap:4px' }, ...errors.slice(0, 40).map(t => el('li', { text: t }))),
+      el('div', { class: 'sheet-actions' }, el('button', { class: 'btn primary', type: 'button', text: 'Đã hiểu', onclick: closeSheet })));
+  });
+}
+let pickTarget = null;
+function pickFiles(target) { pickTarget = target; const inp = $('#file-pick'); inp.value = ''; inp.click(); }
+$('#file-pick').addEventListener('change', e => { const fl = e.target.files; if (fl && fl.length) importFiles(fl, pickTarget); });
+$('#btn-import').addEventListener('click', () => pickFiles(null));
+
+const SAMPLE = [
+  ['Mở đầu', 'Trăm năm trong cõi người ta,\nChữ tài chữ mệnh khéo là ghét nhau.\nTrải qua một cuộc bể dâu,\nNhững điều trông thấy mà đau đớn lòng.\nLạ gì bỉ sắc tư phong,\nTrời xanh quen thói má hồng đánh ghen.\nCảo thơm lần giở trước đèn,\nPhong tình cổ lục còn truyền sử xanh.'],
+  ['Nhà họ Vương', 'Rằng năm Gia Tĩnh triều Minh,\nBốn phương phẳng lặng hai kinh vững vàng.\nCó nhà viên ngoại họ Vương,\nGia tư nghĩ cũng thường thường bậc trung.\nMột trai con thứ rốt lòng,\nVương Quan là chữ nối dòng nho gia.\nĐầu lòng hai ả tố nga,\nThúy Kiều là chị em là Thúy Vân.\nMai cốt cách tuyết tinh thần,\nMỗi người một vẻ mười phân vẹn mười.\nVân xem trang trọng khác vời,\nKhuôn trăng đầy đặn nét ngài nở nang.\nHoa cười ngọc thốt đoan trang,\nMây thua nước tóc tuyết nhường màu da.\nKiều càng sắc sảo mặn mà,\nSo bề tài sắc lại là phần hơn.\nLàn thu thủy nét xuân sơn,\nHoa ghen thua thắm liễu hờn kém xanh.\nMột hai nghiêng nước nghiêng thành,\nSắc đành đòi một tài đành họa hai.'],
+];
+async function addSample() {
+  const id = uid(), key = `${id}/f0`;
+  const book = { id, title: 'Truyện Kiều (trích) · Sách mẫu', author: 'Nguyễn Du', created: Date.now(), lastRead: Date.now(), kind: 'novel', hasCover: false, files: [{ n: 0, key, name: 'truyen-kieu.txt', size: 2000 }], chapters: [] };
+  for (let j = 0; j < SAMPLE.length; j++) { const tk = `${key}_t${j}`; await Store.putFile(tk, new Blob([SAMPLE[j][1]], { type: 'text/plain' })); book.chapters.push({ id: `c0_${j}`, type: 'text', verse: true, title: SAMPLE[j][0], textKey: tk, file: key, src: 'truyen-kieu.txt', sub: j }); }
+  await Store.putBook(book); await renderLibrary(); openBook(id);
+}
+
+/* ---------------- Trình đọc ---------------- */
+const flow = $('#flow'), reader = $('#reader');
+const R = { book: null, secs: [], busy: false, gen: 0, zips: new Map(), saveT: 0, chrome: true, lastY: 0, pos: null };
+const settings = Object.assign({ fs: 19, lh: 1.7, font: 'serif', theme: 'paper' }, lsGet('kt-settings', {}));
+const io = new IntersectionObserver(ents => {
+  for (const e of ents) { const img = e.target; if (e.isIntersecting) { if (img.getAttribute('src') !== img.dataset.src) img.src = img.dataset.src; } else if (img.hasAttribute('src')) img.removeAttribute('src'); }
+}, { rootMargin: '250% 0px 250% 0px' });
+
+async function zipFor(key) {
+  if (!R.zips.has(key)) R.zips.set(key, (async () => { const blob = await Store.file(key); if (!blob) throw new Error('mất dữ liệu file, hãy thêm lại'); return openZip(blob); })());
+  try { return await R.zips.get(key); } catch (e) { R.zips.delete(key); throw e; }
+}
+async function buildSection(i) {
+  const ch = R.book.chapters[i], urls = [];
+  const sec = el('section', { class: 'chap ' + (ch.type === 'images' ? 'comic' : 'text'), 'data-i': i });
+  sec.append(el('div', { class: 'chap-label', text: ch.title }));
+  if (ch.type === 'images') {
+    const zip = await zipFor(ch.file);
+    for (const p of ch.pages) {
+      let blob; try { blob = await zip.blob(p); } catch { continue; }
+      const url = URL.createObjectURL(blob); urls.push(url);
+      const sz = (await imgSize(blob)) || (await sizeByLoad(url));
+      const img = el('img', { alt: '', decoding: 'async', width: sz.w, height: sz.h, style: `aspect-ratio:${sz.w}/${sz.h}` });
+      img.dataset.src = url; sec.append(img);
+    }
+  } else if (ch.type === 'text') {
+    const blob = await Store.file(ch.textKey);
+    const text = blob ? await blob.text() : '';
+    const box = el('div', { class: 'content' + (ch.verse ? ' verse' : '') });
+    for (const para of text.split(ch.verse ? /\n/ : /\n\s*\n|\n/)) { const t = para.trim(); if (t) box.append(el('p', { text: t })); }
+    sec.append(box);
+  } else {
+    const zip = await zipFor(ch.file);
+    const box = el('div', { class: 'content' });
+    for (const entry of ch.entries) {
+      let html; try { html = await zip.text(entry); } catch { continue; }
+      const d = parseHtml(html), body = d.body; if (!body) continue;
+      body.querySelectorAll('script,style,link,meta,title,iframe,object,embed,form,input,button,noscript,base,video,audio').forEach(n => n.remove());
+      for (const n of body.querySelectorAll('*')) for (const a of [...n.attributes]) if (/^on/i.test(a.name) || a.name === 'style' || a.name === 'srcset') n.removeAttribute(a.name);
+      const base = dirOf(entry);
+      for (const svg of body.querySelectorAll('svg')) { const im = svg.querySelector('image'); if (im) { const r = d.createElement('img'); r.setAttribute('src', im.getAttribute('xlink:href') || im.getAttribute('href') || ''); svg.replaceWith(r); } }
+      for (const img of body.querySelectorAll('img')) {
+        const p = resolvePath(base, img.getAttribute('src'));
+        if (!p || !zip.has(p)) { img.remove(); continue; }
+        const u = URL.createObjectURL(await zip.blob(p)); urls.push(u); img.setAttribute('src', u); img.setAttribute('alt', img.getAttribute('alt') || '');
+      }
+      for (const a of body.querySelectorAll('a[href]')) { const t = resolvePath(base, a.getAttribute('href')); a.removeAttribute('href'); if (t) { a.dataset.target = t; a.setAttribute('role', 'link'); a.style.textDecoration = 'underline'; } }
+      box.append(...[...body.childNodes].map(nd => document.importNode(nd, true)));
+    }
+    sec.append(box);
+  }
+  return { i, el: sec, urls };
+}
+function attach(s) { for (const img of s.el.querySelectorAll('img[data-src]')) io.observe(img); }
+function dispose(s) { for (const img of s.el.querySelectorAll('img[data-src]')) io.unobserve(img); s.urls.forEach(u => URL.revokeObjectURL(u)); s.el.remove(); }
+function clearSections() { R.secs.forEach(dispose); R.secs = []; flow.replaceChildren(); }
+const absTop = e => e.getBoundingClientRect().top + window.scrollY;
+function currentSec() { for (const s of R.secs) { if (s.el.getBoundingClientRect().bottom > 2) return s; } return R.secs[R.secs.length - 1]; }
+
+async function openBook(id) {
+  const book = await Store.book(id); if (!book) return;
+  R.book = book; R.gen++; R.zips.clear(); R.pos = null;
+  document.body.classList.remove('in-lib'); document.body.classList.add('reading');
+  $('#lib-view').hidden = true; reader.hidden = false;
+  applySettings();
+  $('#r-title').textContent = book.title;
+  $('#r-settings').hidden = book.kind === 'comic';
+  setChrome(true);
+  const p = await Store.progress(id);
+  const ci = p ? Math.max(0, book.chapters.findIndex(c => c.id === p.chId)) : 0;
+  await jumpTo(ci, p ? p.frac || 0 : 0);
+  book.lastRead = Date.now(); Store.putBook(book).catch(() => {});
+}
+async function jumpTo(i, frac = 0) {
+  if (!R.book) return;
+  i = clamp(i, 0, R.book.chapters.length - 1);
+  const gen = ++R.gen; R.busy = true;
+  try {
+    clearSections();
+    const s = await buildSection(i);
+    if (gen !== R.gen) { dispose(s); return; }
+    flow.append(s.el); R.secs = [s]; attach(s);
+    window.scrollTo(0, absTop(s.el) + frac * s.el.getBoundingClientRect().height);
+    R.lastY = window.scrollY;
+  } catch (e) { toast('Không mở được chương: ' + (e.message || e)); }
+  finally { if (gen === R.gen) R.busy = false; }
+  updateBars(); ensure();
+}
+async function ensure() {
+  if (R.busy || !R.book || !R.secs.length) return;
+  R.busy = true; const gen = R.gen; let changed = false;
+  try {
+    const n = R.book.chapters.length, vh = window.innerHeight;
+    const first = R.secs[0], last = R.secs[R.secs.length - 1];
+    if (document.documentElement.scrollHeight - (window.scrollY + vh) < vh * 2.5 && last.i + 1 < n) {
+      const s = await buildSection(last.i + 1); if (gen !== R.gen) { dispose(s); return; }
+      flow.append(s.el); R.secs.push(s); attach(s); changed = true;
+    } else if (window.scrollY < vh * 1.5 && first.i > 0) {
+      const s = await buildSection(first.i - 1); if (gen !== R.gen) { dispose(s); return; }
+      const y0 = window.scrollY; flow.prepend(s.el);
+      window.scrollTo(0, y0 + s.el.getBoundingClientRect().height);
+      R.secs.unshift(s); attach(s); changed = true;
+    }
+    while (R.secs.length > 4) {
+      const ci = (currentSec() || R.secs[0]).i, a = R.secs[0], b = R.secs[R.secs.length - 1];
+      if (Math.abs(a.i - ci) >= Math.abs(b.i - ci)) { const h = a.el.getBoundingClientRect().height, y0 = window.scrollY; dispose(a); R.secs.shift(); window.scrollTo(0, y0 - h); }
+      else { dispose(b); R.secs.pop(); }
+    }
+    syncEnd();
+  } catch (e) { console.error(e); toast('Không tải được chương kế: ' + (e.message || e)); }
+  finally { if (gen === R.gen) R.busy = false; }
+  if (changed) setTimeout(ensure, 30);
+}
+function syncEnd() {
+  const last = R.secs[R.secs.length - 1];
+  let end = flow.querySelector('.flow-end');
+  if (last && last.i === R.book.chapters.length - 1) { if (!end) flow.append(el('div', { class: 'flow-end', text: 'Bạn đã đọc tới chương cuối cùng.' })); else flow.append(end); }
+  else end?.remove();
+}
+function readPos() {
+  const s = currentSec(); if (!s || !R.book) return null;
+  const r = s.el.getBoundingClientRect();
+  return { i: s.i, frac: clamp(-r.top / Math.max(1, r.height), 0, 1) };
+}
+function updateBars() {
+  const p = readPos(); if (!p) return;
+  const n = R.book.chapters.length;
+  $('#r-chap').textContent = R.book.chapters[p.i].title;
+  $('#r-pos').textContent = `Chương ${p.i + 1}/${n}`;
+  $('#r-pct').textContent = `${Math.round(p.frac * 100)}% chương · ${Math.round((p.i + p.frac) / n * 100)}% bộ`;
+  $('#r-prev').disabled = p.i === 0; $('#r-next').disabled = p.i >= n - 1;
+}
+function saveNow() {
+  if (!R.book || R.busy && !R.secs.length) return;
+  const p = readPos(); if (!p) return;
+  R.pos = p;
+  Store.putProgress({ id: R.book.id, chId: R.book.chapters[p.i].id, frac: p.frac, at: Date.now() }).catch(() => {});
+}
+function scheduleSave() { clearTimeout(R.saveT); R.saveT = setTimeout(saveNow, 350); }
+let ticking = false;
+window.addEventListener('scroll', () => {
+  if (!R.book || reader.hidden) { $('#lib-head').classList.toggle('scrolled', window.scrollY > 4); return; }
+  if (ticking) return; ticking = true;
+  requestAnimationFrame(() => {
+    ticking = false;
+    const y = window.scrollY;
+    if (R.chrome && Math.abs(y - R.lastY) > 60) setChrome(false);
+    if (!R.chrome) R.lastY = y;
+    updateBars(); scheduleSave(); ensure();
+  });
+}, { passive: true });
+function setChrome(on) { R.chrome = on; R.lastY = window.scrollY; reader.classList.toggle('chrome-off', !on); }
+flow.addEventListener('click', e => {
+  const a = e.target.closest('[data-target]');
+  if (a) { const t = a.dataset.target; const idx = R.book.chapters.findIndex(c => c.entries?.includes(t)); if (idx >= 0) { jumpTo(idx, 0); return; } }
+  setChrome(!R.chrome);
+});
+async function closeReader() {
+  saveNow(); R.gen++; clearSections(); R.book = null; R.zips.clear();
+  reader.hidden = true; $('#lib-view').hidden = false;
+  document.body.classList.remove('reading', 't-light', 't-paper', 't-dark'); document.body.classList.add('in-lib');
+  window.scrollTo(0, 0); await renderLibrary();
+}
+$('#r-back').addEventListener('click', closeReader);
+$('#r-prev').addEventListener('click', () => { const p = readPos(); if (p) jumpTo(p.i - 1, 0); });
+$('#r-next').addEventListener('click', () => { const p = readPos(); if (p) jumpTo(p.i + 1, 0); });
+$('#r-jump').addEventListener('click', () => { const s = currentSec(); if (s) window.scrollTo(0, absTop(s.el)); });
+$('#r-toc').addEventListener('click', () => {
+  const cur = readPos()?.i ?? 0;
+  openSheet('Mục lục', body => {
+    const list = el('ol', { class: 'toc' });
+    R.book.chapters.forEach((c, i) => list.append(el('li', {}, el('button', { type: 'button', class: i === cur ? 'cur' : '', onclick: () => { closeSheet(); jumpTo(i, 0); } }, el('span', { text: c.title }), el('small', { text: String(i + 1) })))));
+    body.append(el('p', { text: `${R.book.chapters.length} chương · đang ở chương ${cur + 1}` }), list);
+    requestAnimationFrame(() => list.querySelector('.cur')?.scrollIntoView({ block: 'center' }));
+  });
+});
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveNow(); });
+window.addEventListener('pagehide', saveNow);
+let resizeT;
+window.addEventListener('resize', () => { if (!R.book) return; const p = R.pos || readPos(); clearTimeout(resizeT); resizeT = setTimeout(() => { if (!p) return; const s = R.secs.find(x => x.i === p.i); if (s) window.scrollTo(0, absTop(s.el) + p.frac * s.el.getBoundingClientRect().height); }, 120); });
+
+/* Cài đặt chữ */
+function applySettings() {
+  document.body.classList.remove('t-light', 't-paper', 't-dark');
+  if (R.book && R.book.kind !== 'comic') document.body.classList.add('t-' + settings.theme);
+  reader.style.setProperty('--fs', settings.fs + 'px');
+  reader.style.setProperty('--lh', settings.lh);
+  reader.style.setProperty('--rf', settings.font === 'serif' ? 'var(--f-serif)' : 'var(--f-sans)');
+  lsSet('kt-settings', settings);
+}
+function keepPlace(fn) { const p = readPos(); fn(); if (p) { const s = R.secs.find(x => x.i === p.i); if (s) window.scrollTo(0, absTop(s.el) + p.frac * s.el.getBoundingClientRect().height); } }
+$('#r-settings').addEventListener('click', () => {
+  openSheet('Chữ và giao diện', body => {
+    const seg = (opts, val, set) => { const g = el('div', { class: 'seg' }); for (const [v, label] of opts) g.append(el('button', { type: 'button', class: v === val() ? 'on' : '', text: label, onclick: ev => { keepPlace(() => { set(v); applySettings(); }); [...g.children].forEach(c => c.classList.remove('on')); ev.currentTarget.classList.add('on'); } })); return g; };
+    const sizeLabel = el('span', { class: 'val', text: settings.fs + ' px' });
+    const step = d => keepPlace(() => { settings.fs = clamp(settings.fs + d, 14, 30); sizeLabel.textContent = settings.fs + ' px'; applySettings(); });
+    body.append(
+      el('div', { class: 'setrow' }, el('span', { text: 'Cỡ chữ' }), el('div', { class: 'seg' }, el('button', { type: 'button', text: 'A−', onclick: () => step(-1) }), sizeLabel, el('button', { type: 'button', text: 'A+', onclick: () => step(1) }))),
+      el('div', { class: 'setrow' }, el('span', { text: 'Giãn dòng' }), seg([[1.5, 'Hẹp'], [1.7, 'Vừa'], [1.95, 'Rộng']], () => settings.lh, v => settings.lh = v)),
+      el('div', { class: 'setrow' }, el('span', { text: 'Kiểu chữ' }), seg([['serif', 'Có chân'], ['sans', 'Không chân']], () => settings.font, v => settings.font = v)),
+      el('div', { class: 'setrow' }, el('span', { text: 'Nền' }), seg([['light', 'Sáng'], ['paper', 'Giấy'], ['dark', 'Tối']], () => settings.theme, v => settings.theme = v)));
+  }, 'Xong');
+});
+
+/* ---------------- Bảng trượt, lớp phủ, thông báo ---------------- */
+function openSheet(title, build, closeLabel = 'Đóng') {
+  const wrap = $('#sheet');
+  const body = el('div', { class: 'sheet-body' });
+  const card = el('div', { class: 'sheet', role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
+    el('div', { class: 'sheet-head' }, el('h3', { text: title }), el('button', { type: 'button', text: closeLabel, onclick: closeSheet })), body);
+  wrap.replaceChildren(card); build(body); wrap.hidden = false;
+  wrap.onclick = e => { if (e.target === wrap) closeSheet(); };
+}
+function closeSheet() { const w = $('#sheet'); w.hidden = true; w.replaceChildren(); }
+function showOverlay(t) { $('#ov-title').textContent = t; $('#ov-bar').style.width = '0'; $('#ov-sub').textContent = ''; $('#overlay').hidden = false; }
+function updateOverlay(f, sub) { $('#ov-bar').style.width = (f * 100).toFixed(1) + '%'; $('#ov-sub').textContent = sub; }
+function hideOverlay() { $('#overlay').hidden = true; }
+let toastT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 3200); }
+
+/* ---------------- Khởi động ---------------- */
+document.body.classList.add('in-lib');
+document.addEventListener('click', e => { const b = e.target.closest('[data-close-note]'); if (b) { const n = b.closest('.note'); n.hidden = true; lsSet('kt-hide-' + n.id, 1); } });
+const inFrame = (() => { try { return window.self !== window.top; } catch { return true; } })();
+const standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+const hasManifest = !!document.querySelector('link[rel="manifest"]');
+if (hasManifest && !standalone && /iPhone|iPad|iPod/.test(navigator.userAgent) && !lsGet('kt-hide-install-note', 0)) $('#install-note').hidden = false;
+if (inFrame && !lsGet('kt-hide-frame-note', 0)) $('#frame-note').hidden = false;
+if (hasManifest && 'serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+renderLibrary();
+})();
+</script>
+
+</body>
+</html>
