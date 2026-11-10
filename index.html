@@ -173,13 +173,15 @@ html.rd{background:var(--rbg)}
 .curl{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
 .curl-box{position:absolute;left:0;top:0;width:100%;height:100%;background:var(--rbg);overflow:hidden}
 .curl-inner{position:absolute;inset:0}
+.curl-view{position:absolute;overflow:hidden}
+.curl{z-index:4}
 .curl-flapwrap{position:absolute;inset:0;filter:drop-shadow(0 0 10px rgba(0,0,0,.22))}
 .curl-flap{transform-origin:0 0}
-.curl-flap .curl-inner{opacity:.17}
+.curl-flap .curl-inner{opacity:.2}
 .curl-shadow,.curl-shade{position:absolute;left:0;top:0;width:0;height:0;transform-origin:0 0}
 .curl-shadow::before,.curl-shade::before{content:"";position:absolute;left:0;top:-2500px;height:5000px}
-.curl-shadow::before{width:60px;background:linear-gradient(to right,rgba(0,0,0,.26),rgba(0,0,0,0))}
-.curl-shade::before{width:140px;background:linear-gradient(to right,rgba(0,0,0,.12),rgba(255,255,255,.22) 35%,rgba(0,0,0,.04) 75%,rgba(0,0,0,0))}
+.curl-shadow::before{width:46px;background:linear-gradient(to right,rgba(0,0,0,.24),rgba(0,0,0,.08) 40%,rgba(0,0,0,0))}
+.curl-shade::before{width:var(--sw,200px);background:linear-gradient(to right,rgba(0,0,0,.20),rgba(255,255,255,.38) 14%,rgba(255,255,255,.14) 45%,rgba(0,0,0,.05) 80%,rgba(0,0,0,.16))}
 
 /* Nút nổi trên/dưới */
 .rc-top,.rc-bot{position:fixed;left:0;right:0;z-index:20;display:flex;align-items:center;gap:12px;transition:opacity .2s ease,transform .22s ease;pointer-events:none}
@@ -892,17 +894,17 @@ const FONTS = [
 ];
 const fontStack = id => (FONTS.find(f => f[0] === id) || FONTS[4])[2];
 const THEMES = [
-  { id: 'original', name: 'Gốc', font: 'newyork', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 24, justify: true,
+  { id: 'original', name: 'Gốc', font: 'newyork', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 36, justify: true,
     light: { bg: '#ffffff', ink: '#1c1c1e', muted: '#8e8e93' }, dark: { bg: '#000000', ink: '#e5e5ea', muted: '#8e8e93' } },
-  { id: 'quiet', name: 'Yên tĩnh', font: 'newyork', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 24, justify: true,
+  { id: 'quiet', name: 'Yên tĩnh', font: 'newyork', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 36, justify: true,
     light: { bg: '#4a4a4f', ink: '#d1d1d6', muted: '#9c9ca2' }, dark: { bg: '#1c1c1e', ink: '#9d9da3', muted: '#66666b' } },
-  { id: 'paper', name: 'Giấy', font: 'charter', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 26, justify: true,
+  { id: 'paper', name: 'Giấy', font: 'charter', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 38, justify: true,
     light: { bg: '#f1f1ee', ink: '#2a2a2a', muted: '#8a8a87' }, dark: { bg: '#1f1f1f', ink: '#d4d4d2', muted: '#83837f' } },
-  { id: 'bold', name: 'Đậm', font: 'sf', bold: true, lh: 1.55, ls: 0, ws: 0, mg: 24, justify: true,
+  { id: 'bold', name: 'Đậm', font: 'sf', bold: true, lh: 1.55, ls: 0, ws: 0, mg: 36, justify: true,
     light: { bg: '#ffffff', ink: '#000000', muted: '#6e6e73' }, dark: { bg: '#000000', ink: '#ffffff', muted: '#98989f' } },
-  { id: 'calm', name: 'Dịu', font: 'iowan', bold: false, lh: 1.65, ls: 0, ws: 0, mg: 26, justify: true,
+  { id: 'calm', name: 'Dịu', font: 'iowan', bold: false, lh: 1.65, ls: 0, ws: 0, mg: 38, justify: true,
     light: { bg: '#f1e5cf', ink: '#3e3225', muted: '#8f7d64' }, dark: { bg: '#2b251d', ink: '#d9cbb2', muted: '#8f816b' } },
-  { id: 'focus', name: 'Tập trung', font: 'athelas', bold: false, lh: 1.7, ls: 0, ws: 0, mg: 26, justify: true,
+  { id: 'focus', name: 'Tập trung', font: 'athelas', bold: false, lh: 1.7, ls: 0, ws: 0, mg: 38, justify: true,
     light: { bg: '#fdf9ec', ink: '#1d1b16', muted: '#8d877a' }, dark: { bg: '#1d1c19', ink: '#e4e0d4', muted: '#87827a' } },
 ];
 const LAYOUT = ['lh', 'ls', 'ws', 'mg', 'justify'];
@@ -1262,20 +1264,32 @@ function snapBack() { if (P.cur) setTrack(P.page, S.mode === 'slide'); }
    Phần bị gấp được lật đối xứng qua đường gấp (thấy chữ ngược, mờ như mặt sau tờ giấy),
    kèm bóng đổ; trang kế nằm sẵn bên dưới. */
 let CU = null;
+const CURL_Q = 0.3;   // độ rộng mặt sau so với phần giấy bị cuộn (giống giấy cuộn tròn)
+// Số trang ở chân trang cho vị trí pos (tính cả chương trước/sau)
+function footLabel(pos) {
+  const s = pos < 0 ? P.prev : pos >= P.cur.pages ? P.next : P.cur; if (!s) return '';
+  const local = pos < 0 ? pos + s.pages : pos >= P.cur.pages ? pos - P.cur.pages : pos;
+  return local >= s.pages - 1 ? '' : `${local + 1} / ${Math.max(1, s.pages - 1)}`;
+}
+// Bản sao nguyên một trang màn hình: tên truyện, khung chữ, số trang
 function pageBox(pos) {
   const s = pos < 0 ? P.prev : pos >= P.cur.pages ? P.next : P.cur;
+  const vr = pgView.getBoundingClientRect(), pr = pager.getBoundingClientRect();
   const inner = el('div', { class: 'curl-inner', style: `transform:translate3d(${-pos * P.vw}px,0,0)` });
   if (s) inner.append(s.el.cloneNode(true));
-  return el('div', { class: 'curl-box' }, inner);
+  return el('div', { class: 'curl-box' },
+    el('div', { class: 'pg-head', text: $('#pg-head').textContent }),
+    el('div', { class: 'curl-view', style: `left:${vr.left - pr.left}px;top:${vr.top - pr.top}px;width:${vr.width}px;height:${vr.height}px` }, inner),
+    el('div', { class: 'pg-foot', text: footLabel(pos) }));
 }
 function curlStart(dir, gy) {
-  const W = P.vw, H = P.vh, from = P.page, to = from + dir;
+  const pr = pager.getBoundingClientRect(), W = pr.width, H = pr.height, from = P.page, to = from + dir;
   const page = pageBox(dir > 0 ? from : to), flap = pageBox(dir > 0 ? from : to);
   const shadow = el('div', { class: 'curl-shadow' }), shade = el('div', { class: 'curl-shade' });
   flap.classList.add('curl-flap'); flap.append(shade);
   const ov = el('div', { class: 'curl' }, page, shadow, el('div', { class: 'curl-flapwrap' }, flap));
-  pgView.append(ov);
-  if (dir > 0) setTrack(to, false);           // trang kế nằm sẵn bên dưới
+  pager.append(ov); $('#pg-ribbon').hidden = true;
+  if (dir > 0) { setTrack(to, false); $('#pg-foot').textContent = footLabel(to); }   // trang kế nằm sẵn bên dưới
   gy = clamp(gy, H * 0.05, H * 0.95);
   CU = { dir, from, to, ov, page, flap, shadow, shade, W, H, gy,
     open: { x: W, y: gy }, closed: { x: -W * 1.08, y: gy + (gy > H / 2 ? -1 : 1) * H * 0.12 } };
@@ -1298,7 +1312,10 @@ function curlSet(fx, fy) {
   const d = (x, y) => x * nx + y * ny - k;
   c.page.style.clipPath = clipPoly(c.W, c.H, d, -1);
   c.flap.style.clipPath = clipPoly(c.W, c.H, d, 1);
-  c.flap.style.transform = `matrix(${1 - 2 * nx * nx},${-2 * nx * ny},${-2 * nx * ny},${1 - 2 * ny * ny},${2 * k * nx},${2 * k * ny})`;
+  const q = 1 + CURL_Q;                       // phản chiếu qua nếp gấp, rồi nén lại còn CURL_Q
+  c.flap.style.transform = `matrix(${1 - q * nx * nx},${-q * nx * ny},${-q * nx * ny},${1 - q * ny * ny},${q * k * nx},${q * k * ny})`;
+  const depth = Math.max(1, d(0, 0), d(c.W, 0), d(0, c.H), d(c.W, c.H));
+  c.shade.style.setProperty('--sw', depth + 'px');
   const rot = `translate(${mx}px,${my}px) rotate(${Math.atan2(ny, nx)}rad)`;
   c.shadow.style.transform = rot; c.shade.style.transform = rot;
   c.shadow.style.opacity = String(clamp(len / 40, 0, 1) * clamp((c.W * 2 - len) / (c.W * 0.4), 0, 1));
@@ -1318,10 +1335,10 @@ function curlFinish(commit, ms = 300) {
   const tgt = (c.dir > 0) === commit ? c.closed : c.open;
   curlAnim(tgt.x, tgt.y, ms, () => {
     c.ov.remove(); CU = null; P.anim = false;
-    if (commit) settle(c.to); else if (c.dir > 0) setTrack(c.from, false);
+    if (commit) settle(c.to); else { if (c.dir > 0) setTrack(c.from, false); updateBars(); }
   });
 }
-function curlTurn(dir) { P.anim = true; curlStart(dir, P.vh * 0.82); curlFinish(true, 520); }
+function curlTurn(dir) { P.anim = true; curlStart(dir, pager.getBoundingClientRect().height * 0.82); curlFinish(true, 520); }
 function curlCancel() { if (CU) { CU.ov.remove(); CU = null; } }
 
 /* Vuốt, chạm hai bên mép, cuộn chuột, phím mũi tên */
@@ -1343,7 +1360,7 @@ pgView.addEventListener('pointermove', e => {
       const dir = dx < 0 ? 1 : -1;
       if (blocked(dir)) { drag.dead = true; return; }
       P.anim = true; drag.curl = true;
-      curlStart(dir, drag.y - pgView.getBoundingClientRect().top);
+      curlStart(dir, drag.y - pager.getBoundingClientRect().top);
       drag.x = e.clientX; drag.y = e.clientY; drag.t = performance.now();
       return;
     }
