@@ -105,7 +105,7 @@ html.paged,html.paged body{overflow:hidden;height:100%;overscroll-behavior:none}
 .flow-end{color:var(--rmuted);text-align:center;font-size:14px;padding:48px 16px calc(env(safe-area-inset-bottom,0px) + 110px)}
 
 /* Chế độ lật trang: mỗi chương là một khối nhiều cột, mỗi cột rộng đúng một màn hình */
-.pager{position:fixed;inset:0;background:var(--rbg);color:var(--rink);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.pager{position:fixed;top:0;left:0;right:0;height:100vh;height:100lvh;background:var(--rbg);color:var(--rink);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .pg-head,.pg-foot{position:absolute;left:0;right:0;text-align:center;font:500 12.5px/1.2 var(--f-ui);color:var(--rmuted);padding:0 72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
 .pg-head{top:calc(env(safe-area-inset-top,0px) + 16px)}
 .pg-foot{bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
@@ -115,6 +115,17 @@ html.paged,html.paged body{overflow:hidden;height:100%;overscroll-behavior:none}
 .pager .chap-label{padding:0 0 1.4em}
 .pager .chap.text .content{max-width:none}
 .pager .chap img{max-height:var(--pgh,80vh);width:auto;max-width:100%;margin:0 auto .8em;break-inside:avoid;object-fit:contain;display:block}
+html.rd{background:var(--rbg)}
+.curl{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+.curl-box{position:absolute;left:0;top:0;width:100%;height:100%;background:var(--rbg);overflow:hidden}
+.curl-inner{position:absolute;inset:0}
+.curl-flapwrap{position:absolute;inset:0;filter:drop-shadow(0 0 10px rgba(0,0,0,.22))}
+.curl-flap{transform-origin:0 0}
+.curl-flap .curl-inner{opacity:.17}
+.curl-shadow,.curl-shade{position:absolute;left:0;top:0;width:0;height:0;transform-origin:0 0}
+.curl-shadow::before,.curl-shade::before{content:"";position:absolute;left:0;top:-2500px;height:5000px}
+.curl-shadow::before{width:60px;background:linear-gradient(to right,rgba(0,0,0,.26),rgba(0,0,0,0))}
+.curl-shade::before{width:140px;background:linear-gradient(to right,rgba(0,0,0,.12),rgba(255,255,255,.22) 35%,rgba(0,0,0,.04) 75%,rgba(0,0,0,0))}
 
 /* Nút nổi trên/dưới */
 .rc-top,.rc-bot{position:fixed;left:0;right:0;z-index:20;display:flex;align-items:center;gap:12px;transition:opacity .2s ease,transform .22s ease;pointer-events:none}
@@ -131,7 +142,7 @@ html.paged,html.paged body{overflow:hidden;height:100%;overscroll-behavior:none}
 .scrub{flex:1;min-width:0;display:grid;gap:0;justify-items:center}
 .scrub input{width:min(100%,440px)}
 .scrub-txt{font-size:13px;color:var(--rmuted);font-variant-numeric:tabular-nums;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dim{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:95}
+.dim{position:fixed;top:0;left:0;right:0;height:100vh;height:100lvh;background:#000;opacity:0;pointer-events:none;z-index:95}
 
 /* Thanh trượt */
 .rg{-webkit-appearance:none;appearance:none;width:100%;height:30px;margin:0;background:transparent;--on:var(--rink);--off:color-mix(in srgb,var(--rink) 18%,transparent)}
@@ -747,17 +758,17 @@ const FONTS = [
 ];
 const fontStack = id => (FONTS.find(f => f[0] === id) || FONTS[4])[2];
 const THEMES = [
-  { id: 'original', name: 'Gốc', font: 'newyork', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 24, justify: false,
+  { id: 'original', name: 'Gốc', font: 'newyork', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 24, justify: true,
     light: { bg: '#ffffff', ink: '#1c1c1e', muted: '#8e8e93' }, dark: { bg: '#000000', ink: '#e5e5ea', muted: '#8e8e93' } },
-  { id: 'quiet', name: 'Yên tĩnh', font: 'newyork', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 24, justify: false,
+  { id: 'quiet', name: 'Yên tĩnh', font: 'newyork', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 24, justify: true,
     light: { bg: '#4a4a4f', ink: '#d1d1d6', muted: '#9c9ca2' }, dark: { bg: '#1c1c1e', ink: '#9d9da3', muted: '#66666b' } },
-  { id: 'paper', name: 'Giấy', font: 'charter', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 26, justify: false,
+  { id: 'paper', name: 'Giấy', font: 'charter', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 26, justify: true,
     light: { bg: '#f1f1ee', ink: '#2a2a2a', muted: '#8a8a87' }, dark: { bg: '#1f1f1f', ink: '#d4d4d2', muted: '#83837f' } },
-  { id: 'bold', name: 'Đậm', font: 'sf', bold: true, lh: 1.55, ls: 0, ws: 0, mg: 24, justify: false,
+  { id: 'bold', name: 'Đậm', font: 'sf', bold: true, lh: 1.55, ls: 0, ws: 0, mg: 24, justify: true,
     light: { bg: '#ffffff', ink: '#000000', muted: '#6e6e73' }, dark: { bg: '#000000', ink: '#ffffff', muted: '#98989f' } },
-  { id: 'calm', name: 'Dịu', font: 'iowan', bold: false, lh: 1.65, ls: 0, ws: 0, mg: 26, justify: false,
+  { id: 'calm', name: 'Dịu', font: 'iowan', bold: false, lh: 1.65, ls: 0, ws: 0, mg: 26, justify: true,
     light: { bg: '#f1e5cf', ink: '#3e3225', muted: '#8f7d64' }, dark: { bg: '#2b251d', ink: '#d9cbb2', muted: '#8f816b' } },
-  { id: 'focus', name: 'Tập trung', font: 'athelas', bold: false, lh: 1.7, ls: 0, ws: 0, mg: 26, justify: false,
+  { id: 'focus', name: 'Tập trung', font: 'athelas', bold: false, lh: 1.7, ls: 0, ws: 0, mg: 26, justify: true,
     light: { bg: '#fdf9ec', ink: '#1d1b16', muted: '#8d877a' }, dark: { bg: '#1d1c19', ink: '#e4e0d4', muted: '#87827a' } },
 ];
 const LAYOUT = ['lh', 'ls', 'ws', 'mg', 'justify'];
@@ -796,7 +807,7 @@ function applySettings() {
   Object.assign(v, isDark()
     ? { '--rs-bg': 'rgba(28,28,30,.97)', '--rs-ink': '#f2f2f7', '--rs-muted': '#98989f', '--rs-card': '#2c2c2e', '--rs-line': 'rgba(255,255,255,.1)', '--rs-track': 'rgba(255,255,255,.2)', '--rs-okink': '#1c1c1e' }
     : { '--rs-bg': 'rgba(242,242,247,.97)', '--rs-ink': '#1c1c1e', '--rs-muted': '#6e6e73', '--rs-card': '#ffffff', '--rs-line': 'rgba(0,0,0,.08)', '--rs-track': 'rgba(0,0,0,.13)', '--rs-okink': '#ffffff' });
-  setVars(document.body, v);
+  setVars(document.documentElement, v);
   $('#dim').style.opacity = (S.dim * 0.75).toFixed(3);
   $('#r-look').style.visibility = comic ? 'hidden' : '';
   if (R.book) $('meta[name="theme-color"]').setAttribute('content', v['--rbg']);
@@ -862,7 +873,7 @@ function currentSec() { for (const s of R.secs) { if (s.el.getBoundingClientRect
 async function openBook(id) {
   const book = await Store.book(id); if (!book) return;
   R.book = book; R.gen++; R.zips.clear(); R.pos = null;
-  document.body.classList.remove('in-lib'); document.body.classList.add('reading');
+  document.body.classList.remove('in-lib'); document.body.classList.add('reading'); document.documentElement.classList.add('rd');
   $('#lib-view').hidden = true; reader.hidden = false;
   applySettings(); setModeUI(effMode());
   setChrome(true);
@@ -966,7 +977,7 @@ function addPg(s) {
 }
 function clearPager() {
   for (const s of [P.prev, P.cur, P.next]) if (s) dispose(s);
-  P.prev = P.cur = P.next = null; P.anim = false; P.tok++; pgTrack.replaceChildren();
+  curlCancel(); P.prev = P.cur = P.next = null; P.anim = false; P.tok++; pgTrack.replaceChildren();
   pgView.style.opacity = '';
 }
 async function pageJump(i, frac) {
@@ -999,13 +1010,17 @@ async function pgNeighbors() {
   } catch (e) { console.error(e); }
   finally { if (P.loading === gen) P.loading = 0; }
 }
+function blocked(dir) {
+  const pos = P.page + dir;
+  if (pos >= P.cur.pages && !P.next) { toast(P.cur.i + 1 >= R.book.chapters.length ? 'Bạn đã đọc tới trang cuối cùng.' : 'Đang tải chương sau…'); pgNeighbors(); return true; }
+  if (pos < 0 && !P.prev) { if (P.cur.i > 0) { toast('Đang tải chương trước…'); pgNeighbors(); } return true; }
+  return false;
+}
 function turn(dir) {
   if (!P.cur || P.anim) return;
   if (R.chrome) setChrome(false);
-  const pos = P.page + dir;
-  if (pos >= P.cur.pages && !P.next) { toast(P.cur.i + 1 >= R.book.chapters.length ? 'Bạn đã đọc tới trang cuối cùng.' : 'Đang tải chương sau…'); pgNeighbors(); snapBack(); return; }
-  if (pos < 0 && !P.prev) { if (P.cur.i > 0) { toast('Đang tải chương trước…'); pgNeighbors(); } snapBack(); return; }
-  goPos(pos);
+  if (blocked(dir)) { snapBack(); return; }
+  goPos(P.page + dir);
 }
 function goPos(pos) {
   P.anim = true;
@@ -1015,6 +1030,7 @@ function goPos(pos) {
     pgView.style.transition = 'opacity .13s ease'; pgView.style.opacity = '0';
     setTimeout(() => { if (tok !== P.tok) return; setTrack(pos, false); pgView.style.opacity = '1'; setTimeout(done, 130); }, 130);
   } else if (S.mode === 'none' || matchMedia('(prefers-reduced-motion: reduce)').matches) { setTrack(pos, false); done(); }
+  else if (S.mode === 'curl') curlTurn(pos - P.page);
   else { setTrack(pos, true); const t = setTimeout(done, 400); pgTrack.addEventListener('transitionend', () => { clearTimeout(t); done(); }, { once: true }); }
 }
 function settle(pos) {
@@ -1029,16 +1045,74 @@ function settle(pos) {
   updateBars(); scheduleSave(); pgNeighbors();
 }
 function snapBack() { if (P.cur) setTrack(P.page, S.mode === 'slide'); }
-let relayT;
-function relayoutSoon() { clearTimeout(relayT); relayT = setTimeout(relayout, 80); }
-function relayout() {
-  if (R.mode !== 'page' || !P.cur) return;
-  if (P.anim) { relayoutSoon(); return; }
-  const frac = P.page / P.cur.pages;
-  pgGeom(); for (const s of [P.prev, P.cur, P.next]) if (s) measure(s);
-  P.page = clamp(Math.floor(frac * P.cur.pages + 1e-6), 0, P.cur.pages - 1);
-  place(); setTrack(P.page, false); updateBars();
+
+/* ----- Lật trang kiểu sách giấy -----
+   Trang đang lật là một bản sao của trang hiện tại, bị cắt theo đường gấp.
+   Phần bị gấp được lật đối xứng qua đường gấp (thấy chữ ngược, mờ như mặt sau tờ giấy),
+   kèm bóng đổ; trang kế nằm sẵn bên dưới. */
+let CU = null;
+function pageBox(pos) {
+  const s = pos < 0 ? P.prev : pos >= P.cur.pages ? P.next : P.cur;
+  const inner = el('div', { class: 'curl-inner', style: `transform:translate3d(${-pos * P.vw}px,0,0)` });
+  if (s) inner.append(s.el.cloneNode(true));
+  return el('div', { class: 'curl-box' }, inner);
 }
+function curlStart(dir, gy) {
+  const W = P.vw, H = P.vh, from = P.page, to = from + dir;
+  const page = pageBox(dir > 0 ? from : to), flap = pageBox(dir > 0 ? from : to);
+  const shadow = el('div', { class: 'curl-shadow' }), shade = el('div', { class: 'curl-shade' });
+  flap.classList.add('curl-flap'); flap.append(shade);
+  const ov = el('div', { class: 'curl' }, page, shadow, el('div', { class: 'curl-flapwrap' }, flap));
+  pgView.append(ov);
+  if (dir > 0) setTrack(to, false);           // trang kế nằm sẵn bên dưới
+  gy = clamp(gy, H * 0.05, H * 0.95);
+  CU = { dir, from, to, ov, page, flap, shadow, shade, W, H, gy,
+    open: { x: W, y: gy }, closed: { x: -W * 1.08, y: gy + (gy > H / 2 ? -1 : 1) * H * 0.12 } };
+  const s = dir > 0 ? CU.open : CU.closed; curlSet(s.x, s.y);
+}
+function clipPoly(W, H, d, sgn) {
+  const pts = [[0, 0], [W, 0], [W, H], [0, H]], out = [];
+  for (let i = 0; i < 4; i++) {
+    const a = pts[i], b = pts[(i + 1) % 4], da = sgn * d(a[0], a[1]), db = sgn * d(b[0], b[1]);
+    if (da >= 0) out.push(a);
+    if ((da >= 0) !== (db >= 0)) { const t = da / (da - db); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]); }
+  }
+  return out.length < 3 ? 'polygon(0 0,0 0,0 0)' : 'polygon(' + out.map(q => q[0].toFixed(1) + 'px ' + q[1].toFixed(1) + 'px').join(',') + ')';
+}
+function curlSet(fx, fy) {
+  const c = CU; c.fx = fx; c.fy = fy;
+  const dx = c.W - fx, dy = c.gy - fy, len = Math.hypot(dx, dy);
+  if (len < 0.5) { c.page.style.clipPath = 'none'; c.flap.style.clipPath = 'polygon(0 0,0 0,0 0)'; c.shadow.style.opacity = '0'; return; }
+  const nx = dx / len, ny = dy / len, mx = (c.W + fx) / 2, my = (c.gy + fy) / 2, k = mx * nx + my * ny;
+  const d = (x, y) => x * nx + y * ny - k;
+  c.page.style.clipPath = clipPoly(c.W, c.H, d, -1);
+  c.flap.style.clipPath = clipPoly(c.W, c.H, d, 1);
+  c.flap.style.transform = `matrix(${1 - 2 * nx * nx},${-2 * nx * ny},${-2 * nx * ny},${1 - 2 * ny * ny},${2 * k * nx},${2 * k * ny})`;
+  const rot = `translate(${mx}px,${my}px) rotate(${Math.atan2(ny, nx)}rad)`;
+  c.shadow.style.transform = rot; c.shade.style.transform = rot;
+  c.shadow.style.opacity = String(clamp(len / 40, 0, 1) * clamp((c.W * 2 - len) / (c.W * 0.4), 0, 1));
+}
+function curlAnim(tx, ty, ms, done) {
+  const c = CU, x0 = c.fx, y0 = c.fy, t0 = performance.now();
+  const step = now => {
+    if (CU !== c) return;
+    const k = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - k, 3);
+    curlSet(x0 + (tx - x0) * e, y0 + (ty - y0) * e);
+    if (k < 1) requestAnimationFrame(step); else done();
+  };
+  requestAnimationFrame(step);
+}
+function curlFinish(commit, ms = 300) {
+  const c = CU; if (!c) return;
+  const tgt = (c.dir > 0) === commit ? c.closed : c.open;
+  curlAnim(tgt.x, tgt.y, ms, () => {
+    c.ov.remove(); CU = null; P.anim = false;
+    if (commit) settle(c.to); else if (c.dir > 0) setTrack(c.from, false);
+  });
+}
+function curlTurn(dir) { P.anim = true; curlStart(dir, P.vh * 0.82); curlFinish(true, 520); }
+function curlCancel() { if (CU) { CU.ov.remove(); CU = null; } }
+
 /* Vuốt, chạm hai bên mép, cuộn chuột, phím mũi tên */
 let drag = null;
 pgView.addEventListener('pointerdown', e => {
@@ -1046,12 +1120,22 @@ pgView.addEventListener('pointerdown', e => {
   drag = { x: e.clientX, y: e.clientY, t: performance.now(), dx: 0, on: false, id: e.pointerId };
 });
 pgView.addEventListener('pointermove', e => {
-  if (!drag || P.anim) return;
+  if (!drag || drag.dead) return;
   const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (drag.curl) { if (!CU) { drag = null; return; } drag.dx = dx; curlSet((CU.dir > 0 ? CU.W : -CU.W) + 2 * dx, CU.gy + dy * 0.6); return; }
+  if (P.anim) return;
   if (!drag.on) {
     if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy)) return;
     drag.on = true; try { pgView.setPointerCapture(drag.id); } catch {}
     if (R.chrome) setChrome(false);
+    if (S.mode === 'curl' && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const dir = dx < 0 ? 1 : -1;
+      if (blocked(dir)) { drag.dead = true; return; }
+      P.anim = true; drag.curl = true;
+      curlStart(dir, drag.y - pgView.getBoundingClientRect().top);
+      drag.x = e.clientX; drag.y = e.clientY; drag.t = performance.now();
+      return;
+    }
   }
   drag.dx = dx;
   if (S.mode === 'slide') {
@@ -1062,6 +1146,13 @@ pgView.addEventListener('pointermove', e => {
 pgView.addEventListener('pointerup', e => {
   if (!drag) return;
   const d = drag; drag = null;
+  if (d.dead) return;
+  if (d.curl) {
+    const v = d.dx / Math.max(1, performance.now() - d.t), c = CU;
+    const commit = c.dir > 0 ? (c.fx < c.W * 0.4 || v < -0.4) && v < 0.4 : (c.fx > -c.W * 0.4 || v > 0.4) && v > -0.4;
+    curlFinish(commit);
+    return;
+  }
   if (d.on) {
     const v = d.dx / Math.max(1, performance.now() - d.t);
     const dir = d.dx < -P.vw * 0.18 || v < -0.45 ? 1 : d.dx > P.vw * 0.18 || v > 0.45 ? -1 : 0;
@@ -1074,7 +1165,17 @@ pgView.addEventListener('pointerup', e => {
   const x = e.clientX - pgView.getBoundingClientRect().left;
   if (x < P.vw * 0.28) turn(-1); else if (x > P.vw * 0.72) turn(1); else setChrome(!R.chrome);
 });
-pgView.addEventListener('pointercancel', () => { if (drag?.on) snapBack(); drag = null; });
+pgView.addEventListener('pointercancel', () => { if (drag?.curl) curlFinish(false); else if (drag?.on) snapBack(); drag = null; });
+let relayT;
+function relayoutSoon() { clearTimeout(relayT); relayT = setTimeout(relayout, 80); }
+function relayout() {
+  if (R.mode !== 'page' || !P.cur) return;
+  if (P.anim) { relayoutSoon(); return; }
+  const frac = P.page / P.cur.pages;
+  pgGeom(); for (const s of [P.prev, P.cur, P.next]) if (s) measure(s);
+  P.page = clamp(Math.floor(frac * P.cur.pages + 1e-6), 0, P.cur.pages - 1);
+  place(); setTrack(P.page, false); updateBars();
+}
 let wheelT = 0;
 pgView.addEventListener('wheel', e => {
   e.preventDefault();
@@ -1107,7 +1208,7 @@ function updateBars() {
   if (R.mode === 'page' && P.cur) {
     const left = P.cur.pages - P.page - 1;
     $('#r-label').textContent = left > 0 ? `Còn ${left} trang trong chương` : 'Trang cuối của chương';
-    $('#pg-head').textContent = ch.title;
+    $('#pg-head').textContent = R.book.title;
     $('#pg-foot').textContent = `${P.page + 1} / ${P.cur.pages}`;
   } else $('#r-label').textContent = ch.title;
   if (scrubbing) return;
@@ -1151,7 +1252,7 @@ async function closeReader() {
   saveNow(); R.gen++; clearSections(); clearPager(); closeMenu(); closeLook(); R.book = null; R.zips.clear();
   setModeUI('scroll');
   reader.hidden = true; $('#lib-view').hidden = false;
-  document.body.classList.remove('reading'); document.body.classList.add('in-lib');
+  document.body.classList.remove('reading'); document.documentElement.classList.remove('rd'); document.body.classList.add('in-lib');
   $('meta[name="theme-color"]').setAttribute('content', getComputedStyle(document.body).backgroundColor);
   window.scrollTo(0, 0); await renderLibrary();
 }
@@ -1206,7 +1307,7 @@ function keepPlace(fn) {
   if (p) { const s = R.secs.find(x => x.i === p.i); if (s) window.scrollTo(0, absTop(s.el) + p.frac * s.el.getBoundingClientRect().height); }
 }
 let draft = null;
-const MODES = [['scroll', 'Cuộn dọc'], ['slide', 'Lật trang – trượt'], ['fade', 'Lật trang – mờ dần'], ['none', 'Lật trang – tức thì']];
+const MODES = [['scroll', 'Cuộn dọc'], ['curl', 'Lật trang – như sách'], ['slide', 'Lật trang – trượt'], ['fade', 'Lật trang – mờ dần'], ['none', 'Lật trang – tức thì']];
 const LOOKS = [['auto', 'Tự động theo máy'], ['light', 'Luôn sáng'], ['dark', 'Luôn tối']];
 const panel = (...kids) => el('div', { class: 'rs-panel', role: 'dialog', 'aria-modal': 'true' }, ...kids);
 function openLook() { if (!R.book || R.book.kind === 'comic') return; closeMenu(); rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(); }; lookMain(); }
