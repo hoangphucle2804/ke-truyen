@@ -1397,7 +1397,15 @@ pgView.addEventListener('wheel', e => {
 document.addEventListener('keydown', e => {
   if (!R.book || reader.hidden) return;
   if (e.key === 'Escape') { if (!rs.hidden) closeLook(); else if (!$('#r-menu').hidden) closeMenu(); else if (!$('#sheet').hidden) closeSheet(); return; }
-  if (R.mode !== 'page' || !rs.hidden || !$('#sheet').hidden || e.target.closest?.('input,textarea')) return;
+  if (!rs.hidden || !$('#sheet').hidden || e.target.closest?.('input,textarea') || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (R.mode === 'scroll') {                       // cuộn dọc: ← → để đổi chương
+    const p = readPos(); if (!p || !['ArrowRight', 'ArrowLeft'].includes(e.key)) return;
+    e.preventDefault();
+    const i = p.i + (e.key === 'ArrowRight' ? 1 : -1);
+    if (i < 0 || i >= R.book.chapters.length) { toast(i < 0 ? 'Đây là chương đầu tiên.' : 'Đây là chương cuối cùng.'); return; }
+    autoStop(); jumpTo(i, 0); toast(R.book.chapters[i].title);
+    return;
+  }
   if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); turn(1); }
   else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); turn(-1); }
 });
