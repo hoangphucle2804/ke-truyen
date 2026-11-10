@@ -85,40 +85,127 @@ main.lib{padding-block:8px 48px}
 .storage{margin-top:36px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 16px;font-variant-numeric:tabular-nums}
 
 /* ---------- Trình đọc ---------- */
-body.reading{--rbg:#000;--rink:#e9e9e9;--rmuted:#8a8f99;--bar:rgba(18,20,26,.94);--bar-ink:#f1f3f7;--bar-line:rgba(255,255,255,.12);background:var(--rbg)}
-body.reading.t-light{--rbg:#ffffff;--rink:#1b1d22;--rmuted:#6b7280;--bar:rgba(255,255,255,.96);--bar-ink:#15181d;--bar-line:rgba(0,0,0,.1)}
-body.reading.t-paper{--rbg:#f4ecd8;--rink:#3b2f22;--rmuted:#8a7a63;--bar:rgba(244,236,216,.97);--bar-ink:#3b2f22;--bar-line:rgba(59,47,34,.15)}
-body.reading.t-dark{--rbg:#121316;--rink:#d5d7dc;--rmuted:#7d838f;--bar:rgba(24,26,31,.96);--bar-ink:#eef0f4;--bar-line:rgba(255,255,255,.1)}
-.seg .val{display:grid;place-items:center;min-width:52px;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+body.reading{background:var(--rbg,#000);color:var(--rink,#e9e9e9);
+  --rchip:color-mix(in srgb,var(--rbg) 90%,var(--rink));--rline:color-mix(in srgb,var(--rink) 14%,transparent)}
+html.paged,html.paged body{overflow:hidden;height:100%;overscroll-behavior:none}
 .flow{max-width:820px;margin:0 auto;min-height:100vh;overflow-anchor:none}
-.chap-label{color:var(--rmuted);font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 22px) 16px 14px}
+.chap-label{color:var(--rmuted);font-family:var(--f-ui);font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 68px) 16px 14px}
+.chap + .chap .chap-label{padding-top:40px}
 .chap.comic img{display:block;width:100%;max-width:100%;height:auto;background:#15161a}
 .chap.comic + .chap.comic .chap-label{padding-top:28px}
-.chap.text{color:var(--rink);font-family:var(--rf,var(--f-serif));font-size:var(--fs,19px);line-height:var(--lh,1.7);
-  padding:0 max(20px, env(safe-area-inset-right, 0px)) 36px max(20px, env(safe-area-inset-left, 0px));overflow-wrap:break-word}
+.chap.text{color:var(--rink);font-family:var(--rf,var(--f-serif));font-size:var(--fs,19px);line-height:var(--lh,1.7);font-weight:var(--fw,400);
+  letter-spacing:var(--ls,0);word-spacing:var(--ws,0);text-align:var(--ta,start);-webkit-hyphens:auto;hyphens:auto;
+  padding:0 max(var(--mg,20px), env(safe-area-inset-right, 0px)) 36px max(var(--mg,20px), env(safe-area-inset-left, 0px));overflow-wrap:break-word}
 .chap.text .content{max-width:38em;margin:0 auto}
 .chap.text p{margin:0 0 .85em}
-.chap.text h1,.chap.text h2,.chap.text h3{font-family:var(--f-sans);line-height:1.3;text-wrap:balance;margin:1.2em 0 .8em;font-size:1.25em}
+.chap.text h1,.chap.text h2,.chap.text h3{line-height:1.3;text-wrap:balance;margin:1.2em 0 .8em;font-size:1.25em;font-weight:700;text-align:start}
 .chap.text img{max-width:100%;height:auto;display:block;margin:1em auto}
 .chap.text a{color:inherit}
 .chap.text .verse p{margin:0}
-.flow-end{color:var(--rmuted);text-align:center;font-size:14px;padding:48px 16px calc(env(safe-area-inset-bottom,0px) + 96px)}
-.bar-top,.bar-bot{position:fixed;left:0;right:0;z-index:20;background:var(--bar);color:var(--bar-ink);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px);transition:transform .22s ease}
-.bar-top{top:0;padding:env(safe-area-inset-top,0px) var(--gutter-r) 0 var(--gutter-l);border-bottom:1px solid var(--bar-line)}
-.bar-bot{bottom:0;padding:0 var(--gutter-r) env(safe-area-inset-bottom,0px) var(--gutter-l);border-top:1px solid var(--bar-line)}
-#reader.chrome-off .bar-top{transform:translateY(-100%)}
-#reader.chrome-off .bar-bot{transform:translateY(100%)}
-.bar-top .in{display:flex;align-items:center;gap:6px;height:52px;max-width:900px;margin:0 auto}
-.bar-top .titles{min-width:0;flex:1;line-height:1.25}
-.bar-top .titles b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bar-top .titles small{display:block;font-size:12.5px;opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ibtn{width:44px;height:44px;flex:none;border-radius:12px;display:grid;place-items:center}
-.ibtn svg{width:22px;height:22px}
-.ibtn:disabled{opacity:.3}
-.ibtn.txt{font-family:var(--f-serif);font-size:19px;font-weight:600}
-.bar-bot .in{display:flex;align-items:center;justify-content:space-between;gap:4px;height:56px;max-width:900px;margin:0 auto}
-.bar-bot .pos{flex:1;text-align:center;font-size:13px;font-variant-numeric:tabular-nums;line-height:1.25;min-width:0}
-.bar-bot .pos small{display:block;opacity:.65;font-size:11.5px}
+.flow-end{color:var(--rmuted);text-align:center;font-size:14px;padding:48px 16px calc(env(safe-area-inset-bottom,0px) + 110px)}
+
+/* Chế độ lật trang: mỗi chương là một khối nhiều cột, mỗi cột rộng đúng một màn hình */
+.pager{position:fixed;inset:0;background:var(--rbg);color:var(--rink);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.pg-head,.pg-foot{position:absolute;left:0;right:0;text-align:center;font:500 12.5px/1.2 var(--f-ui);color:var(--rmuted);padding:0 72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.pg-head{top:calc(env(safe-area-inset-top,0px) + 16px)}
+.pg-foot{bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
+.pg-view{position:absolute;left:env(safe-area-inset-left,0px);right:env(safe-area-inset-right,0px);top:calc(env(safe-area-inset-top,0px) + 46px);bottom:calc(env(safe-area-inset-bottom,0px) + 44px);overflow:hidden;touch-action:none}
+.pg-track{position:absolute;inset:0;will-change:transform}
+.pager .chap.pg-chap{position:absolute;top:0;padding:0;column-fill:auto}
+.pager .chap-label{padding:0 0 1.4em}
+.pager .chap.text .content{max-width:none}
+.pager .chap img{max-height:var(--pgh,80vh);width:auto;max-width:100%;margin:0 auto .8em;break-inside:avoid;object-fit:contain;display:block}
+
+/* Nút nổi trên/dưới */
+.rc-top,.rc-bot{position:fixed;left:0;right:0;z-index:20;display:flex;align-items:center;gap:12px;transition:opacity .2s ease,transform .22s ease;pointer-events:none}
+.rc-top>*,.rc-bot>*{pointer-events:auto}
+.rc-top{top:0;padding:calc(env(safe-area-inset-top,0px) + 8px) var(--gutter-r) 18px var(--gutter-l);background:linear-gradient(var(--rbg) 55%,transparent)}
+.rc-bot{bottom:0;padding:18px var(--gutter-r) calc(env(safe-area-inset-bottom,0px) + 10px) var(--gutter-l);background:linear-gradient(transparent,var(--rbg) 45%)}
+#reader.chrome-off .rc-top{opacity:0;transform:translateY(-12px)}
+#reader.chrome-off .rc-bot{opacity:0;transform:translateY(12px)}
+#reader.chrome-off .rc-top>*,#reader.chrome-off .rc-bot>*{pointer-events:none}
+.rc-label{flex:1;min-width:0;text-align:center;font-size:14.5px;font-weight:500;color:var(--rmuted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.rbtn{width:46px;height:46px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--rchip);color:var(--rink);border:1px solid var(--rline);box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.rbtn svg{width:22px;height:22px}
+.rbtn.aa{font-family:Georgia,serif;font-size:18px;font-weight:600}
+.scrub{flex:1;min-width:0;display:grid;gap:0;justify-items:center}
+.scrub input{width:min(100%,440px)}
+.scrub-txt{font-size:13px;color:var(--rmuted);font-variant-numeric:tabular-nums;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dim{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:95}
+
+/* Thanh trượt */
+.rg{-webkit-appearance:none;appearance:none;width:100%;height:30px;margin:0;background:transparent;--on:var(--rink);--off:color-mix(in srgb,var(--rink) 18%,transparent)}
+.rg::-webkit-slider-runnable-track{height:6px;border-radius:99px;background:linear-gradient(to right,var(--on) var(--fill,0%),var(--off) var(--fill,0%))}
+.rg::-moz-range-track{height:6px;border-radius:99px;background:linear-gradient(to right,var(--on) var(--fill,0%),var(--off) var(--fill,0%))}
+.rg::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;margin-top:-10px;border-radius:50%;background:#fff;border:0;box-shadow:0 1px 5px rgba(0,0,0,.3)}
+.rg::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:#fff;border:0;box-shadow:0 1px 5px rgba(0,0,0,.3)}
+.rg:disabled{opacity:.35}
+.rs-panel .rg{--on:var(--rs-ink);--off:var(--rs-track)}
+
+/* Menu “…” */
+.rmenu{position:fixed;right:var(--gutter-r);bottom:calc(env(safe-area-inset-bottom,0px) + 70px);z-index:30;min-width:244px;background:var(--rs-card);color:var(--rs-ink);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.28);padding:6px;display:grid;font-family:var(--f-ui)}
+.rmenu button{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px;border-radius:10px;font-size:16px;text-align:left}
+.rmenu button:disabled{opacity:.35}
+.rmenu .mi{width:22px;display:grid;place-items:center}
+.rmenu .mi svg{width:20px;height:20px}
+.mi-aa{font-family:Georgia,serif;font-size:15px}
+
+/* Bảng Giao diện & Cài đặt */
+.rs-wrap{position:fixed;inset:0;z-index:55;display:flex;align-items:flex-end;justify-content:center;padding:0 10px calc(env(safe-area-inset-bottom,0px) + 10px)}
+.rs-panel{position:relative;width:100%;max-width:470px;max-height:calc(100% - env(safe-area-inset-top,0px) - 16px);overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:var(--rs-bg);color:var(--rs-ink);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-radius:30px;padding:16px 16px 18px;box-shadow:0 12px 50px rgba(0,0,0,.3);font-family:var(--f-ui);display:grid;gap:14px;animation:rs-in .22s ease}
+@keyframes rs-in{from{transform:translateY(24px);opacity:0}}
+.rs-head{display:flex;align-items:center;gap:14px}
+.rs-head h3{margin:0;font-size:18px;font-weight:650;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs-x{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--rs-card);color:var(--rs-ink);border:1px solid var(--rs-line);flex:none}
+.rs-x svg{width:20px;height:20px}
+.rs-x.ok{background:var(--rs-ink);color:var(--rs-okink);border-color:transparent}
+.rs-row{display:grid;grid-template-columns:1.55fr 1fr;gap:10px}
+.pill{display:flex;align-items:stretch;height:50px;background:var(--rs-card);border-radius:999px;overflow:hidden}
+.pill button{flex:1;display:grid;place-items:center}
+.pill button+button{border-left:1px solid var(--rs-line)}
+.pill svg{width:24px;height:24px}
+.a-sm{font-size:16px;font-weight:600}
+.a-lg{font-size:25px;font-weight:600}
+.rs-bright{display:flex;align-items:center;gap:12px;padding:0 4px}
+.rs-bright svg{width:17px;height:17px}
+.rs-bright .big svg{width:25px;height:25px}
+.tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tcard{position:relative;height:88px;border-radius:18px;display:grid;align-content:center;justify-items:center;gap:2px;background:var(--tbg);color:var(--tink);border:1px solid var(--rs-line);overflow:hidden}
+.tcard b{font-size:33px;line-height:1.05;font-weight:inherit}
+.tcard span{font-size:14.5px}
+.tcard.on{box-shadow:inset 0 0 0 3px var(--rs-ink)}
+.tcard sup{position:absolute;top:9px;right:12px;font-size:16px;line-height:1}
+.rs-wide{height:52px;border-radius:999px;background:var(--rs-card);display:flex;align-items:center;justify-content:center;gap:10px;font-size:17px;font-weight:600}
+.rs-wide svg{width:22px;height:22px}
+.rs-pop{position:absolute;z-index:3;min-width:236px;background:var(--rs-card);color:var(--rs-ink);border-radius:14px;box-shadow:0 10px 36px rgba(0,0,0,.28);padding:6px;display:grid}
+.rs-pop button{display:flex;align-items:center;gap:8px;padding:11px 10px;border-radius:9px;font-size:15.5px;text-align:left}
+.rs-pop .ck{width:20px;flex:none}
+.rs-pop .ck svg,.rs-item .ck svg{width:18px;height:18px}
+.rs-top{margin:-16px -16px 0;padding:16px 0 20px;background:var(--rbg);color:var(--rink);border-bottom:1px solid var(--rs-line)}
+.rs-top .rs-head{padding:0 16px}
+.pv{padding:0 var(--mg)}
+.pv-aa{font-family:var(--rf);font-weight:var(--fw);font-size:44px;line-height:1.1;margin:12px 0 6px}
+.pv-text{margin:0;font-family:var(--rf);font-size:var(--fs);line-height:var(--lh);font-weight:var(--fw);letter-spacing:var(--ls);word-spacing:var(--ws);text-align:var(--ta);max-height:calc(var(--fs) * var(--lh) * 3);overflow:hidden;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
+.rs-sec h4{margin:4px 4px 8px;font-size:19px;font-weight:700}
+.rs-group{background:var(--rs-card);border-radius:18px;padding:0 16px}
+.rs-group > * + *{border-top:1px solid var(--rs-line)}
+.rs-item{display:flex;align-items:center;gap:12px;min-height:54px;width:100%;text-align:left;font-size:16.5px}
+.rs-item > span:first-child:not(.ic),.rs-item .ic + span{flex:1;min-width:0}
+.rs-item .ic{width:24px;text-align:center;font-family:Georgia,serif;font-size:17px}
+.rs-item .v{color:var(--rs-muted);font-size:17px}
+.rs-item .chev svg{width:15px;height:15px;color:var(--rs-muted)}
+.rs-item .ck{width:20px;flex:none}
+.sl{padding:12px 0 8px}
+.sl-label{font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--rs-muted);margin-bottom:2px}
+.sl-row{display:flex;align-items:center;gap:14px}
+.sl-val{min-width:58px;text-align:right;color:var(--rs-muted);font-size:16px;font-variant-numeric:tabular-nums}
+.rs-group.off .sl,.rs-group.off .rs-item:last-child{opacity:.45}
+.sw{width:52px;height:32px;border-radius:99px;background:var(--rs-track);position:relative;flex:none;transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25);transition:transform .2s}
+.sw.on{background:#34c759}
+.sw.on::after{transform:translateX(20px)}
+.rs-link{color:var(--rs-muted);font-size:15px;justify-self:center;padding:6px 10px}
+.rs-note{margin:0 4px;color:var(--rs-muted);font-size:13px}
 
 /* ---------- Bảng trượt, lớp phủ, thông báo ---------- */
 .sheet-wrap{position:fixed;inset:0;z-index:50;background:var(--shade);display:flex;align-items:flex-end;justify-content:center}
@@ -148,7 +235,7 @@ body.reading.t-dark{--rbg:#121316;--rink:#d5d7dc;--rmuted:#7d838f;--bar:rgba(24,
 .meter{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
 .meter i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 84px);transform:translateX(-50%);z-index:70;max-width:calc(100% - 32px);background:#1d2129;color:#f4f6fa;padding:10px 16px;border-radius:12px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
-@media (prefers-reduced-motion: reduce){.bar-top,.bar-bot,.meter i{transition:none}}
+@media (prefers-reduced-motion: reduce){.rc-top,.rc-bot,.meter i{transition:none}}
 </style>
 </head>
 <body>
@@ -180,23 +267,25 @@ body.reading.t-dark{--rbg:#121316;--rink:#d5d7dc;--rmuted:#7d838f;--bar:rgba(24,
 
 <div id="reader" hidden>
   <div class="flow" id="flow"></div>
-  <div class="bar-top">
-    <div class="in">
-      <button class="ibtn" id="r-back" type="button" aria-label="Về kệ sách"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-      <div class="titles"><b id="r-title"></b><small id="r-chap"></small></div>
-      <button class="ibtn txt" id="r-settings" type="button" aria-label="Cỡ chữ và giao diện">Aa</button>
-    </div>
+  <div class="pager" id="pager" hidden>
+    <div class="pg-head" id="pg-head"></div>
+    <div class="pg-view" id="pg-view"><div class="pg-track" id="pg-track"></div></div>
+    <div class="pg-foot" id="pg-foot"></div>
   </div>
-  <div class="bar-bot">
-    <div class="in">
-      <button class="ibtn" id="r-toc" type="button" aria-label="Mục lục"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2" fill="currentColor"/><circle cx="4.5" cy="12" r="1.2" fill="currentColor"/><circle cx="4.5" cy="18" r="1.2" fill="currentColor"/></svg></button>
-      <button class="ibtn" id="r-prev" type="button" aria-label="Chương trước"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg></button>
-      <div class="pos"><span id="r-pos"></span><small id="r-pct"></small></div>
-      <button class="ibtn" id="r-next" type="button" aria-label="Chương sau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 7l5 5-5 5M6 7l5 5-5 5"/></svg></button>
-      <button class="ibtn" id="r-jump" type="button" aria-label="Lên đầu chương"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6M6 5h12"/></svg></button>
-    </div>
+  <div class="rc-top">
+    <button class="rbtn" id="r-back" type="button" aria-label="Đóng truyện" data-icon="x"></button>
+    <div class="rc-label" id="r-label"></div>
+    <button class="rbtn" id="r-toc" type="button" aria-label="Mục lục" data-icon="list"></button>
   </div>
+  <div class="rc-bot">
+    <button class="rbtn aa" id="r-look" type="button" aria-label="Giao diện và cài đặt">Aa</button>
+    <div class="scrub"><input class="rg" type="range" id="r-scrub" min="0" max="0" step="1" value="0" aria-label="Kéo để tới chương"><div class="scrub-txt" id="r-pos"></div></div>
+    <button class="rbtn" id="r-more" type="button" aria-label="Thêm tuỳ chọn" data-icon="more"></button>
+  </div>
+  <div class="rmenu" id="r-menu" hidden></div>
+  <div class="dim" id="dim"></div>
 </div>
+<div id="rsheet" class="rs-wrap" hidden></div>
 
 <div id="sheet" class="sheet-wrap" hidden></div>
 <div id="overlay" class="overlay" hidden>
@@ -621,9 +710,100 @@ async function addSample() {
 }
 
 /* ---------------- Trình đọc ---------------- */
-const flow = $('#flow'), reader = $('#reader');
-const R = { book: null, secs: [], busy: false, gen: 0, zips: new Map(), saveT: 0, chrome: true, lastY: 0, pos: null };
-const settings = Object.assign({ fs: 19, lh: 1.7, font: 'serif', theme: 'paper' }, lsGet('kt-settings', {}));
+const flow = $('#flow'), reader = $('#reader'), pager = $('#pager'), pgView = $('#pg-view'), pgTrack = $('#pg-track'), rs = $('#rsheet'), scrub = $('#r-scrub');
+const R = { book: null, secs: [], busy: false, gen: 0, zips: new Map(), saveT: 0, chrome: true, lastY: 0, pos: null, mode: 'scroll' };
+const P = { prev: null, cur: null, next: null, page: 0, vw: 0, vh: 0, mg: 24, anim: false, tok: 0, loading: 0 };
+const sv = (d, w = 2) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const ICON = {
+  x: sv('<path d="M6 6l12 12M18 6L6 18"/>', 2.2),
+  list: sv('<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.2" fill="currentColor"/><circle cx="4.5" cy="12" r="1.2" fill="currentColor"/><circle cx="4.5" cy="18" r="1.2" fill="currentColor"/>'),
+  more: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>',
+  page: sv('<path d="M6 3.5h8.5L19 8v12.5H6z"/><path d="M14.5 3.5V8H19"/>', 1.8),
+  scroll: sv('<rect x="6" y="3.5" width="12" height="17" rx="2"/><path d="M12 8v8M9.5 13.5 12 16l2.5-2.5"/>', 1.8),
+  sunset: sv('<path d="M3 18h18M7 18a5 5 0 0 1 10 0M12 6.5V9M5.3 10.3l1.6 1.6M18.7 10.3l-1.6 1.6"/>', 1.8),
+  sun: sv('<circle cx="12" cy="12" r="3.5"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>', 1.8),
+  gear: sv('<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>', 1.8),
+  check: sv('<path d="M5 12.5l4.5 4.5L19 7.5"/>', 2.4),
+  chev: sv('<path d="M9 5l7 7-7 7"/>', 2.2),
+  back: sv('<path d="M15 5l-7 7 7 7"/>', 2.2),
+  top: sv('<path d="M6 15l6-6 6 6M6 5h12"/>'),
+  prev: sv('<path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>'),
+  next: sv('<path d="M13 7l5 5-5 5M6 7l5 5-5 5"/>'),
+};
+document.querySelectorAll('[data-icon]').forEach(b => { b.innerHTML = ICON[b.dataset.icon]; });
+
+/* Phông chữ và chủ đề. Mỗi chủ đề có bản sáng và bản tối. */
+const FONTS = [
+  ['athelas', 'Athelas', '"Athelas","Iowan Old Style","Times New Roman",serif'],
+  ['charter', 'Charter', '"Charter","Bitstream Charter","Iowan Old Style","Times New Roman",serif'],
+  ['georgia', 'Georgia', 'Georgia,"Times New Roman",serif'],
+  ['iowan', 'Iowan', '"Iowan Old Style","Palatino","Palatino Linotype",serif'],
+  ['newyork', 'New York', 'ui-serif,"New York","Times New Roman",serif'],
+  ['palatino', 'Palatino', '"Palatino","Palatino Linotype","Book Antiqua",serif'],
+  ['times', 'Times New Roman', '"Times New Roman",Times,serif'],
+  ['sf', 'San Francisco', '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif'],
+  ['avenir', 'Avenir Next', '"Avenir Next","Avenir","Segoe UI",Roboto,sans-serif'],
+  ['seravek', 'Seravek', '"Seravek","Gill Sans","Gill Sans MT","Segoe UI",sans-serif'],
+];
+const fontStack = id => (FONTS.find(f => f[0] === id) || FONTS[4])[2];
+const THEMES = [
+  { id: 'original', name: 'Gốc', font: 'newyork', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 24, justify: false,
+    light: { bg: '#ffffff', ink: '#1c1c1e', muted: '#8e8e93' }, dark: { bg: '#000000', ink: '#e5e5ea', muted: '#8e8e93' } },
+  { id: 'quiet', name: 'Yên tĩnh', font: 'newyork', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 24, justify: false,
+    light: { bg: '#4a4a4f', ink: '#d1d1d6', muted: '#9c9ca2' }, dark: { bg: '#1c1c1e', ink: '#9d9da3', muted: '#66666b' } },
+  { id: 'paper', name: 'Giấy', font: 'charter', bold: false, lh: 1.6, ls: 0, ws: 0, mg: 26, justify: false,
+    light: { bg: '#f1f1ee', ink: '#2a2a2a', muted: '#8a8a87' }, dark: { bg: '#1f1f1f', ink: '#d4d4d2', muted: '#83837f' } },
+  { id: 'bold', name: 'Đậm', font: 'sf', bold: true, lh: 1.55, ls: 0, ws: 0, mg: 24, justify: false,
+    light: { bg: '#ffffff', ink: '#000000', muted: '#6e6e73' }, dark: { bg: '#000000', ink: '#ffffff', muted: '#98989f' } },
+  { id: 'calm', name: 'Dịu', font: 'iowan', bold: false, lh: 1.65, ls: 0, ws: 0, mg: 26, justify: false,
+    light: { bg: '#f1e5cf', ink: '#3e3225', muted: '#8f7d64' }, dark: { bg: '#2b251d', ink: '#d9cbb2', muted: '#8f816b' } },
+  { id: 'focus', name: 'Tập trung', font: 'athelas', bold: false, lh: 1.7, ls: 0, ws: 0, mg: 26, justify: false,
+    light: { bg: '#fdf9ec', ink: '#1d1b16', muted: '#8d877a' }, dark: { bg: '#1d1c19', ink: '#e4e0d4', muted: '#87827a' } },
+];
+const LAYOUT = ['lh', 'ls', 'ws', 'mg', 'justify'];
+const themeOf = id => THEMES.find(t => t.id === id) || THEMES[THEMES.length - 1];
+const S = (() => {
+  const d = { fs: 19, mode: 'scroll', appearance: 'auto', theme: 'focus', dim: 0, over: {} };
+  const s = lsGet('kt-reader', null);
+  if (s && typeof s === 'object') return Object.assign(d, s, { over: s.over || {} });
+  const old = lsGet('kt-settings', null);   // cài đặt của bản cũ
+  if (old) {
+    d.fs = clamp(+old.fs || 19, 12, 36);
+    d.theme = { light: 'original', paper: 'calm', dark: 'original' }[old.theme] || 'focus';
+    if (old.theme === 'dark') d.appearance = 'dark';
+    if (old.font === 'sans') d.over[d.theme] = { font: 'sf' };
+  }
+  return d;
+})();
+function themeCfg(id = S.theme, over = S.over[id] || {}) {
+  const t = themeOf(id), c = { font: over.font || t.font, bold: over.bold ?? t.bold };
+  for (const k of LAYOUT) c[k] = over.custom && over[k] != null ? over[k] : t[k];
+  return c;
+}
+const darkMQ = matchMedia('(prefers-color-scheme: dark)');
+const isDark = () => S.appearance === 'dark' || (S.appearance === 'auto' && darkMQ.matches);
+const palette = id => { const t = themeOf(id); return isDark() ? t.dark : t.light; };
+function styleVars(id = S.theme, over) {
+  const c = themeCfg(id, over), p = palette(id);
+  return { '--rbg': p.bg, '--rink': p.ink, '--rmuted': p.muted, '--rf': fontStack(c.font), '--fw': c.bold ? '600' : '400', '--fs': S.fs + 'px',
+    '--lh': String(c.lh), '--ls': c.ls / 100 + 'em', '--ws': c.ws / 100 + 'em', '--mg': c.mg + 'px', '--ta': c.justify ? 'justify' : 'start' };
+}
+const setVars = (node, v) => { for (const k in v) node.style.setProperty(k, v[k]); };
+const effMode = () => !R.book || R.book.kind === 'comic' || S.mode === 'scroll' ? 'scroll' : 'page';
+function applySettings() {
+  const comic = R.book && R.book.kind === 'comic';
+  const v = comic ? { '--rbg': '#000000', '--rink': '#e9e9e9', '--rmuted': '#8a8f99' } : styleVars();
+  Object.assign(v, isDark()
+    ? { '--rs-bg': 'rgba(28,28,30,.97)', '--rs-ink': '#f2f2f7', '--rs-muted': '#98989f', '--rs-card': '#2c2c2e', '--rs-line': 'rgba(255,255,255,.1)', '--rs-track': 'rgba(255,255,255,.2)', '--rs-okink': '#1c1c1e' }
+    : { '--rs-bg': 'rgba(242,242,247,.97)', '--rs-ink': '#1c1c1e', '--rs-muted': '#6e6e73', '--rs-card': '#ffffff', '--rs-line': 'rgba(0,0,0,.08)', '--rs-track': 'rgba(0,0,0,.13)', '--rs-okink': '#ffffff' });
+  setVars(document.body, v);
+  $('#dim').style.opacity = (S.dim * 0.75).toFixed(3);
+  $('#r-look').style.visibility = comic ? 'hidden' : '';
+  if (R.book) $('meta[name="theme-color"]').setAttribute('content', v['--rbg']);
+  lsSet('kt-reader', S);
+}
+darkMQ.addEventListener?.('change', () => { if (R.book && S.appearance === 'auto') keepPlace(applySettings); });
+
 const io = new IntersectionObserver(ents => {
   for (const e of ents) { const img = e.target; if (e.isIntersecting) { if (img.getAttribute('src') !== img.dataset.src) img.src = img.dataset.src; } else if (img.hasAttribute('src')) img.removeAttribute('src'); }
 }, { rootMargin: '250% 0px 250% 0px' });
@@ -684,18 +864,30 @@ async function openBook(id) {
   R.book = book; R.gen++; R.zips.clear(); R.pos = null;
   document.body.classList.remove('in-lib'); document.body.classList.add('reading');
   $('#lib-view').hidden = true; reader.hidden = false;
-  applySettings();
-  $('#r-title').textContent = book.title;
-  $('#r-settings').hidden = book.kind === 'comic';
+  applySettings(); setModeUI(effMode());
   setChrome(true);
   const p = await Store.progress(id);
   const ci = p ? Math.max(0, book.chapters.findIndex(c => c.id === p.chId)) : 0;
   await jumpTo(ci, p ? p.frac || 0 : 0);
   book.lastRead = Date.now(); Store.putBook(book).catch(() => {});
+  document.fonts?.ready.then(relayoutSoon);
 }
-async function jumpTo(i, frac = 0) {
+function setModeUI(m) { R.mode = m; const pg = m === 'page'; flow.hidden = pg; pager.hidden = !pg; document.documentElement.classList.toggle('paged', pg); }
+function setReadMode(m) {
+  const p = readPos(); S.mode = m; applySettings();
+  const em = effMode();
+  if (!R.book || em === R.mode) return;
+  R.gen++; clearSections(); clearPager(); setModeUI(em); window.scrollTo(0, 0);
+  jumpTo(p ? p.i : 0, p ? p.frac : 0);
+}
+function jumpTo(i, frac = 0) {
   if (!R.book) return;
   i = clamp(i, 0, R.book.chapters.length - 1);
+  return R.mode === 'page' ? pageJump(i, frac) : scrollJump(i, frac);
+}
+
+/* ----- Chế độ cuộn dọc ----- */
+async function scrollJump(i, frac) {
   const gen = ++R.gen; R.busy = true;
   try {
     clearSections();
@@ -709,7 +901,7 @@ async function jumpTo(i, frac = 0) {
   updateBars(); ensure();
 }
 async function ensure() {
-  if (R.busy || !R.book || !R.secs.length) return;
+  if (R.busy || !R.book || !R.secs.length || R.mode !== 'scroll') return;
   R.busy = true; const gen = R.gen; let changed = false;
   try {
     const n = R.book.chapters.length, vh = window.innerHeight;
@@ -739,21 +931,199 @@ function syncEnd() {
   if (last && last.i === R.book.chapters.length - 1) { if (!end) flow.append(el('div', { class: 'flow-end', text: 'Bạn đã đọc tới chương cuối cùng.' })); else flow.append(end); }
   else end?.remove();
 }
+
+/* ----- Chế độ lật trang -----
+   Mỗi chương là một khối nhiều cột cao đúng khung đọc; mỗi cột rộng đúng một trang.
+   Giữ tối đa 3 chương (trước, hiện tại, sau) xếp liền nhau trên một dải ngang,
+   nên vuốt qua ranh giới chương vẫn liền mạch. */
+function pgGeom() {
+  const r = pgView.getBoundingClientRect();
+  P.vw = r.width; P.vh = r.height;
+  P.mg = Math.round(clamp(themeCfg().mg, 4, P.vw * 0.18));
+  pgTrack.style.setProperty('--pgh', Math.floor(P.vh * 0.92) + 'px');
+}
+function measure(s) {
+  const w = P.vw - 2 * P.mg, st = s.el.style;
+  st.width = w + 'px'; st.height = P.vh + 'px'; st.columnWidth = w + 'px'; st.columnGap = 2 * P.mg + 'px';
+  s.pages = Math.max(1, Math.round((s.el.scrollWidth + 2 * P.mg) / P.vw));
+}
+function place() {
+  const put = (s, off) => { s.el.style.left = off * P.vw + P.mg + 'px'; };
+  if (!P.cur) return;
+  put(P.cur, 0); if (P.prev) put(P.prev, -P.prev.pages); if (P.next) put(P.next, P.cur.pages);
+}
+function setTrack(pos, anim, dx = 0) {
+  pgTrack.style.transition = anim ? 'transform .3s cubic-bezier(.25,.8,.25,1)' : 'none';
+  pgTrack.style.transform = `translate3d(${(-pos * P.vw + dx).toFixed(2)}px,0,0)`;
+}
+function addPg(s) {
+  s.el.classList.add('pg-chap');
+  for (const img of s.el.querySelectorAll('img')) {
+    if (img.dataset.src && !img.getAttribute('src')) img.src = img.dataset.src;
+    if (!img.complete) img.addEventListener('load', relayoutSoon, { once: true });
+  }
+  pgTrack.append(s.el);
+}
+function clearPager() {
+  for (const s of [P.prev, P.cur, P.next]) if (s) dispose(s);
+  P.prev = P.cur = P.next = null; P.anim = false; P.tok++; pgTrack.replaceChildren();
+  pgView.style.opacity = '';
+}
+async function pageJump(i, frac) {
+  const gen = ++R.gen; R.busy = true;
+  try {
+    const s = await buildSection(i);
+    if (gen !== R.gen) { dispose(s); return; }
+    clearPager(); addPg(s); P.cur = s; pgGeom(); measure(s);
+    P.page = clamp(Math.floor(frac * s.pages + 1e-6), 0, s.pages - 1);
+    place(); setTrack(P.page, false);
+  } catch (e) { toast('Không mở được chương: ' + (e.message || e)); }
+  finally { if (gen === R.gen) R.busy = false; }
+  updateBars(); pgNeighbors();
+}
+async function pgNeighbors() {
+  if (R.mode !== 'page' || !P.cur || P.loading === R.gen) return;
+  const gen = R.gen; P.loading = gen;
+  try {
+    for (;;) {
+      if (gen !== R.gen || !P.cur) return;
+      const n = R.book.chapters.length;
+      let side = null;
+      if (!P.next && P.cur.i + 1 < n) side = 'next'; else if (!P.prev && P.cur.i > 0) side = 'prev';
+      if (!side) return;
+      const want = side === 'next' ? P.cur.i + 1 : P.cur.i - 1;
+      const s = await buildSection(want);
+      if (gen !== R.gen || !P.cur || P[side] || (side === 'next' ? P.cur.i + 1 : P.cur.i - 1) !== s.i) { dispose(s); continue; }
+      addPg(s); measure(s); P[side] = s; place();
+    }
+  } catch (e) { console.error(e); }
+  finally { if (P.loading === gen) P.loading = 0; }
+}
+function turn(dir) {
+  if (!P.cur || P.anim) return;
+  if (R.chrome) setChrome(false);
+  const pos = P.page + dir;
+  if (pos >= P.cur.pages && !P.next) { toast(P.cur.i + 1 >= R.book.chapters.length ? 'Bạn đã đọc tới trang cuối cùng.' : 'Đang tải chương sau…'); pgNeighbors(); snapBack(); return; }
+  if (pos < 0 && !P.prev) { if (P.cur.i > 0) { toast('Đang tải chương trước…'); pgNeighbors(); } snapBack(); return; }
+  goPos(pos);
+}
+function goPos(pos) {
+  P.anim = true;
+  const tok = ++P.tok;
+  const done = () => { if (tok !== P.tok || !P.anim) return; P.anim = false; settle(pos); };
+  if (S.mode === 'fade') {
+    pgView.style.transition = 'opacity .13s ease'; pgView.style.opacity = '0';
+    setTimeout(() => { if (tok !== P.tok) return; setTrack(pos, false); pgView.style.opacity = '1'; setTimeout(done, 130); }, 130);
+  } else if (S.mode === 'none' || matchMedia('(prefers-reduced-motion: reduce)').matches) { setTrack(pos, false); done(); }
+  else { setTrack(pos, true); const t = setTimeout(done, 400); pgTrack.addEventListener('transitionend', () => { clearTimeout(t); done(); }, { once: true }); }
+}
+function settle(pos) {
+  if (pos >= P.cur.pages && P.next) {
+    if (P.prev) dispose(P.prev);
+    P.prev = P.cur; P.cur = P.next; P.next = null; P.page = clamp(pos - P.prev.pages, 0, P.cur.pages - 1);
+  } else if (pos < 0 && P.prev) {
+    if (P.next) dispose(P.next);
+    P.next = P.cur; P.cur = P.prev; P.prev = null; P.page = clamp(P.cur.pages + pos, 0, P.cur.pages - 1);
+  } else P.page = clamp(pos, 0, P.cur.pages - 1);
+  place(); setTrack(P.page, false);
+  updateBars(); scheduleSave(); pgNeighbors();
+}
+function snapBack() { if (P.cur) setTrack(P.page, S.mode === 'slide'); }
+let relayT;
+function relayoutSoon() { clearTimeout(relayT); relayT = setTimeout(relayout, 80); }
+function relayout() {
+  if (R.mode !== 'page' || !P.cur) return;
+  if (P.anim) { relayoutSoon(); return; }
+  const frac = P.page / P.cur.pages;
+  pgGeom(); for (const s of [P.prev, P.cur, P.next]) if (s) measure(s);
+  P.page = clamp(Math.floor(frac * P.cur.pages + 1e-6), 0, P.cur.pages - 1);
+  place(); setTrack(P.page, false); updateBars();
+}
+/* Vuốt, chạm hai bên mép, cuộn chuột, phím mũi tên */
+let drag = null;
+pgView.addEventListener('pointerdown', e => {
+  if (!P.cur || (e.pointerType === 'mouse' && e.button !== 0)) return;
+  drag = { x: e.clientX, y: e.clientY, t: performance.now(), dx: 0, on: false, id: e.pointerId };
+});
+pgView.addEventListener('pointermove', e => {
+  if (!drag || P.anim) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (!drag.on) {
+    if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy)) return;
+    drag.on = true; try { pgView.setPointerCapture(drag.id); } catch {}
+    if (R.chrome) setChrome(false);
+  }
+  drag.dx = dx;
+  if (S.mode === 'slide') {
+    const stuck = (dx > 0 && P.page === 0 && !P.prev) || (dx < 0 && P.page === P.cur.pages - 1 && !P.next);
+    setTrack(P.page, false, stuck ? dx / 3 : dx);
+  }
+});
+pgView.addEventListener('pointerup', e => {
+  if (!drag) return;
+  const d = drag; drag = null;
+  if (d.on) {
+    const v = d.dx / Math.max(1, performance.now() - d.t);
+    const dir = d.dx < -P.vw * 0.18 || v < -0.45 ? 1 : d.dx > P.vw * 0.18 || v > 0.45 ? -1 : 0;
+    if (dir) turn(dir); else snapBack();
+    return;
+  }
+  if (Math.abs(e.clientX - d.x) > 10 || Math.abs(e.clientY - d.y) > 10) return;
+  const a = e.target.closest?.('[data-target]');
+  if (a) { followLink(a); return; }
+  const x = e.clientX - pgView.getBoundingClientRect().left;
+  if (x < P.vw * 0.28) turn(-1); else if (x > P.vw * 0.72) turn(1); else setChrome(!R.chrome);
+});
+pgView.addEventListener('pointercancel', () => { if (drag?.on) snapBack(); drag = null; });
+let wheelT = 0;
+pgView.addEventListener('wheel', e => {
+  e.preventDefault();
+  const d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+  if (Math.abs(d) < 12 || Date.now() - wheelT < 380) return;
+  wheelT = Date.now(); turn(d > 0 ? 1 : -1);
+}, { passive: false });
+document.addEventListener('keydown', e => {
+  if (!R.book || reader.hidden) return;
+  if (e.key === 'Escape') { if (!rs.hidden) closeLook(); else if (!$('#r-menu').hidden) closeMenu(); else if (!$('#sheet').hidden) closeSheet(); return; }
+  if (R.mode !== 'page' || !rs.hidden || !$('#sheet').hidden || e.target.closest?.('input,textarea')) return;
+  if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); turn(1); }
+  else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); turn(-1); }
+});
+function followLink(a) { const t = a.dataset.target; const idx = R.book.chapters.findIndex(c => c.entries?.includes(t)); if (idx >= 0) jumpTo(idx, 0); }
+
+/* ----- Vị trí đọc, thanh tiến độ ----- */
 function readPos() {
-  const s = currentSec(); if (!s || !R.book) return null;
+  if (!R.book) return null;
+  if (R.mode === 'page') return P.cur ? { i: P.cur.i, frac: P.page / P.cur.pages } : null;
+  const s = currentSec(); if (!s) return null;
   const r = s.el.getBoundingClientRect();
   return { i: s.i, frac: clamp(-r.top / Math.max(1, r.height), 0, 1) };
 }
+const fill = inp => inp.style.setProperty('--fill', (inp.value - inp.min) / ((inp.max - inp.min) || 1) * 100 + '%');
+let scrubbing = false;
 function updateBars() {
   const p = readPos(); if (!p) return;
-  const n = R.book.chapters.length;
-  $('#r-chap').textContent = R.book.chapters[p.i].title;
-  $('#r-pos').textContent = `Chương ${p.i + 1}/${n}`;
-  $('#r-pct').textContent = `${Math.round(p.frac * 100)}% chương · ${Math.round((p.i + p.frac) / n * 100)}% bộ`;
-  $('#r-prev').disabled = p.i === 0; $('#r-next').disabled = p.i >= n - 1;
+  const n = R.book.chapters.length, ch = R.book.chapters[p.i];
+  if (R.mode === 'page' && P.cur) {
+    const left = P.cur.pages - P.page - 1;
+    $('#r-label').textContent = left > 0 ? `Còn ${left} trang trong chương` : 'Trang cuối của chương';
+    $('#pg-head').textContent = ch.title;
+    $('#pg-foot').textContent = `${P.page + 1} / ${P.cur.pages}`;
+  } else $('#r-label').textContent = ch.title;
+  if (scrubbing) return;
+  scrub.max = Math.max(0, n - 1); scrub.value = p.i; fill(scrub);
+  $('#r-pos').textContent = `Chương ${p.i + 1} / ${n} · ${Math.round((p.i + p.frac) / n * 100)}%`;
 }
+scrub.addEventListener('input', () => {
+  scrubbing = true; fill(scrub);
+  const i = +scrub.value; $('#r-pos').textContent = `${i + 1}. ${R.book.chapters[i].title}`;
+});
+scrub.addEventListener('change', () => {
+  scrubbing = false; const i = +scrub.value, p = readPos();
+  if (!p || p.i !== i) jumpTo(i, 0); else updateBars();
+});
 function saveNow() {
-  if (!R.book || R.busy && !R.secs.length) return;
+  if (!R.book) return;
   const p = readPos(); if (!p) return;
   R.pos = p;
   Store.putProgress({ id: R.book.id, chId: R.book.chapters[p.i].id, frac: p.frac, at: Date.now() }).catch(() => {});
@@ -762,7 +1132,7 @@ function scheduleSave() { clearTimeout(R.saveT); R.saveT = setTimeout(saveNow, 3
 let ticking = false;
 window.addEventListener('scroll', () => {
   if (!R.book || reader.hidden) { $('#lib-head').classList.toggle('scrolled', window.scrollY > 4); return; }
-  if (ticking) return; ticking = true;
+  if (R.mode !== 'scroll' || ticking) return; ticking = true;
   requestAnimationFrame(() => {
     ticking = false;
     const y = window.scrollY;
@@ -771,23 +1141,25 @@ window.addEventListener('scroll', () => {
     updateBars(); scheduleSave(); ensure();
   });
 }, { passive: true });
-function setChrome(on) { R.chrome = on; R.lastY = window.scrollY; reader.classList.toggle('chrome-off', !on); }
+function setChrome(on) { R.chrome = on; R.lastY = window.scrollY; reader.classList.toggle('chrome-off', !on); if (!on) closeMenu(); }
 flow.addEventListener('click', e => {
   const a = e.target.closest('[data-target]');
-  if (a) { const t = a.dataset.target; const idx = R.book.chapters.findIndex(c => c.entries?.includes(t)); if (idx >= 0) { jumpTo(idx, 0); return; } }
+  if (a) { followLink(a); return; }
   setChrome(!R.chrome);
 });
 async function closeReader() {
-  saveNow(); R.gen++; clearSections(); R.book = null; R.zips.clear();
+  saveNow(); R.gen++; clearSections(); clearPager(); closeMenu(); closeLook(); R.book = null; R.zips.clear();
+  setModeUI('scroll');
   reader.hidden = true; $('#lib-view').hidden = false;
-  document.body.classList.remove('reading', 't-light', 't-paper', 't-dark'); document.body.classList.add('in-lib');
+  document.body.classList.remove('reading'); document.body.classList.add('in-lib');
+  $('meta[name="theme-color"]').setAttribute('content', getComputedStyle(document.body).backgroundColor);
   window.scrollTo(0, 0); await renderLibrary();
 }
-$('#r-back').addEventListener('click', closeReader);
-$('#r-prev').addEventListener('click', () => { const p = readPos(); if (p) jumpTo(p.i - 1, 0); });
-$('#r-next').addEventListener('click', () => { const p = readPos(); if (p) jumpTo(p.i + 1, 0); });
-$('#r-jump').addEventListener('click', () => { const s = currentSec(); if (s) window.scrollTo(0, absTop(s.el)); });
-$('#r-toc').addEventListener('click', () => {
+function toChapStart() {
+  if (R.mode === 'page') { if (P.cur) { P.tok++; P.anim = false; P.page = 0; setTrack(0, false); updateBars(); scheduleSave(); } }
+  else { const s = currentSec(); if (s) window.scrollTo(0, absTop(s.el)); }
+}
+function openToc() {
   const cur = readPos()?.i ?? 0;
   openSheet('Mục lục', body => {
     const list = el('ol', { class: 'toc' });
@@ -795,34 +1167,164 @@ $('#r-toc').addEventListener('click', () => {
     body.append(el('p', { text: `${R.book.chapters.length} chương · đang ở chương ${cur + 1}` }), list);
     requestAnimationFrame(() => list.querySelector('.cur')?.scrollIntoView({ block: 'center' }));
   });
-});
+}
+$('#r-back').addEventListener('click', closeReader);
+$('#r-toc').addEventListener('click', openToc);
+$('#r-look').addEventListener('click', openLook);
+$('#r-more').addEventListener('click', openMenu);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveNow(); });
 window.addEventListener('pagehide', saveNow);
 let resizeT;
-window.addEventListener('resize', () => { if (!R.book) return; const p = R.pos || readPos(); clearTimeout(resizeT); resizeT = setTimeout(() => { if (!p) return; const s = R.secs.find(x => x.i === p.i); if (s) window.scrollTo(0, absTop(s.el) + p.frac * s.el.getBoundingClientRect().height); }, 120); });
-
-/* Cài đặt chữ */
-function applySettings() {
-  document.body.classList.remove('t-light', 't-paper', 't-dark');
-  if (R.book && R.book.kind !== 'comic') document.body.classList.add('t-' + settings.theme);
-  reader.style.setProperty('--fs', settings.fs + 'px');
-  reader.style.setProperty('--lh', settings.lh);
-  reader.style.setProperty('--rf', settings.font === 'serif' ? 'var(--f-serif)' : 'var(--f-sans)');
-  lsSet('kt-settings', settings);
-}
-function keepPlace(fn) { const p = readPos(); fn(); if (p) { const s = R.secs.find(x => x.i === p.i); if (s) window.scrollTo(0, absTop(s.el) + p.frac * s.el.getBoundingClientRect().height); } }
-$('#r-settings').addEventListener('click', () => {
-  openSheet('Chữ và giao diện', body => {
-    const seg = (opts, val, set) => { const g = el('div', { class: 'seg' }); for (const [v, label] of opts) g.append(el('button', { type: 'button', class: v === val() ? 'on' : '', text: label, onclick: ev => { keepPlace(() => { set(v); applySettings(); }); [...g.children].forEach(c => c.classList.remove('on')); ev.currentTarget.classList.add('on'); } })); return g; };
-    const sizeLabel = el('span', { class: 'val', text: settings.fs + ' px' });
-    const step = d => keepPlace(() => { settings.fs = clamp(settings.fs + d, 14, 30); sizeLabel.textContent = settings.fs + ' px'; applySettings(); });
-    body.append(
-      el('div', { class: 'setrow' }, el('span', { text: 'Cỡ chữ' }), el('div', { class: 'seg' }, el('button', { type: 'button', text: 'A−', onclick: () => step(-1) }), sizeLabel, el('button', { type: 'button', text: 'A+', onclick: () => step(1) }))),
-      el('div', { class: 'setrow' }, el('span', { text: 'Giãn dòng' }), seg([[1.5, 'Hẹp'], [1.7, 'Vừa'], [1.95, 'Rộng']], () => settings.lh, v => settings.lh = v)),
-      el('div', { class: 'setrow' }, el('span', { text: 'Kiểu chữ' }), seg([['serif', 'Có chân'], ['sans', 'Không chân']], () => settings.font, v => settings.font = v)),
-      el('div', { class: 'setrow' }, el('span', { text: 'Nền' }), seg([['light', 'Sáng'], ['paper', 'Giấy'], ['dark', 'Tối']], () => settings.theme, v => settings.theme = v)));
-  }, 'Xong');
+window.addEventListener('resize', () => {
+  if (!R.book) return;
+  if (R.mode === 'page') { relayoutSoon(); return; }
+  const p = R.pos || readPos(); clearTimeout(resizeT);
+  resizeT = setTimeout(() => { if (!p) return; const s = R.secs.find(x => x.i === p.i); if (s) window.scrollTo(0, absTop(s.el) + p.frac * s.el.getBoundingClientRect().height); }, 120);
 });
+
+/* ----- Menu “…” ----- */
+function openMenu() {
+  const m = $('#r-menu'); if (!m.hidden) { closeMenu(); return; }
+  const p = readPos(), n = R.book.chapters.length;
+  const item = (label, icon, fn, off) => el('button', { type: 'button', disabled: off ? '' : null, onclick: () => { closeMenu(); fn(); } }, el('span', { text: label }), el('span', { class: 'mi', html: icon }));
+  m.replaceChildren(
+    item('Mục lục', ICON.list, openToc),
+    R.book.kind !== 'comic' ? item('Giao diện & Cài đặt', '<b class="mi-aa">Aa</b>', openLook) : null,
+    item('Về đầu chương', ICON.top, toChapStart),
+    item('Chương trước', ICON.prev, () => jumpTo(p.i - 1, 0), !p || p.i === 0),
+    item('Chương sau', ICON.next, () => jumpTo(p.i + 1, 0), !p || p.i >= n - 1));
+  m.hidden = false;
+  setTimeout(() => document.addEventListener('pointerdown', menuAway, true));
+}
+function menuAway(e) { if (!$('#r-menu').contains(e.target) && !$('#r-more').contains(e.target)) closeMenu(); }
+function closeMenu() { $('#r-menu').hidden = true; document.removeEventListener('pointerdown', menuAway, true); }
+
+/* ----- Bảng Giao diện & Cài đặt ----- */
+function keepPlace(fn) {
+  if (R.mode === 'page') { fn(); relayout(); return; }
+  const p = readPos(); fn();
+  if (p) { const s = R.secs.find(x => x.i === p.i); if (s) window.scrollTo(0, absTop(s.el) + p.frac * s.el.getBoundingClientRect().height); }
+}
+let draft = null;
+const MODES = [['scroll', 'Cuộn dọc'], ['slide', 'Lật trang – trượt'], ['fade', 'Lật trang – mờ dần'], ['none', 'Lật trang – tức thì']];
+const LOOKS = [['auto', 'Tự động theo máy'], ['light', 'Luôn sáng'], ['dark', 'Luôn tối']];
+const panel = (...kids) => el('div', { class: 'rs-panel', role: 'dialog', 'aria-modal': 'true' }, ...kids);
+function openLook() { if (!R.book || R.book.kind === 'comic') return; closeMenu(); rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(); }; lookMain(); }
+function closeLook() { rs.hidden = true; rs.replaceChildren(); draft = null; }
+function sw(on, change) {
+  const b = el('button', { type: 'button', class: 'sw', role: 'switch' });
+  const set = v => { b.classList.toggle('on', !!v); b.setAttribute('aria-checked', String(!!v)); };
+  set(on); b.addEventListener('click', () => { const v = !b.classList.contains('on'); set(v); change(v); });
+  return { el: b, set };
+}
+function popover(anchor, items, cur, pick) {
+  const pn = anchor.closest('.rs-panel'); pn.querySelector('.rs-pop')?.remove();
+  const pop = el('div', { class: 'rs-pop', role: 'menu' });
+  for (const [v, label] of items) pop.append(el('button', { type: 'button', role: 'menuitemradio', 'aria-checked': String(v === cur), onclick: e => { e.stopPropagation(); pop.remove(); pick(v); } }, el('span', { class: 'ck', html: v === cur ? ICON.check : '' }), el('span', { text: label })));
+  const pr = pn.getBoundingClientRect(), br = anchor.getBoundingClientRect();
+  pop.style.top = br.bottom - pr.top + pn.scrollTop + 8 + 'px';
+  pop.style.right = Math.max(8, pr.right - br.right - 4) + 'px';
+  pn.append(pop);
+  const away = ev => { if (!pop.contains(ev.target)) { pop.remove(); document.removeEventListener('pointerdown', away, true); } };
+  setTimeout(() => document.addEventListener('pointerdown', away, true));
+}
+function lookMain() {
+  const fsBtn = (cls, d, label) => el('button', { type: 'button', class: cls, text: 'A', 'aria-label': label, onclick: () => keepPlace(() => { S.fs = clamp(S.fs + d, 12, 36); applySettings(); }) });
+  const modeBtn = el('button', { type: 'button', 'aria-label': 'Kiểu đọc: cuộn dọc hoặc lật trang', html: S.mode === 'scroll' ? ICON.scroll : ICON.page });
+  modeBtn.onclick = () => popover(modeBtn, MODES, S.mode, v => { setReadMode(v); lookMain(); });
+  const lookBtn = el('button', { type: 'button', 'aria-label': 'Sáng hoặc tối', html: ICON.sunset });
+  lookBtn.onclick = () => popover(lookBtn, LOOKS, S.appearance, v => { S.appearance = v; keepPlace(applySettings); lookMain(); });
+  const br = el('input', { type: 'range', class: 'rg', min: 0, max: 100, step: 1, value: Math.round((1 - S.dim) * 100), 'aria-label': 'Độ sáng màn hình đọc' });
+  br.addEventListener('input', () => { S.dim = 1 - br.value / 100; fill(br); applySettings(); }); fill(br);
+  const grid = el('div', { class: 'tgrid' });
+  for (const t of THEMES) {
+    const c = themeCfg(t.id), p = palette(t.id);
+    grid.append(el('button', { type: 'button', class: 'tcard' + (t.id === S.theme ? ' on' : ''), 'aria-pressed': String(t.id === S.theme),
+      style: `--tbg:${p.bg};--tink:${p.ink};font-family:${fontStack(c.font)};font-weight:${c.bold ? 700 : 400}`,
+      onclick: () => { keepPlace(() => { S.theme = t.id; applySettings(); }); lookMain(); } },
+      el('b', { text: 'Aa' }), el('span', { text: t.name }), Object.keys(S.over[t.id] || {}).length ? el('sup', { text: '*' }) : null));
+  }
+  rs.replaceChildren(panel(
+    el('div', { class: 'rs-head' }, el('button', { type: 'button', class: 'rs-x', 'aria-label': 'Đóng', html: ICON.x, onclick: closeLook }), el('h3', { text: 'Giao diện & Cài đặt' })),
+    el('div', { class: 'rs-row' },
+      el('div', { class: 'pill' }, fsBtn('a-sm', -1, 'Chữ nhỏ hơn'), fsBtn('a-lg', 1, 'Chữ lớn hơn')),
+      el('div', { class: 'pill' }, modeBtn, lookBtn)),
+    el('div', { class: 'rs-bright' }, el('span', { html: ICON.sun }), br, el('span', { class: 'big', html: ICON.sun })),
+    grid,
+    el('button', { type: 'button', class: 'rs-wide', onclick: () => lookCustom(true) }, el('span', { html: ICON.gear }), el('span', { text: 'Tuỳ chỉnh' }))));
+}
+function sampleText() {
+  const node = R.mode === 'page' ? P.cur?.el : currentSec()?.el;
+  const txt = [...(node?.querySelectorAll('.content p, .content div') || [])].map(x => x.textContent).join(' ').replace(/\s+/g, ' ').trim();
+  return txt.slice(0, 260) || 'Đêm ấy trăng sáng vằng vặc, gió thổi qua rặng tre nghe xào xạc. Nàng khẽ mở cuốn sách cũ, lật từng trang giấy đã ngả màu.';
+}
+function lookCustom(fresh) {
+  if (fresh || !draft) draft = JSON.parse(JSON.stringify(S.over[S.theme] || {}));
+  const t = themeOf(S.theme);
+  const val = k => draft.custom && draft[k] != null ? draft[k] : t[k];
+  const top = el('div', { class: 'rs-top' });
+  const upd = () => setVars(top, styleVars(S.theme, draft));
+  const sliders = [];
+  const slider = (k, label, min, max, step, fmt) => {
+    const out = el('span', { class: 'sl-val', text: fmt(val(k)) });
+    const inp = el('input', { type: 'range', class: 'rg', min, max, step, value: val(k), 'aria-label': label });
+    inp.disabled = !draft.custom;
+    inp.addEventListener('input', () => { draft[k] = +inp.value; out.textContent = fmt(+inp.value); fill(inp); upd(); });
+    fill(inp); sliders.push({ inp, out, k, fmt });
+    return el('div', { class: 'sl' }, el('div', { class: 'sl-label', text: label }), el('div', { class: 'sl-row' }, inp, out));
+  };
+  const pct = v => Math.round(v) + '%';
+  const layout = el('div', { class: 'rs-group' + (draft.custom ? '' : ' off') });
+  const just = sw(val('justify'), v => { draft.justify = v; upd(); });
+  just.el.disabled = !draft.custom;
+  const custom = sw(!!draft.custom, on => {
+    draft.custom = on;
+    if (on) for (const k of LAYOUT) if (draft[k] == null) draft[k] = t[k];
+    for (const s of sliders) { s.inp.disabled = !on; s.inp.value = val(s.k); s.out.textContent = s.fmt(val(s.k)); fill(s.inp); }
+    just.set(val('justify')); just.el.disabled = !on; layout.classList.toggle('off', !on); upd();
+  });
+  layout.append(
+    el('div', { class: 'rs-item' }, el('span', { text: 'Tuỳ chỉnh bố cục' }), custom.el),
+    slider('lh', 'Giãn dòng', 1, 2.6, 0.05, v => (+v).toFixed(2).replace('.', ',')),
+    slider('ls', 'Khoảng cách ký tự', 0, 15, 1, pct),
+    slider('ws', 'Khoảng cách từ', 0, 50, 1, pct),
+    slider('mg', 'Lề hai bên', 4, 64, 2, v => v + ' px'),
+    el('div', { class: 'rs-item' }, el('span', { text: 'Căn đều hai bên' }), just.el));
+  const bold = sw(draft.bold ?? t.bold, v => { draft.bold = v; upd(); });
+  const fid = draft.font || t.font;
+  top.append(
+    el('div', { class: 'rs-head' },
+      el('button', { type: 'button', class: 'rs-x', 'aria-label': 'Huỷ thay đổi', html: ICON.x, onclick: () => { draft = null; lookMain(); } }),
+      el('h3', { text: `Tuỳ chỉnh “${t.name}”` }),
+      el('button', { type: 'button', class: 'rs-x ok', 'aria-label': 'Lưu', html: ICON.check, onclick: saveDraft })),
+    el('div', { class: 'pv' }, el('div', { class: 'pv-aa', text: 'Aa' }), el('p', { class: 'pv-text', text: sampleText() })));
+  upd();
+  rs.replaceChildren(panel(top,
+    el('div', { class: 'rs-sec' }, el('h4', { text: 'Chữ' }), el('div', { class: 'rs-group' },
+      el('button', { type: 'button', class: 'rs-item', onclick: lookFonts }, el('span', { class: 'ic', text: 'Aa' }), el('span', { text: 'Phông chữ' }),
+        el('span', { class: 'v', text: (FONTS.find(f => f[0] === fid) || FONTS[4])[1], style: `font-family:${fontStack(fid)}` }), el('span', { class: 'chev', html: ICON.chev })),
+      el('div', { class: 'rs-item' }, el('span', { class: 'ic', html: '<b>B</b>' }), el('span', { text: 'Chữ đậm' }), bold.el))),
+    el('div', { class: 'rs-sec' }, el('h4', { text: 'Bố cục & dễ đọc' }), layout),
+    el('button', { type: 'button', class: 'rs-link', text: 'Khôi phục mặc định của chủ đề này', onclick: () => { draft = {}; lookCustom(false); } })));
+}
+function saveDraft() {
+  const t = themeOf(S.theme), d = draft || {};
+  if (!d.custom) { delete d.custom; LAYOUT.forEach(k => delete d[k]); }
+  if (!d.font || d.font === t.font) delete d.font;
+  if (d.bold == null || d.bold === t.bold) delete d.bold;
+  if (Object.keys(d).length) S.over[S.theme] = d; else delete S.over[S.theme];
+  draft = null; keepPlace(applySettings); lookMain();
+}
+function lookFonts() {
+  const t = themeOf(S.theme), cur = draft.font || t.font;
+  const list = el('div', { class: 'rs-group' });
+  for (const [id, name, stack] of FONTS) list.append(el('button', { type: 'button', class: 'rs-item', style: `font-family:${stack}`, onclick: () => { draft.font = id; lookCustom(false); } },
+    el('span', { text: name + (id === t.font ? ' (mặc định)' : '') }), el('span', { class: 'ck', html: id === cur ? ICON.check : '' })));
+  rs.replaceChildren(panel(
+    el('div', { class: 'rs-head' }, el('button', { type: 'button', class: 'rs-x', 'aria-label': 'Quay lại', html: ICON.back, onclick: () => lookCustom(false) }), el('h3', { text: 'Phông chữ' })),
+    list,
+    el('p', { class: 'rs-note', text: 'Phông nào máy không có sẽ được thay bằng phông gần giống. Nếu thấy dấu tiếng Việt bị lệch phông, hãy chọn phông khác.' })));
+}
 
 /* ---------------- Bảng trượt, lớp phủ, thông báo ---------------- */
 function openSheet(title, build, closeLabel = 'Đóng') {
