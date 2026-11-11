@@ -101,6 +101,7 @@ html.paged,html.paged body{overflow:hidden;height:100%;overscroll-behavior:none}
 .chap-end{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;font-family:var(--f-ui);font-weight:400;letter-spacing:0;word-spacing:0;color:var(--rmuted);padding:56px 16px 40px}
 .chap-end .ec-next{font-family:var(--rf);font-size:1.35em;line-height:1.3;color:var(--rink);font-weight:500;text-wrap:balance;max-width:16em}
 .chap-end .ec-sub{font-size:14px;line-height:1.4}
+.chap-end .ec-meta{min-height:1.4em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .chap-end .ec-pill{margin-top:16px;padding:10px 18px;border-radius:999px;background:var(--rink);color:var(--rbg);font-size:14px}
 .pager .chap-end{break-before:column;height:var(--pgfull,80vh);padding:0}
 .hero{display:flex;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;margin:8px 0 14px;text-align:left;width:100%;align-items:center}
@@ -1639,6 +1640,7 @@ async function zipFor(key) {
   if (!R.zips.has(key)) R.zips.set(key, (async () => { const blob = await Store.file(key); if (!blob) throw new Error('mất dữ liệu file, hãy thêm lại'); return openZip(blob); })());
   try { return await R.zips.get(key); } catch (e) { R.zips.delete(key); throw e; }
 }
+const todayLine = () => { const m = Math.round((ST.days[today()] || 0) / 60); return m ? `Hôm nay bạn đã đọc ${m} phút` : ''; };
 async function buildSection(i) {
   const ch = R.book.chapters[i], urls = [];
   const sec = el('section', { class: 'chap ' + (ch.type === 'images' ? 'comic' : 'text'), 'data-i': i });
@@ -1682,7 +1684,7 @@ async function buildSection(i) {
   sec.append(el('div', { class: 'chap-end' },
     el('div', { class: 'ec-sub', text: 'Hết ' + shortTitle(ch.title) }),
     el('div', { class: 'ec-next', text: nx ? nx.title : 'Bạn đã đọc hết truyện' }),
-    el('div', { class: 'ec-sub ec-meta' }),
+    el('div', { class: 'ec-sub ec-meta', text: todayLine() }),
     nx ? el('div', { class: 'ec-pill', text: R.mode === 'page' ? 'Lật để đọc tiếp' : 'Cuộn để đọc tiếp' }) : null));
   return { i, el: sec, urls, chars: (sec.querySelector('.content')?.textContent || '').length };
 }
@@ -2115,8 +2117,8 @@ function updateBars() {
     $('#pg-head').textContent = R.book.title;
     $('#pg-foot').textContent = P.page >= last ? '' : `${P.page + 1} / ${Math.max(1, last)}`;
   } else $('#r-label').textContent = m != null && ch.type !== 'images' ? `Còn ${fmtMin(m)} trong chương` : ch.title;
-  const mins = Math.round((ST.days[today()] || 0) / 60);
-  for (const e of reader.querySelectorAll('.ec-meta')) e.textContent = mins ? `Hôm nay bạn đã đọc ${mins} phút` : '';
+  const tl = todayLine();
+  for (const e of reader.querySelectorAll('.ec-meta')) if (e.textContent !== tl) e.textContent = tl;
   updateMark();
   $('#nav-prev').disabled = p.i === 0; $('#nav-next').disabled = p.i >= n - 1;
   $('#chap-prog').firstElementChild.style.width = (clamp(R.mode === 'page' && P.cur ? P.page / Math.max(1, P.cur.pages - 2) : p.frac, 0, 1) * 100).toFixed(1) + '%';
@@ -2526,13 +2528,15 @@ function panel(...kids) {
   const grab = el('div', { class: 'rs-grab', 'aria-hidden': 'true' });
   const pn = el('div', { class: 'rs-panel', role: 'dialog', 'aria-modal': 'true' }, grab, ...kids);
   const anchor = R.popAnchor; R.popAnchor = null;
+  if (!anchor) pn.style.animation = 'none';       // vẽ lại bên trong bảng đang mở: không chạy lại hiệu ứng mở
   if (anchor) queueMicrotask(() => {               // bung ra từ đúng vị trí nút vừa bấm, các dòng hiện lần lượt
     if (!pn.isConnected) return;
     const a = anchor.getBoundingClientRect(), r = pn.getBoundingClientRect();
     if (!a.width || !r.width) return;
     pn.style.transformOrigin = `${(a.left + a.width / 2 - r.left).toFixed(0)}px ${(a.top + a.height / 2 - r.top).toFixed(0)}px`;
     [...pn.children].forEach((c, k) => c.style.setProperty('--k', Math.min(k, 7)));
-    pn.classList.add('pop'); setTimeout(() => pn.classList.remove('pop'), 1100);
+    pn.classList.add('pop');
+    setTimeout(() => { pn.style.animation = 'none'; pn.classList.remove('pop'); }, 1100);   // xong thì tắt hẳn, không để hiệu ứng trồi lên chạy lại
   });
   // Kéo tay nắm: bảng đi theo ngón tay; thả khi đã kéo xuống đủ xa hoặc vuốt nhanh thì đóng, không thì bật lại
   let d = null;
