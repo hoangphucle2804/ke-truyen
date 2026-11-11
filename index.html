@@ -396,6 +396,77 @@ html.rd::-webkit-scrollbar{width:0;height:0;display:none}
 .meter i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 84px);transform:translateX(-50%);z-index:70;max-width:calc(100% - 32px);background:#1d2129;color:#f4f6fa;padding:10px 16px;border-radius:12px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
 @media (prefers-reduced-motion: reduce){.rc-top,.rc-bot,.meter i{transition:none}}
+
+/* ===== Phong cách Lucian cho các bảng trong trình đọc =====
+   Lucian UX/UI Prompt #039 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#039  (tab viên thuốc trượt)
+   Lucian UX/UI Prompt #013 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#013  (công tắc co giãn)
+   Lucian UX/UI Prompt #017 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#017  (thanh trượt có bong bóng nghiêng)
+   Lucian UX/UI Prompt #336 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#336  (bảng kéo theo ngón tay)
+   Đã thu nhỏ kích thước cho vừa bảng trên điện thoại; giữ đường cong và thời lượng chuyển động. */
+:root{--ux-ease:cubic-bezier(.2,.8,.2,1);--ux-spring:cubic-bezier(.34,1.45,.64,1)}
+.rs-panel{background:var(--rs-bg);-webkit-backdrop-filter:none;backdrop-filter:none;border-radius:30px;padding:24px 16px 18px;box-shadow:0 0 0 1px var(--rs-line),0 18px 50px -12px var(--rs-shadow);letter-spacing:-.01em;animation:rs-in .5s var(--ux-spring)}
+@keyframes rs-in{from{transform:translateY(46px);opacity:0}}
+.rs-panel :focus-visible{outline:2px solid var(--rs-acc);outline-offset:2px}
+.rs-panel{grid-template-columns:minmax(0,1fr)}
+.rs-panel > *{min-width:0}
+.rs-grab{position:absolute;top:0;left:0;right:0;height:24px;z-index:4;touch-action:none;cursor:grab}
+.rs-grab::after{content:"";position:absolute;left:50%;top:8px;width:38px;height:4px;margin-left:-19px;border-radius:9px;background:var(--rs-track)}
+.rs-top{margin:-24px -16px 0;padding:24px 0 20px;border-radius:30px 30px 0 0}
+.rs-head h3{font-weight:700;letter-spacing:-.02em}
+.rs-x{background:var(--rs-card);border:0;box-shadow:0 0 0 1px var(--rs-line);transition:transform .35s var(--ux-spring)}
+.rs-x:active{transform:scale(.92)}
+.rs-x.ok{background:var(--rs-acc);color:var(--rs-acci);box-shadow:none}
+.rs-panel .btn.primary{background:var(--rs-acc);color:var(--rs-acci)}
+.rs-panel .field{border:0;box-shadow:0 0 0 1px var(--rs-line);border-radius:14px}
+.rs-panel .field:focus-visible{outline:2px solid var(--rs-acc);outline-offset:1px}
+.pill,.rs-wide,.rs-group{box-shadow:0 0 0 1px var(--rs-line)}
+.rs-wide{transition:transform .35s var(--ux-spring)}
+.rs-wide:active,.preset:active,.tcard:active{transform:scale(.97)}
+.tcard,.preset{border:0;box-shadow:0 0 0 1px var(--rs-line);transition:transform .35s var(--ux-spring),box-shadow .3s var(--ux-ease)}
+.tcard.on,.preset.on{box-shadow:0 0 0 2px var(--rs-acc)}
+.rs-pop{background:var(--rs-bg);box-shadow:0 0 0 1px var(--rs-line),0 14px 36px -10px var(--rs-shadow)}
+.rs-play{background:var(--rs-acc);color:var(--rs-acci)}
+.seg2{border-radius:999px;padding:4px;background:var(--rs-track)}
+.seg2 button{border-radius:999px;font-weight:650;color:var(--rs-ink2);transition:color .3s var(--ux-ease),background .3s var(--ux-ease)}
+.seg2 button.on{background:var(--rs-ink);color:var(--rs-okink);box-shadow:none}
+/* Công tắc co giãn */
+.sw{background:var(--rs-track);box-shadow:inset 0 0 0 1px var(--rs-line);transition:background .45s var(--ux-ease)}
+.sw::before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(135deg,#2FD8A8,#14B8A6 55%,#0EA5E9);opacity:0;transition:opacity .45s var(--ux-ease)}
+.sw.on{background:var(--rs-track)}
+.sw.on::before{opacity:1}
+.sw::after{box-shadow:0 3px 8px -2px rgba(0,0,0,.3),0 0 0 .5px rgba(0,0,0,.06);transition:left .5s var(--ux-spring),width .32s var(--ux-ease);transform:none!important}
+.sw.on::after{left:23px}
+.sw.st::after{width:34px;transition:left .5s var(--ux-spring),width .18s var(--ux-ease)}
+.sw.on.st::after{left:15px}
+/* Thanh trượt trong bảng */
+.rs-panel .rg::-webkit-slider-runnable-track{height:10px;background:linear-gradient(90deg,#8B6CFF,#4F8DFF) 0 0/var(--fill,0%) 100% no-repeat,var(--rs-track)}
+.rs-panel .rg::-moz-range-track{height:10px;background:linear-gradient(90deg,#8B6CFF,#4F8DFF) 0 0/var(--fill,0%) 100% no-repeat,var(--rs-track)}
+.rs-panel .rg::-webkit-slider-thumb{width:26px;height:26px;margin-top:-8px;box-shadow:0 0 0 3px #4F8DFF,0 6px 14px -6px rgba(40,60,160,.5)}
+.rs-panel .rg::-moz-range-thumb{width:24px;height:24px;box-shadow:0 0 0 3px #4F8DFF,0 6px 14px -6px rgba(40,60,160,.5)}
+.rgw{position:relative;flex:1;min-width:0;display:block}
+.rg-bub{position:absolute;left:calc(13px + (100% - 26px) * var(--p,0));bottom:32px;transform-origin:50% 100%;transform:translateX(-50%) rotate(var(--tilt,0deg)) scale(.6);opacity:0;transition:transform .55s var(--ux-spring),opacity .2s var(--ux-ease);pointer-events:none;padding:5px 10px;border-radius:11px;background:var(--rs-ink);color:var(--rs-okink);font-size:13px;font-weight:760;white-space:nowrap;font-variant-numeric:tabular-nums;z-index:2}
+.rgw.drag .rg-bub{opacity:1;transform:translateX(-50%) rotate(var(--tilt,0deg)) scale(1);transition:transform .12s linear,opacity .15s}
+/* Tab viên thuốc trượt (mục lục) */
+.lx-tabs{position:relative;display:flex;padding:4px;border-radius:999px;background:var(--rs-card);box-shadow:0 0 0 1px var(--rs-line);flex:none}
+.lx-pill{position:absolute;left:0;top:4px;bottom:4px;width:var(--w,80px);border-radius:999px;background:var(--rs-ink);transform:translateX(var(--x,4px));box-shadow:0 8px 16px -10px var(--rs-shadow);transition:transform .5s var(--ux-spring),width .5s var(--ux-spring)}
+.lx-tab{position:relative;flex:1;height:38px;border-radius:999px;font-size:14px;font-weight:680;color:var(--rs-ink2);white-space:nowrap;transition:color .35s var(--ux-ease)}
+.lx-tab[aria-selected="true"]{color:var(--rs-okink)}
+.tl-i{transition:transform .55s var(--ux-spring),opacity .35s var(--ux-ease)}
+.tl-i.cur{background:var(--rs-card);box-shadow:0 0 0 1px var(--rs-line)}
+.tl-tag{background:var(--rs-accs);color:var(--rs-acc);border-radius:7px;font-weight:800;font-size:10.5px;padding:3px 7px}
+/* Menu ⋯ */
+.mprog{height:5px}
+.mprog i{background:var(--rs-grad);border-radius:99px}
+.mnav button,.mt{box-shadow:0 0 0 1px var(--rs-line);transition:transform .35s var(--ux-spring)}
+.mnav button:active,.mt:active{transform:scale(.95)}
+.mgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.mgrid:has(> :nth-child(7)){grid-template-columns:repeat(4,minmax(0,1fr))}
+.mt{color:var(--rs-ink2);font-weight:600;border-radius:18px}
+.mt-i{width:38px;height:38px;border-radius:12px;background:var(--rs-accs);color:var(--rs-acc);font-size:16px}
+.mt-i svg{width:21px;height:21px}
+.mt.on{color:var(--rs-ink2)}
+.mt.on .mt-i{background:var(--rs-acc);color:var(--rs-acci)}
+@media (prefers-reduced-motion: reduce){.rs-panel{animation:none}.lx-pill,.tl-i,.sw::after,.rg-bub{transition:none}}
 </style>
 </head>
 <body>
@@ -1148,9 +1219,12 @@ function applySettings() {
   const v = comic ? { '--rbg': cb, '--rink': light ? '#1c1c1e' : '#e9e9e9', '--rmuted': light ? '#6e6e73' : '#8a8f99', '--cgap': S.comic.gap + 'px' } : styleVars(S.theme, LIVE || undefined);
   R.wasDark = isDark();
   const cw = COLW[S.colw] || COLW.medium; v['--colw'] = cw[0]; v['--flow-w'] = cw[1];
+  // Bảng (menu ⋯, mục lục, Aa) dùng bộ màu Lucian UX/UI Prompt · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/
   Object.assign(v, isDark()
-    ? { '--rs-bg': 'rgba(28,28,30,.97)', '--rs-ink': '#f2f2f7', '--rs-muted': '#98989f', '--rs-card': '#2c2c2e', '--rs-line': 'rgba(255,255,255,.1)', '--rs-track': 'rgba(255,255,255,.2)', '--rs-okink': '#1c1c1e' }
-    : { '--rs-bg': 'rgba(242,242,247,.97)', '--rs-ink': '#1c1c1e', '--rs-muted': '#6e6e73', '--rs-card': '#ffffff', '--rs-line': 'rgba(0,0,0,.08)', '--rs-track': 'rgba(0,0,0,.13)', '--rs-okink': '#ffffff' });
+    ? { '--rs-bg': '#13141C', '--rs-card': '#1A1B25', '--rs-ink': '#F4F0E8', '--rs-ink2': 'rgba(244,240,232,.68)', '--rs-muted': 'rgba(244,240,232,.42)', '--rs-line': 'rgba(255,255,255,.08)', '--rs-track': '#252632', '--rs-okink': '#07080D',
+        '--rs-acc': '#B7A4FF', '--rs-accs': 'rgba(183,164,255,.15)', '--rs-acci': '#0B0C12', '--rs-grad': 'linear-gradient(120deg,#B7A4FF,#7DB4FF 55%,#A5F2D3)', '--rs-shadow': 'rgba(0,0,0,.45)' }
+    : { '--rs-bg': '#FFFFFF', '--rs-card': '#F5F3EF', '--rs-ink': '#16151B', '--rs-ink2': '#57535F', '--rs-muted': '#8E8A97', '--rs-line': 'rgba(22,21,27,.09)', '--rs-track': '#EAE7E1', '--rs-okink': '#F4F2EE',
+        '--rs-acc': '#6A57F2', '--rs-accs': 'rgba(106,87,242,.12)', '--rs-acci': '#FFFFFF', '--rs-grad': 'linear-gradient(120deg,#7B61FF,#3D8BFF 55%,#1FB89A)', '--rs-shadow': 'rgba(40,30,80,.14)' });
   setVars(document.documentElement, v);
   $('#dim').style.opacity = '0';
   $('#r-find').style.display = comic ? 'none' : '';
@@ -1813,7 +1887,7 @@ function openToc() {
   const inp = el('input', { class: 'field', type: 'search', inputmode: 'search', enterkeyhint: 'go', autocomplete: 'off', placeholder: `Số chương (1–${total}) hoặc tên chương`, 'aria-label': 'Đến chương' });
   const jump = i => { closeLook(); goChapter(i, Math.sign(i - cur)); };
   const marks = () => (b.marks || []).map(m => ({ m, i: b.chapters.findIndex(c => c.id === m.chId) })).filter(x => x.i >= 0).sort((x, y) => x.i - y.i || x.m.frac - y.m.frac);
-  const fill = () => {
+  const fill = (dir = 0) => {
     list.replaceChildren();
     if (tab === 'ch') {
       const q = inp.value.trim(), f = foldVi(q); let shown = 0;
@@ -1838,6 +1912,13 @@ function openToc() {
       }
       info.textContent = `${ms.length} đánh dấu`;
     }
+    if (dir && !matchMedia('(prefers-reduced-motion: reduce)').matches) {       // các dòng đầu trượt vào từ hướng vừa chuyển
+      const rows = [...list.children].slice(0, 12);
+      rows.forEach((r, k) => { r.style.transitionDelay = k * 45 + 'ms'; r.style.transform = `translateX(${dir * 70}%)`; r.style.opacity = '0'; });
+      void list.offsetWidth;
+      rows.forEach(r => { r.style.transform = ''; r.style.opacity = ''; });
+      setTimeout(() => rows.forEach(r => { r.style.transitionDelay = ''; }), 1200);
+    }
   };
   const go = () => {
     const q = inp.value.trim();
@@ -1851,16 +1932,23 @@ function openToc() {
   };
   inp.addEventListener('input', () => { err.hidden = true; if (tab !== 'ch') { tab = 'ch'; tabs(); } fill(); });
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); go(); } });
-  const seg = el('div', { class: 'seg2 full' });
-  const tabs = () => seg.replaceChildren(
-    el('button', { type: 'button', class: tab === 'ch' ? 'on' : '', text: `Chương (${total})`, onclick: () => { tab = 'ch'; tabs(); fill(); } }),
-    el('button', { type: 'button', class: tab === 'mk' ? 'on' : '', text: `Đánh dấu (${marks().length})`, onclick: () => { tab = 'mk'; tabs(); fill(); } }));
-  tabs();
+  const pillEl = el('span', { class: 'lx-pill', 'aria-hidden': 'true' });
+  const tb = ['ch', 'mk'].map(k => el('button', { type: 'button', class: 'lx-tab', role: 'tab', onclick: () => { if (tab === k) return; tab = k; tabs(); fill(k === 'mk' ? 1 : -1); } }));
+  const seg = el('div', { class: 'lx-tabs', role: 'tablist', 'aria-label': 'Mục lục' }, pillEl, ...tb);
+  const tabs = (anim = true) => {
+    tb[0].textContent = `Chương (${total})`; tb[1].textContent = `Đánh dấu (${marks().length})`;
+    tb.forEach((t, k) => t.setAttribute('aria-selected', String((k === 0) === (tab === 'ch'))));
+    const t = tb[tab === 'ch' ? 0 : 1];
+    if (!anim) pillEl.style.transition = 'none';
+    pillEl.style.setProperty('--x', t.offsetLeft + 'px'); pillEl.style.setProperty('--w', t.offsetWidth + 'px');
+    if (!anim) { void pillEl.offsetWidth; pillEl.style.transition = ''; }
+  };
+  seg.addEventListener('keydown', e => { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; e.preventDefault(); e.stopPropagation(); const k = tab === 'ch' ? 1 : 0; tb[k].click(); tb[k].focus(); });
   const pn = panel(
     el('div', { class: 'rs-head' }, el('button', { type: 'button', class: 'rs-x', 'aria-label': 'Đóng', html: ICON.x, onclick: closeLook }), el('h3', { text: 'Mục lục' }), info),
     el('div', { class: 'toc-go' }, inp, el('button', { class: 'btn primary', type: 'button', text: 'Đến', onclick: go })), err, seg, list);
   pn.classList.add('tocp');
-  rs.replaceChildren(pn); fill();
+  rs.replaceChildren(pn); fill(); tabs(false);
   if (canFolder) setTimeout(() => inp.focus(), 60);
 }
 $('#r-back').addEventListener('click', closeReader);
@@ -2015,7 +2103,39 @@ function keepPlace(fn) {
 let draft = null;
 const MODES = [['scroll', 'Cuộn dọc'], ['curl', 'Lật trang – như sách'], ['slide', 'Lật trang – trượt'], ['fade', 'Lật trang – mờ dần'], ['none', 'Lật trang – tức thì']];
 const LOOKS = [['auto', 'Tự động theo máy'], ['light', 'Luôn sáng'], ['dark', 'Luôn tối']];
-const panel = (...kids) => el('div', { class: 'rs-panel', role: 'dialog', 'aria-modal': 'true' }, ...kids);
+function panel(...kids) {
+  const grab = el('div', { class: 'rs-grab', 'aria-hidden': 'true' });
+  const pn = el('div', { class: 'rs-panel', role: 'dialog', 'aria-modal': 'true' }, grab, ...kids);
+  // Kéo tay nắm: bảng đi theo ngón tay; thả khi đã kéo xuống đủ xa hoặc vuốt nhanh thì đóng, không thì bật lại
+  let d = null;
+  grab.addEventListener('pointerdown', e => { d = { y: e.clientY, t: performance.now(), dy: 0 }; try { grab.setPointerCapture(e.pointerId); } catch {} pn.style.animation = 'none'; pn.style.transition = 'none'; });
+  grab.addEventListener('pointermove', e => { if (!d) return; d.dy = e.clientY - d.y; pn.style.transform = `translateY(${d.dy > 0 ? d.dy : d.dy / 5}px)`; });
+  const end = () => {
+    if (!d) return; const g = d; d = null;
+    const fast = g.dy / Math.max(1, performance.now() - g.t) > 0.5;
+    if (g.dy > 90 || (fast && g.dy > 24)) { pn.style.transition = 'transform .25s var(--ux-ease)'; pn.style.transform = 'translateY(110%)'; setTimeout(closeLook, 220); }
+    else { pn.style.transition = 'transform .5s var(--ux-spring)'; pn.style.transform = ''; }
+  };
+  grab.addEventListener('pointerup', end); grab.addEventListener('pointercancel', end);
+  return pn;
+}
+// Thanh trượt có bong bóng giá trị nghiêng theo tốc độ kéo
+function bubbled(inp, fmt) {
+  const bub = el('span', { class: 'rg-bub', 'aria-hidden': 'true' }), w = el('span', { class: 'rgw' }, inp, bub);
+  let lx = 0, lt = 0, st;
+  const place = () => { w.style.setProperty('--p', ((inp.value - inp.min) / ((inp.max - inp.min) || 1)).toFixed(4)); bub.textContent = fmt(+inp.value); };
+  inp.addEventListener('pointerdown', e => { w.classList.add('drag'); lx = e.clientX; lt = performance.now(); place(); });
+  inp.addEventListener('pointermove', e => {
+    if (!w.classList.contains('drag')) return;
+    const n = performance.now(), v = (e.clientX - lx) / Math.max(8, n - lt); lx = e.clientX; lt = n;
+    bub.style.setProperty('--tilt', clamp(-v * 14, -22, 22).toFixed(1) + 'deg');
+    clearTimeout(st); st = setTimeout(() => bub.style.setProperty('--tilt', '0deg'), 90);
+  });
+  const end = () => { w.classList.remove('drag'); bub.style.setProperty('--tilt', '0deg'); };
+  for (const t of ['pointerup', 'pointercancel', 'blur']) inp.addEventListener(t, end);
+  inp.addEventListener('input', place); place();
+  return w;
+}
 function openLook() { if (!R.book) return; closeMenu(); rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(); }; lookAny(); }
 const lookAny = () => (R.book.kind === 'comic' ? lookComic : lookMain)();
 function closeLook() { rs.hidden = true; rs.replaceChildren(); draft = null; endLive(); }
@@ -2071,7 +2191,7 @@ function wakeRow() {
 function sw(on, change) {
   const b = el('button', { type: 'button', class: 'sw', role: 'switch' });
   const set = v => { b.classList.toggle('on', !!v); b.setAttribute('aria-checked', String(!!v)); };
-  set(on); b.addEventListener('click', () => { const v = !b.classList.contains('on'); set(v); change(v); });
+  set(on); b.addEventListener('click', () => { const v = !b.classList.contains('on'); set(v); b.classList.add('st'); setTimeout(() => b.classList.remove('st'), 170); change(v); });
   return { el: b, set };
 }
 function popover(anchor, items, cur, pick) {
@@ -2141,7 +2261,7 @@ function lookCustom(fresh) {
     inp.disabled = !draft.custom;
     inp.addEventListener('input', () => { draft[k] = +inp.value; out.textContent = fmt(+inp.value); fill(inp); upd(); });
     fill(inp); sliders.push({ inp, out, k, fmt });
-    return el('div', { class: 'sl' }, el('div', { class: 'sl-label', text: label }), el('div', { class: 'sl-row' }, inp, out));
+    return el('div', { class: 'sl' }, el('div', { class: 'sl-label', text: label }), el('div', { class: 'sl-row' }, bubbled(inp, fmt), out));
   };
   const pct = v => Math.round(v) + '%';
   const layout = el('div', { class: 'rs-group' + (draft.custom ? '' : ' off') });
