@@ -157,7 +157,7 @@ html.paged,html.paged body{overflow:hidden;height:100%;overscroll-behavior:none}
 .flow-end{color:var(--rmuted);text-align:center;font-size:14px;padding:48px 16px calc(env(safe-area-inset-bottom,0px) + 110px)}
 
 /* Chế độ lật trang: mỗi chương là một khối nhiều cột, mỗi cột rộng đúng một màn hình */
-.pager{position:fixed;top:0;left:0;right:0;height:100vh;height:100lvh;background:var(--rbg);color:var(--rink);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.pager{position:fixed;top:0;left:0;right:0;height:100vh;height:calc(100lvh + var(--vfix,0px));background:var(--rbg);color:var(--rink);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .pg-head,.pg-foot{position:absolute;left:0;right:0;text-align:center;font:500 12.5px/1.2 var(--f-ui);color:var(--rmuted);padding:0 72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
 .pg-head{top:calc(env(safe-area-inset-top,0px) + 18px)}
 #reader:not(.chrome-off) .pg-head,#reader:not(.chrome-off) .pg-foot{opacity:0}
@@ -195,6 +195,47 @@ html.rd{background:var(--rbg)}
 .rbtn{width:46px;height:46px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--rchip);color:var(--rink);border:1px solid var(--rline);box-shadow:0 2px 12px rgba(0,0,0,.08)}
 .rbtn svg{width:22px;height:22px}
 .rbtn.aa{font-family:Georgia,serif;font-size:18px;font-weight:600}
+/* Bảng trượt chung: không cho trượt ngang */
+html .sheet-body{overflow-x:hidden;grid-template-columns:minmax(0,1fr)}
+html .sheet-body > *{min-width:0}
+/* iPhone (app ở màn hình chính): vùng hiển thị bị hụt một đoạn ở đáy; --vfix kéo các lớp phủ xuống tới mép dưới thật */
+html .rc-bot{bottom:calc(-1 * var(--vfix,0px))}
+html .sheet-wrap,html .rs-wrap,html .overlay{bottom:calc(-1 * var(--vfix,0px))}
+html .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 84px - var(--vfix,0px))}
+/* Mục lục */
+.rs-panel.tocp{display:flex;flex-direction:column;gap:12px;overflow:hidden;height:min(calc(100% - env(safe-area-inset-top,0px) - 16px),780px);padding-bottom:10px}
+.rs-panel .field{background:var(--rs-card);border:1px solid var(--rs-line);color:var(--rs-ink)}
+.rs-panel .btn.primary{background:var(--rs-ink);color:var(--rs-okink)}
+.rs-head small{color:var(--rs-muted);font-size:13px;flex:none}
+.seg2.full{display:flex}
+.seg2.full button{flex:1}
+.tl{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;margin:0 -6px;padding:0 6px;display:grid;align-content:start;gap:2px}
+.tl-i{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;padding:11px 10px;border-radius:12px;font-size:15.5px;line-height:1.35}
+.tl-i:active{background:var(--rs-track)}
+.tl-n{color:var(--rs-muted);font-size:13px;font-variant-numeric:tabular-nums;text-align:right}
+.tl-t{min-width:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.tl-s{display:block;color:var(--rs-muted);font-size:13px;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-i.cur{background:var(--rs-card);font-weight:600}
+.tl-tag{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--rs-ink);color:var(--rs-okink);white-space:nowrap}
+.tl-x{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--rs-muted);font-size:20px}
+.tl-empty{color:var(--rs-muted);text-align:center;padding:34px 12px;font-size:14px;line-height:1.5}
+.tl-err{color:#d0342c;font-size:13px;margin:-4px 4px 0}
+/* Menu ⋯ */
+.mh{flex:1;min-width:0}
+.mh b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mh small{display:block;color:var(--rs-muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mnav{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mnav button{height:52px;border-radius:16px;background:var(--rs-card);display:flex;align-items:center;justify-content:center;gap:8px;font-size:15.5px;font-weight:600}
+.mnav button:disabled{opacity:.35}
+.mnav svg{width:18px;height:18px}
+.mgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.mt{display:grid;justify-items:center;align-content:start;gap:6px;padding:13px 4px 11px;border-radius:16px;background:var(--rs-card);font-size:12.5px;line-height:1.2;text-align:center}
+.mt-i{width:26px;height:26px;display:grid;place-items:center;font-family:Georgia,serif;font-size:18px;font-weight:600}
+.mt-i svg{width:24px;height:24px}
+.mt.on{color:#d0342c}
+.mt:disabled{opacity:.35}
+.mprog{height:4px;border-radius:99px;background:var(--rs-track);overflow:hidden}
+.mprog i{display:block;height:100%;background:var(--rs-ink)}
 .wide-only{display:none}
 @media (min-width:480px){.wide-only{display:grid}}
 /* Khi đọc: bỏ thanh cuộn (đã có vạch tiến độ mảnh ở mép trên) */
@@ -1761,48 +1802,66 @@ async function toggleMark() {
   await Store.putBook(b).catch(() => {});
 }
 function openToc() {
-  const cur = readPos()?.i ?? 0, b = R.book;
-  openSheet('Mục lục', body => {
-    const marks = (b.marks || []).map(m => ({ m, i: b.chapters.findIndex(c => c.id === m.chId) })).filter(x => x.i >= 0).sort((x, y) => x.i - y.i || x.m.frac - y.m.frac);
-    if (marks.length) {
-      const ml = el('ol', { class: 'toc' });
-      for (const { m, i } of marks) {
-        const li = el('li', { style: 'display:flex;align-items:center' });
-        li.append(el('button', { type: 'button', style: 'flex:1;min-width:0;display:block', onclick: () => { closeSheet(); pushHist(); jumpTo(i, m.frac); } },
-          el('span', { class: 'mk-t', text: `${b.chapters[i].title} · ${Math.round(m.frac * 100)}%` }), m.text ? el('span', { class: 'mk-s', text: m.text }) : null),
-          el('button', { type: 'button', class: 'mk-del', 'aria-label': 'Bỏ đánh dấu', text: '×', onclick: async () => { b.marks.splice(b.marks.indexOf(m), 1); li.remove(); updateMark(); await Store.putBook(b).catch(() => {}); } }));
-        ml.append(li);
-      }
-      body.append(el('div', { class: 'section-label', style: 'margin:2px 0 0', text: `Đánh dấu (${marks.length})` }), ml, el('div', { class: 'section-label', style: 'margin:8px 0 0', text: 'Các chương' }));
-    }
-    const list = el('ol', { class: 'toc' });
-    const total = b.chapters.length, folded = b.chapters.map(c => foldVi(c.title));
-    b.chapters.forEach((c, i) => list.append(el('li', {}, el('button', { type: 'button', class: i === cur ? 'cur' : '', onclick: () => { closeSheet(); goChapter(i, Math.sign(i - cur)); } }, el('span', { text: c.title }), el('small', { text: String(i + 1) })))));
-    const info = el('p', { text: `${total} chương · đang ở chương ${cur + 1}` });
-    const inp = el('input', { class: 'field', type: 'search', inputmode: 'search', enterkeyhint: 'go', autocomplete: 'off', placeholder: `Nhập số chương (1–${total}) hoặc tên chương`, 'aria-label': 'Đến chương' });
-    const err = el('p', { style: 'color:var(--danger);font-size:13px', hidden: '' });
-    const go = () => {
-      const q = inp.value.trim();
-      if (/^\d+$/.test(q)) {
-        const k = +q;
-        if (k < 1 || k > total) { err.textContent = `Truyện chỉ có chương 1 đến ${total}.`; err.hidden = false; return; }
-        closeSheet(); goChapter(k - 1, Math.sign(k - 1 - cur)); return;
-      }
-      const first = [...list.children].find(li => !li.hidden);
-      if (q && first) first.querySelector('button').click();
-      else { err.textContent = q ? 'Không có chương nào khớp.' : 'Nhập số chương trước.'; err.hidden = false; }
-    };
-    inp.addEventListener('input', () => {
-      err.hidden = true;
+  if (!R.book) return;
+  closeMenu(); draft = null;
+  const b = R.book, total = b.chapters.length, cur = readPos()?.i ?? 0, folded = b.chapters.map(c => foldVi(c.title));
+  let tab = 'ch';
+  rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(); };
+  const list = el('div', { class: 'tl' });
+  const info = el('small', { text: `${cur + 1} / ${total}` });
+  const err = el('p', { class: 'tl-err', hidden: '' });
+  const inp = el('input', { class: 'field', type: 'search', inputmode: 'search', enterkeyhint: 'go', autocomplete: 'off', placeholder: `Số chương (1–${total}) hoặc tên chương`, 'aria-label': 'Đến chương' });
+  const jump = i => { closeLook(); goChapter(i, Math.sign(i - cur)); };
+  const marks = () => (b.marks || []).map(m => ({ m, i: b.chapters.findIndex(c => c.id === m.chId) })).filter(x => x.i >= 0).sort((x, y) => x.i - y.i || x.m.frac - y.m.frac);
+  const fill = () => {
+    list.replaceChildren();
+    if (tab === 'ch') {
       const q = inp.value.trim(), f = foldVi(q); let shown = 0;
-      [...list.children].forEach((li, i) => { const ok = !q || folded[i].includes(f) || String(i + 1).startsWith(q); li.hidden = !ok; if (ok) shown++; });
-      info.textContent = q ? `${shown} chương khớp` : `${total} chương · đang ở chương ${cur + 1}`;
-    });
-    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); go(); } });
-    body.append(el('div', { class: 'toc-go' }, inp, el('button', { class: 'btn primary', type: 'button', text: 'Đến', onclick: go })), err, info, list);
-    if (canFolder) setTimeout(() => inp.focus(), 60);
-    requestAnimationFrame(() => list.querySelector('.cur')?.scrollIntoView({ block: 'center' }));
-  });
+      b.chapters.forEach((c, i) => {
+        if (q && !(folded[i].includes(f) || String(i + 1).startsWith(q))) return;
+        shown++;
+        list.append(el('button', { type: 'button', class: 'tl-i' + (i === cur ? ' cur' : ''), onclick: () => jump(i) },
+          el('span', { class: 'tl-n', text: String(i + 1) }), el('span', { class: 'tl-t', text: c.title }), i === cur ? el('span', { class: 'tl-tag', text: 'Đang đọc' }) : null));
+      });
+      if (!shown) list.append(el('div', { class: 'tl-empty', text: 'Không có chương nào khớp.' }));
+      info.textContent = q ? `${shown} chương khớp` : `${cur + 1} / ${total}`;
+      if (!q) requestAnimationFrame(() => list.querySelector('.cur')?.scrollIntoView({ block: 'center' }));
+    } else {
+      const ms = marks();
+      if (!ms.length) list.append(el('div', { class: 'tl-empty', text: 'Chưa có đánh dấu nào. Khi đang đọc, bấm nút đánh dấu ở góc trên để lưu lại trang.' }));
+      for (const { m, i } of ms) {
+        const row = el('div', { class: 'tl-i', role: 'button', tabindex: '0', onclick: () => { closeLook(); pushHist(); jumpTo(i, m.frac); } },
+          el('span', { class: 'tl-n', text: String(i + 1) }),
+          el('span', { class: 'tl-t' }, `${b.chapters[i].title} · ${Math.round(m.frac * 100)}%`, m.text ? el('span', { class: 'tl-s', text: m.text }) : null),
+          el('button', { type: 'button', class: 'tl-x', 'aria-label': 'Bỏ đánh dấu', text: '×', onclick: async ev => { ev.stopPropagation(); b.marks.splice(b.marks.indexOf(m), 1); updateMark(); tabs(); fill(); await Store.putBook(b).catch(() => {}); } }));
+        list.append(row);
+      }
+      info.textContent = `${ms.length} đánh dấu`;
+    }
+  };
+  const go = () => {
+    const q = inp.value.trim();
+    if (/^\d+$/.test(q)) {
+      const k = +q;
+      if (k < 1 || k > total) { err.textContent = `Truyện chỉ có chương 1 đến ${total}.`; err.hidden = false; return; }
+      jump(k - 1); return;
+    }
+    const first = list.querySelector('.tl-i');
+    if (q && first) first.click(); else { err.textContent = q ? 'Không có chương nào khớp.' : 'Nhập số chương trước.'; err.hidden = false; }
+  };
+  inp.addEventListener('input', () => { err.hidden = true; if (tab !== 'ch') { tab = 'ch'; tabs(); } fill(); });
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+  const seg = el('div', { class: 'seg2 full' });
+  const tabs = () => seg.replaceChildren(
+    el('button', { type: 'button', class: tab === 'ch' ? 'on' : '', text: `Chương (${total})`, onclick: () => { tab = 'ch'; tabs(); fill(); } }),
+    el('button', { type: 'button', class: tab === 'mk' ? 'on' : '', text: `Đánh dấu (${marks().length})`, onclick: () => { tab = 'mk'; tabs(); fill(); } }));
+  tabs();
+  const pn = panel(
+    el('div', { class: 'rs-head' }, el('button', { type: 'button', class: 'rs-x', 'aria-label': 'Đóng', html: ICON.x, onclick: closeLook }), el('h3', { text: 'Mục lục' }), info),
+    el('div', { class: 'toc-go' }, inp, el('button', { class: 'btn primary', type: 'button', text: 'Đến', onclick: go })), err, seg, list);
+  pn.classList.add('tocp');
+  rs.replaceChildren(pn); fill();
+  if (canFolder) setTimeout(() => inp.focus(), 60);
 }
 $('#r-back').addEventListener('click', closeReader);
 $('#r-mark').addEventListener('click', toggleMark);
@@ -1917,20 +1976,32 @@ function winSheet() {
 
 /* ----- Menu “…” ----- */
 function openMenu() {
-  const m = $('#r-menu'); if (!m.hidden) { closeMenu(); return; }
-  const p = readPos(), n = R.book.chapters.length;
-  const item = (label, icon, fn, off) => el('button', { type: 'button', disabled: off ? '' : null, onclick: () => { closeMenu(); fn(); } }, el('span', { text: label }), el('span', { class: 'mi', html: icon }));
-  m.replaceChildren(...[
-    item('Mục lục & đánh dấu', ICON.list, openToc),
-    R.book.kind !== 'comic' ? item('Tìm trong truyện', ICON.search, openFind) : null,
-    item(R.book.kind === 'comic' ? 'Cài đặt truyện tranh' : 'Giao diện & Cài đặt', '<b class="mi-aa">Aa</b>', openLook),
-    canFolder ? item('Kích cỡ cửa sổ', ICON.win, winSheet) : null,
-    R.hist && R.hist.length ? item('Quay lại chỗ vừa rời', ICON.undo, goBack) : null,
-    item('Về đầu chương', ICON.top, toChapStart),
-    item('Chương trước', ICON.prev, () => goChapter(p.i - 1, -1), !p || p.i === 0),
-    item('Chương sau', ICON.next, () => goChapter(p.i + 1, 1), !p || p.i >= n - 1)].filter(Boolean));
-  m.hidden = false;
-  setTimeout(() => document.addEventListener('pointerdown', menuAway, true));
+  if (!R.book) return;
+  if (!rs.hidden && rs.querySelector('.mgrid')) { closeLook(); return; }
+  closeMenu(); draft = null;
+  const b = R.book, n = b.chapters.length, p = readPos(), comic = b.kind === 'comic';
+  rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(); };
+  const run = fn => () => { closeLook(); fn(); };
+  const tile = (label, icon, fn, o = {}) => el('button', { type: 'button', class: 'mt' + (o.on ? ' on' : ''), disabled: o.off ? '' : null, onclick: run(fn) },
+    el('span', { class: 'mt-i', html: icon }), el('span', { text: label }));
+  const marked = curMark() >= 0;
+  rs.replaceChildren(panel(
+    el('div', { class: 'rs-head' },
+      el('button', { type: 'button', class: 'rs-x', 'aria-label': 'Đóng', html: ICON.x, onclick: closeLook }),
+      el('div', { class: 'mh' }, el('b', { text: b.title }), el('small', { text: p ? `${b.chapters[p.i].title} · ${p.i + 1}/${n}` : '' }))),
+    el('div', { class: 'mprog' }, el('i', { style: `width:${p ? ((p.i + p.frac) / n * 100).toFixed(1) : 0}%` })),
+    el('div', { class: 'mnav' },
+      el('button', { type: 'button', disabled: !p || p.i === 0 ? '' : null, onclick: run(() => goChapter(p.i - 1, -1)) }, el('span', { html: ICON.back }), el('span', { text: 'Chương trước' })),
+      el('button', { type: 'button', disabled: !p || p.i >= n - 1 ? '' : null, onclick: run(() => goChapter(p.i + 1, 1)) }, el('span', { text: 'Chương sau' }), el('span', { html: ICON.chev }))),
+    el('div', { class: 'mgrid' },
+      tile('Mục lục', ICON.list, openToc),
+      comic ? null : tile('Tìm kiếm', ICON.search, openFind),
+      tile(marked ? 'Bỏ đánh dấu' : 'Đánh dấu', ICON.mark, toggleMark, { on: marked }),
+      tile(comic ? 'Cài đặt' : 'Giao diện', 'Aa', openLook),
+      tile('Đầu chương', ICON.top, toChapStart),
+      tile('Quay lại', ICON.undo, goBack, { off: !(R.hist && R.hist.length) }),
+      canFolder ? tile('Cỡ cửa sổ', ICON.win, winSheet) : null,
+      canFolder ? tile('Toàn màn hình', ICON.page, () => setWin(document.fullscreenElement ? 'exit' : 'full')) : null)));
 }
 function menuAway(e) { if (!$('#r-menu').contains(e.target) && !$('#r-more').contains(e.target)) closeMenu(); }
 function closeMenu() { $('#r-menu').hidden = true; document.removeEventListener('pointerdown', menuAway, true); }
@@ -2147,6 +2218,16 @@ document.addEventListener('click', e => { const b = e.target.closest('[data-clos
 const inFrame = (() => { try { return window.self !== window.top; } catch { return true; } })();
 const standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
 const hasManifest = !!document.querySelector('link[rel="manifest"]');
+// iPhone, app ở màn hình chính: chiều cao vùng hiển thị ngắn hơn màn hình thật một đoạn (bằng vùng giờ/pin) → bù lại
+function fixViewport() {
+  let gap = 0;
+  if (standalone && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+    const sh = matchMedia('(orientation: landscape)').matches ? Math.min(screen.width, screen.height) : Math.max(screen.width, screen.height);
+    gap = Math.round(sh - innerHeight); if (gap < 16 || gap > 140) gap = 0;
+  }
+  if (document.documentElement.style.getPropertyValue('--vfix') !== gap + 'px') { document.documentElement.style.setProperty('--vfix', gap + 'px'); relayoutSoon(); }
+}
+fixViewport(); window.addEventListener('resize', fixViewport); window.addEventListener('orientationchange', () => setTimeout(fixViewport, 300));
 if (hasManifest && !standalone && /iPhone|iPad|iPod/.test(navigator.userAgent) && !lsGet('kt-hide-install-note', 0)) $('#install-note').hidden = false;
 if (inFrame && !lsGet('kt-hide-frame-note', 0)) $('#frame-note').hidden = false;
 if (hasManifest && 'serviceWorker' in navigator) {
