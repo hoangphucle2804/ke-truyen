@@ -55,6 +55,8 @@ body.in-lib::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-are
 .btn.ghost{background:var(--surface);border:1px solid var(--line)}
 .btn.danger{background:var(--danger);color:#fff}
 .btn svg{width:18px;height:18px}
+.head-acts{display:flex;gap:8px;flex:none}
+.drop-hint{position:fixed;inset:10px;z-index:80;border:3px dashed var(--accent);border-radius:20px;background:color-mix(in srgb,var(--bg) 88%,transparent);display:grid;place-items:center;font-size:20px;font-weight:650;color:var(--accent);pointer-events:none}
 main.lib{padding-block:8px 48px}
 .note{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:6px 0 18px;font-size:13.5px;color:var(--muted)}
 .note b{color:var(--ink)}
@@ -312,12 +314,19 @@ html.rd{background:var(--rbg)}
   <header class="lib-head" id="lib-head">
     <div class="wrap">
       <div class="brand"><h1>Kệ Truyện</h1><span id="lib-count"></span></div>
+      <div class="head-acts">
+      <button class="btn ghost" id="btn-folder" type="button" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>
+        Thêm thư mục
+      </button>
       <button class="btn primary" id="btn-import" type="button">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
         Thêm truyện
       </button>
+      </div>
     </div>
   </header>
+  <div class="drop-hint" id="drop-hint" hidden><div>Thả file hoặc thư mục truyện vào đây</div></div>
   <main class="lib wrap" id="lib-main">
     <div class="note" id="install-note" hidden>
       <div><b>Đọc offline như app thật:</b> trong Safari bấm nút Chia sẻ, chọn <b>Thêm vào MH chính</b>, rồi mở Kệ Truyện từ biểu tượng ngoài màn hình.</div>
@@ -362,6 +371,7 @@ html.rd{background:var(--rbg)}
 </div>
 <div id="toast" class="toast" hidden></div>
 <input type="file" id="file-pick" multiple hidden>
+<input type="file" id="folder-pick" webkitdirectory multiple hidden>
 
 <script>
 (() => {
@@ -652,16 +662,16 @@ function guessTitle(files, firstMeta) {
   const t = firstMeta?.title || '';
   return t && !/^(ch|chương|chapter)[\s._-]*\d/i.test(t) ? t : '';
 }
-async function importFiles(fileList, target) {
+async function importFiles(fileList, target, opts = {}) {
   const files = [...fileList].filter(f => SUPPORTED.test(f.name)).sort((a, b) => ncmp(a.name, b.name));
   const skipped = fileList.length - files.length;
-  if (!files.length) { toast('Chưa hỗ trợ loại file này. Hãy chọn file EPUB, CBZ hoặc TXT.'); return; }
+  if (!files.length) { if (!opts.batch) toast('Chưa hỗ trợ loại file này. Hãy chọn file EPUB, CBZ hoặc TXT.'); return { added: 0, errors: [] }; }
   try { await navigator.storage?.persist?.(); } catch {}
   const isNew = !target;
   const book = target || { id: uid(), title: '', created: Date.now(), lastRead: Date.now(), chapters: [], files: [], hasCover: false };
   let n = book.files.reduce((m, f) => Math.max(m, f.n + 1), 0);
   const errors = []; let firstMeta = null, coverSource = null, added = 0;
-  showOverlay(isNew ? 'Đang thêm truyện…' : 'Đang thêm chương…');
+  showOverlay(opts.label || (isNew ? 'Đang thêm truyện…' : 'Đang thêm chương…'));
   for (let idx = 0; idx < files.length; idx++) {
     const f = files[idx];
     updateOverlay(idx / files.length, `${idx + 1}/${files.length} · ${f.name}`);
@@ -690,14 +700,15 @@ async function importFiles(fileList, target) {
     } catch (e) { errors.push(`${f.name}: ${e.message || e}`); }
   }
   updateOverlay(1, 'Đang lưu…');
-  if (!added) { hideOverlay(); showErrors(errors, 'Không thêm được file nào'); return; }
+  if (!added) { hideOverlay(); if (!opts.batch) showErrors(errors, 'Không thêm được file nào'); return { added, errors }; }
   book.chapters.sort((a, b) => ncmp(a.src, b.src) || a.sub - b.sub);
   const types = new Set(book.chapters.map(c => c.type));
   book.kind = types.size === 1 && types.has('images') ? 'comic' : types.has('images') ? 'mixed' : 'novel';
-  if (isNew) { book.title = guessTitle(files, firstMeta) || 'Truyện mới'; book.author = firstMeta?.creator || ''; }
+  if (isNew) { book.title = opts.title || guessTitle(files, firstMeta) || 'Truyện mới'; book.author = firstMeta?.creator || ''; }
   if (!book.hasCover && coverSource) { try { const t = await makeThumb(await coverSource()); if (t) { await Store.putFile(`${book.id}/cover`, t); book.hasCover = true; } } catch {} }
   await Store.putBook(book);
   hideOverlay();
+  if (opts.batch) return { added, errors };
   await renderLibrary();
   const msg = `${isNew ? 'Đã thêm' : 'Đã bổ sung'} ${added} file${skipped ? ` (bỏ qua ${skipped} file không hỗ trợ)` : ''}.`;
   if (errors.length) showErrors(errors, msg);
@@ -779,14 +790,19 @@ function libTop(books, pmap) {
 function emptyState() {
   return el('div', { class: 'empty' },
     el('div', {}, el('h2', { text: 'Kệ đang trống. Thêm bộ truyện đầu tiên của bạn.' })),
-    el('p', { text: 'Truyện được lưu ngay trong điện thoại nên đọc được cả khi không có mạng. Kệ Truyện nhớ chỗ bạn đang đọc, kể cả khi thoát ra.' }),
-    el('ol', { class: 'steps' },
+    el('p', { text: `Truyện được lưu ngay trong ${canFolder ? 'máy' : 'điện thoại'} nên đọc được cả khi không có mạng. Kệ Truyện nhớ chỗ bạn đang đọc, kể cả khi thoát ra.` }),
+    canFolder ? el('ol', { class: 'steps' },
+      el('li', {}, el('div', { html: 'Bấm <b>Thêm thư mục</b> và chọn thư mục chứa truyện: mọi file EPUB, CBZ, TXT bên trong được thêm một lượt. Mỗi thư mục con thành <b>một bộ truyện</b>.' })),
+      el('li', {}, el('div', { html: 'Hoặc kéo file / thư mục từ File Explorer <b>thả vào cửa sổ này</b>. Muốn thêm từng file thì bấm <b>Thêm truyện</b>.' })),
+      el('li', {}, el('div', { html: 'Bấm vào bìa để đọc. Phím <b>← →</b> để đổi chương, bấm giữa trang để hiện mục lục và cài đặt.' })))
+    : el('ol', { class: 'steps' },
       el('li', {}, el('div', { html: 'Bấm <b>Thêm truyện</b>, mở thư mục chứa truyện trong ứng dụng Tệp.' })),
       el('li', {}, el('div', { html: 'Bấm <b>Chọn</b> ở góc trên, chọn tất cả các chương (ví dụ 209 file EPUB). Các file chọn cùng lúc được gộp thành <b>một bộ truyện</b>, xếp đúng thứ tự chương.' })),
       el('li', {}, el('div', { html: 'Chạm vào bìa để đọc. Truyện tranh cuộn dọc liền mạch qua các chương, chạm giữa màn hình để hiện mục lục.' }))),
     el('div', { class: 'formats' }, ...['EPUB truyện tranh', 'EPUB truyện chữ', 'CBZ / ZIP ảnh', 'TXT'].map(t => el('span', { class: 'chip', text: t }))),
     el('div', { class: 'row' },
       el('button', { class: 'btn primary', type: 'button', text: 'Thêm truyện', onclick: () => pickFiles(null) }),
+      canFolder ? el('button', { class: 'btn ghost', type: 'button', text: 'Thêm cả thư mục', onclick: () => $('#btn-folder').click() }) : null,
       el('button', { class: 'btn ghost', type: 'button', text: 'Đọc thử sách mẫu', onclick: addSample })));
 }
 async function renderStorage() {
@@ -795,7 +811,7 @@ async function renderStorage() {
     const est = await navigator.storage?.estimate?.();
     if (est) box.append(el('span', { text: `Đã dùng ${fmtBytes(est.usage || 0)}${est.quota ? ' / ' + fmtBytes(est.quota) : ''}` }));
     const persisted = await navigator.storage?.persisted?.();
-    if (persisted != null) box.append(el('span', { text: persisted ? 'Bộ nhớ: được giữ cố định' : 'Bộ nhớ: iOS có thể dọn khi máy đầy' }));
+    if (persisted != null) box.append(el('span', { text: persisted ? 'Bộ nhớ: được giữ cố định' : `Bộ nhớ: ${canFolder ? 'trình duyệt' : 'iOS'} có thể dọn khi máy đầy` }));
   } catch {}
 }
 function bookMenu(b) {
@@ -838,6 +854,73 @@ let pickTarget = null;
 function pickFiles(target) { pickTarget = target; const inp = $('#file-pick'); inp.value = ''; inp.click(); }
 $('#file-pick').addEventListener('change', e => { const fl = e.target.files; if (fl && fl.length) importFiles(fl, pickTarget); });
 $('#btn-import').addEventListener('click', () => pickFiles(null));
+
+/* ----- Thêm cả thư mục (máy tính) và kéo thả ----- */
+const canFolder = 'webkitdirectory' in document.createElement('input') && !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+if (canFolder) $('#btn-folder').hidden = false;
+$('#btn-folder').addEventListener('click', () => { const inp = $('#folder-pick'); inp.value = ''; inp.click(); });
+$('#folder-pick').addEventListener('change', e => { const fl = [...(e.target.files || [])]; if (fl.length) importEntries(fl.map(f => ({ file: f, path: f.webkitRelativePath || f.name }))); });
+const looksLikeChapters = files => files.length >= 3 && files.filter(f => /^(?:ch(?:apter|ap|ương|uong)?|chương|chuong|ep(?:isode)?|tập|tap|vol(?:ume)?)?[\s._-]*\d/i.test(baseName(f.name))).length >= files.length * 0.8;
+// Chia danh sách file thành từng bộ truyện: mỗi thư mục con là một bộ; file lẻ là một bộ riêng,
+// trừ khi chúng trông như các chương của cùng một bộ (Ch.001, Ch.002…)
+function groupEntries(entries) {
+  const ok = entries.filter(e => SUPPORTED.test(e.file.name) && !/(^|\/)(__MACOSX|\.)/.test(e.path));
+  const parts = e => e.path.split('/').filter(Boolean);
+  const depth = Math.min(...ok.map(e => parts(e).length));
+  const base = depth > 1 ? 1 : 0;       // chọn thư mục → bỏ tên thư mục gốc
+  const loose = [], dirs = new Map();
+  for (const e of ok) {
+    const ps = parts(e).slice(base);
+    if (ps.length > 1) { const k = ps[0]; if (!dirs.has(k)) dirs.set(k, []); dirs.get(k).push(e.file); }
+    else loose.push(e.file);
+  }
+  const groups = [...dirs].map(([name, files]) => ({ title: name.replace(/[_]+/g, ' ').trim(), files }));
+  const rootName = base ? parts(ok[0])[0].replace(/[_]+/g, ' ').trim() : '';
+  if (looksLikeChapters(loose)) groups.push({ title: rootName || null, files: loose });
+  else loose.forEach(f => groups.push({ title: null, files: [f] }));
+  return { groups, skipped: entries.length - ok.length };
+}
+async function importEntries(entries) {
+  const { groups, skipped } = groupEntries(entries);
+  if (!groups.length) { toast('Không có file EPUB, CBZ hoặc TXT nào trong đó.'); return; }
+  const books = await Store.books().catch(() => []);
+  const have = new Set(books.flatMap(b => b.files.map(f => f.name + '|' + f.size)));
+  const todo = groups.filter(g => !g.files.every(f => have.has(f.name + '|' + f.size)));
+  const dup = groups.length - todo.length;
+  let ok = 0; const errors = [];
+  for (let i = 0; i < todo.length; i++) {
+    const g = todo[i];
+    const r = await importFiles(g.files, null, { batch: true, title: g.title, label: `Đang thêm truyện ${i + 1}/${todo.length}…` });
+    if (r && r.added) ok++;
+    if (r) errors.push(...r.errors);
+  }
+  await renderLibrary();
+  const msg = `Đã thêm ${ok} bộ truyện` + (dup ? `, bỏ qua ${dup} bộ đã có trên kệ` : '') + (skipped ? `, bỏ qua ${skipped} file không hỗ trợ` : '') + '.';
+  if (errors.length) showErrors(errors, msg); else toast(msg);
+}
+// Kéo thả file/thư mục vào kệ sách
+async function readDropped(dt) {
+  const out = [], items = [...(dt.items || [])].map(it => it.webkitGetAsEntry?.()).filter(Boolean);
+  if (!items.length) return [...(dt.files || [])].map(f => ({ file: f, path: f.name }));
+  const walk = async (entry, path) => {
+    if (entry.isFile) { const f = await new Promise((res, rej) => entry.file(res, rej)); out.push({ file: f, path: path + f.name }); return; }
+    const rd = entry.createReader(); let batch;
+    do { batch = await new Promise((res, rej) => rd.readEntries(res, rej)); for (const e of batch) await walk(e, path + entry.name + '/'); } while (batch.length);
+  };
+  for (const e of items) await walk(e, '');
+  return out;
+}
+let dragN = 0;
+const dragOk = e => !$('#lib-view').hidden && [...(e.dataTransfer?.types || [])].includes('Files');
+window.addEventListener('dragenter', e => { if (!dragOk(e)) return; e.preventDefault(); dragN++; $('#drop-hint').hidden = false; });
+window.addEventListener('dragover', e => { if (dragOk(e)) e.preventDefault(); });
+window.addEventListener('dragleave', e => { if (!dragOk(e)) return; if (--dragN <= 0) { dragN = 0; $('#drop-hint').hidden = true; } });
+window.addEventListener('drop', async e => {
+  if (!dragOk(e)) return;
+  e.preventDefault(); dragN = 0; $('#drop-hint').hidden = true;
+  const entries = await readDropped(e.dataTransfer).catch(() => []);
+  if (entries.length) importEntries(entries);
+});
 
 const SAMPLE = [
   ['Mở đầu', 'Trăm năm trong cõi người ta,\nChữ tài chữ mệnh khéo là ghét nhau.\nTrải qua một cuộc bể dâu,\nNhững điều trông thấy mà đau đớn lòng.\nLạ gì bỉ sắc tư phong,\nTrời xanh quen thói má hồng đánh ghen.\nCảo thơm lần giở trước đèn,\nPhong tình cổ lục còn truyền sử xanh.'],

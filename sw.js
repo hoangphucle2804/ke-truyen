@@ -1,7 +1,7 @@
 // Kệ Truyện – service worker.
 // Trang chính (index.html): lấy bản mới nhất từ mạng trước; mất mạng hoặc mạng quá chậm thì dùng bản đã lưu.
 // Ảnh/icon/manifest: dùng bản đã lưu cho nhanh, đồng thời cập nhật ngầm.
-const CACHE='ke-truyen-v11';
+const CACHE='ke-truyen-v13';
 const SHELL=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 const WAIT_NET=3500; // quá thời gian này mà mạng chưa trả lời thì mở bản đã lưu
 
