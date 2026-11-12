@@ -1143,6 +1143,74 @@ html.c314-on,html.c314-on *{cursor:none!important}
 .srt button[aria-checked="true"]::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
 .srt button:active{background:color-mix(in srgb,var(--ink) 7%,transparent)}
 @media (prefers-reduced-motion: reduce){.srt,.f292-f,.xd-cz{transition:none}}
+
+/* ----- Lucian UX/UI Prompt #004 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#004 ----- */
+.d004{--bar:var(--k-grad,linear-gradient(90deg,#6A57F2,#3D8BFF 60%,#22C3A6));--ok:#12B886;position:relative;display:flex;justify-content:center}
+.d004-btn{--p:0;position:relative;width:100%;height:66px;padding:0;border-radius:999px;background:var(--ink);color:var(--bg);overflow:hidden;isolation:isolate;
+  box-shadow:0 22px 36px -22px rgba(0,0,0,.6);transition:width .6s var(--ux-ease),transform .5s var(--ux-spring),background-color .5s var(--ux-ease)}
+.d004-btn:disabled{opacity:.55}
+.d004-btn:active{transform:scale(.97)}
+.d004-btn:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+.d004-idle,.d004-run,.d004-ok{position:absolute;inset:0;display:flex;align-items:center;transition:opacity .35s var(--ux-ease),transform .5s var(--ux-ease)}
+.d004-idle{gap:14px;padding:0 24px 0 9px}
+.d004-arw{width:48px;height:48px;flex:none;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--bg) 14%,transparent);overflow:hidden}
+.d004-arw svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+.d004-arw .d004-a{transition:transform .5s var(--ux-ease)}
+.d004-btn:not(:disabled) .d004-arw .d004-a{animation:d004-bob 1.6s var(--ux-ease) infinite}
+@keyframes d004-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+.d004-idle b{font-size:17px;font-weight:720;letter-spacing:-.02em;white-space:nowrap}
+.d004-idle small{margin-left:auto;font-size:13px;font-weight:650;opacity:.6;white-space:nowrap}
+.d004-track{position:absolute;inset:0;background:color-mix(in srgb,var(--ink) 88%,var(--bg));opacity:0;transition:opacity .4s var(--ux-ease)}
+.d004-bar{position:absolute;left:0;top:0;bottom:0;width:100%;background:var(--bar);transform-origin:0 50%;transform:scaleX(var(--p));border-radius:inherit}
+.d004-bar::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);background-size:220% 100%;animation:d004-shine 1.3s linear infinite}
+@keyframes d004-shine{from{background-position:120% 0}to{background-position:-100% 0}}
+.d004-run{justify-content:space-between;gap:10px;padding:0 26px;opacity:0;transform:translateY(12px);color:#fff}
+.d004-run b{font-size:19px;font-weight:760;font-variant-numeric:tabular-nums;letter-spacing:-.02em;text-shadow:0 1px 6px rgba(0,0,0,.25)}
+.d004-run small{font-size:13px;font-weight:650;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 6px rgba(0,0,0,.25)}
+.d004-ok{justify-content:center;gap:10px;opacity:0;transform:scale(.6);color:#fff}
+.d004-ok i{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.22)}
+.d004-ok svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.d004-ok path{stroke-dasharray:18;stroke-dashoffset:18;transition:stroke-dashoffset .45s var(--ux-ease) .25s}
+.d004-ok span{font-size:16px;font-weight:720;white-space:nowrap;max-width:0;overflow:hidden;opacity:0;transition:max-width .6s var(--ux-ease),opacity .4s var(--ux-ease)}
+.d004[data-state="run"] .d004-idle{opacity:0;transform:translateY(-12px)}
+.d004[data-state="run"] .d004-arw .d004-a{transform:translateY(26px);animation:none}
+.d004[data-state="run"] .d004-track{opacity:1}
+.d004[data-state="run"] .d004-run{opacity:1;transform:none}
+.d004[data-state="fold"] .d004-idle,.d004[data-state="done"] .d004-idle{opacity:0}
+.d004[data-state="fold"] .d004-btn{width:66px;background:var(--ok)}
+.d004[data-state="fold"] .d004-bar{opacity:0}
+.d004[data-state="fold"] .d004-ok,.d004[data-state="done"] .d004-ok{opacity:1;transform:none}
+.d004[data-state="fold"] .d004-ok path,.d004[data-state="done"] .d004-ok path{stroke-dashoffset:0}
+.d004[data-state="done"] .d004-btn{background:var(--ok);transition-timing-function:var(--ux-spring)}
+.d004[data-state="done"] .d004-bar{opacity:0}
+.d004[data-state="done"] .d004-ok span{max-width:320px;opacity:1}
+.d004.alt .d004-btn{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1.5px var(--line),0 16px 30px -24px rgba(0,0,0,.5)}
+.d004.alt .d004-arw{background:var(--k-soft,color-mix(in srgb,var(--accent) 12%,var(--surface)));color:var(--k-soft-ink,var(--accent))}
+.d004.alt .d004-track{background:color-mix(in srgb,var(--ink) 12%,var(--surface))}
+.d004.alt[data-state="fold"] .d004-btn,.d004.alt[data-state="done"] .d004-btn{background:var(--ok);color:#fff;box-shadow:none}
+.d004-live{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+/* ----- Bảng sao lưu ----- */
+.bk{gap:12px}
+.sheet-body p.bk-file{display:flex;align-items:center;gap:12px;margin:2px 2px 0;color:var(--ink)}
+.bk-ic{width:34px;height:42px;flex:none;border-radius:8px;display:grid;place-items:end center;padding-bottom:6px;background:var(--k-fab,linear-gradient(145deg,#8B6CFF,#5B6CFF));color:#fff;font-size:10px;font-weight:900;letter-spacing:.04em;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+.bk-file b{display:block;font-size:14.5px;font-weight:700;letter-spacing:-.01em;word-break:break-all}
+.bk-file small{display:block;margin-top:2px;font-size:12.5px;color:var(--muted)}
+.sheet-body p.bk-last{margin:-2px 0 0;text-align:center;font-size:12.5px}
+.bk-what{margin:0;padding:12px 14px 12px 30px;border-radius:16px;background:var(--bg);box-shadow:0 0 0 1px var(--line);display:grid;gap:6px;font-size:13px;line-height:1.45;color:var(--muted)}
+.bk-sep{height:1px;background:var(--line);margin:4px 0}
+.bk-sum{display:grid;gap:4px;padding:12px 14px;border-radius:16px;background:var(--k-soft,color-mix(in srgb,var(--accent) 10%,var(--surface)));font-size:13px;line-height:1.45;color:var(--ink)}
+.bk-sum b{font-size:15px}
+.bk-sum .ok::before{content:"✓ ";color:#12B886;font-weight:900}
+.bk-sum .wait::before{content:"⏳ "}
+.bk-note{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:10px 8px 10px 12px;border-radius:18px;background:var(--surface);box-shadow:var(--k-sh,0 0 0 1px var(--line))}
+.bk-note-ic{width:38px;height:38px;flex:none;border-radius:12px;display:grid;place-items:center;background:var(--k-soft,color-mix(in srgb,var(--accent) 12%,var(--surface)));color:var(--k-soft-ink,var(--accent))}
+.bk-note-ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.bk-note > div{flex:1;min-width:0}
+.bk-note b{display:block;font-size:14px;font-weight:750}
+.bk-note small{display:block;font-size:12px;color:var(--muted)}
+.bk-note-go{height:34px;padding:0 14px;border-radius:999px;background:var(--ink);color:var(--bg);font-size:13px;font-weight:800;flex:none}
+.bk-note-x{width:30px;height:30px;flex:none;border-radius:50%;color:var(--muted);font-size:20px;line-height:1}
+@media (prefers-reduced-motion: reduce){.d004-btn,.d004-idle,.d004-run,.d004-ok,.d004-ok span{transition:none}.d004-arw .d004-a,.d004-bar::after{animation:none}}
 </style>
 </head>
 <body>
@@ -1595,6 +1663,7 @@ async function importFiles(fileList, target, opts = {}) {
   if (isNew) { book.title = opts.title || guessTitle(files, firstMeta) || 'Truyện mới'; book.author = firstMeta?.creator || ''; }
   if (!book.hasCover && coverSource) { try { const t = await makeThumb(await coverSource()); if (t) { await Store.putFile(`${book.id}/cover`, t); book.hasCover = true; } } catch {} }
   await Store.putBook(book);
+  await applyPendingFor(book);
   hideOverlay();
   if (opts.batch) return { added, errors };
   await renderLibrary();
@@ -1924,6 +1993,7 @@ function openUi() {
     body.classList.add('ui-set');
     const row = (title, sub, on, change) => el('div', { class: 'ui-row' }, el('div', {}, el('b', { text: title }), el('small', { text: sub })), sw(on, change).el);
     body.append(
+      el('div', { class: 'ui-row' }, el('div', {}, el('b', { text: 'Sao lưu & khôi phục' }), el('small', { text: `Lần gần nhất: ${fmtAgo(lsGet('kt-bk-at', 0))}` })), el('button', { type: 'button', class: 'btn primary', text: 'Mở', onclick: openBackup })),
       el('div', { class: 'ui-h', text: 'Cảnh nền' }), themePanels(),
       el('div', { class: 'ui-h', text: 'Sáng / tối' }),
       seg([['auto', 'Theo máy'], ['light', 'Sáng'], ['dark', 'Tối']], UI.mode, v => { UI.mode = v; saveUI(); applyUI(); $('#scene').classList.toggle('night', libDark()); syncThemeColor(); }, 'Sáng / tối'),
@@ -2198,7 +2268,7 @@ function glassGo(label, b) {
 const finePtr = matchMedia('(hover: hover) and (pointer: fine)');
 (() => {
   const cur = el('div', { class: 'c314', 'aria-hidden': 'true' }, el('span')), cl = cur.firstChild; document.body.append(cur);
-  const BTN = '.btn,.ui-btn,.xd-x,.xd-nav button,.useg button,.fab-main,.fab-it,.xd-opt,.xd-go,.sheet-head button,.ba-it,.cz-nv button,.b361-pv,.b361-nx,.b361-dot,.sw,.emo,.swx-c,.xd-next,.hd-btn,.hd-undo,.wk button,.note button,.czb button,.f292-f,.f292-sort,.srt button,.xd-cz';
+  const BTN = '.btn,.ui-btn,.xd-x,.xd-nav button,.useg button,.fab-main,.fab-it,.xd-opt,.xd-go,.sheet-head button,.ba-it,.cz-nv button,.b361-pv,.b361-nx,.b361-dot,.sw,.emo,.swx-c,.xd-next,.hd-btn,.hd-undo,.wk button,.note button,.czb button,.f292-f,.f292-sort,.srt button,.xd-cz,.d004-btn,.bk-note-go,.bk-note-x';
   const pos = { x: -99, y: -99 }, sp = { x: -99, y: -99 }, vel = { x: 0, y: 0 };
   let mode = '', tgt = null, raf = 0, last = 0, live = false;
   const enabled = () => UI.cursor !== false && finePtr.matches && !R.book;
@@ -2400,6 +2470,207 @@ function sortMenu(btn) {
   xd.addEventListener('touchcancel', () => { g = null; reset(true); }, { passive: true });
 })();
 $('#xd-cz').addEventListener('click', () => { if (XD.cur && !XD.busy) storyCustom(XD.cur.x.b); });
+
+/* ---------------- Sao lưu & khôi phục ----------------
+   Gói chỗ đang đọc, dấu trang, thống kê, cài đặt và tuỳ chỉnh từng truyện vào một file .json nhỏ (không gồm file truyện).
+   Mỗi truyện được nhận diện bằng tên + dung lượng các file gốc, nên khi thêm lại đúng file trên máy mới là tự khớp. */
+const fpOf = b => (b.files || []).map(f => `${f.name}:${f.size}`).sort().join('|');
+const chRef = (b, chId) => { const i = b.chapters.findIndex(c => c.id === chId); if (i < 0) return null; const c = b.chapters[i]; return { src: c.src, sub: c.sub, i, t: c.title }; };
+function chFind(b, r) {
+  if (!r) return null;
+  let c = r.src != null ? b.chapters.find(x => x.src === r.src && x.sub === r.sub) : null;
+  if (!c && b.chapters[r.i] && b.chapters[r.i].title === r.t) c = b.chapters[r.i];
+  if (!c) c = b.chapters.find(x => x.title === r.t) || b.chapters[Math.min(r.i, b.chapters.length - 1)];
+  return c ? c.id : null;
+}
+const toDataUrl = blob => new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.onerror = () => r(null); fr.readAsDataURL(blob); });
+async function buildBackup() {
+  const [books, prog] = await Promise.all([Store.books(), Store.allProgress()]);
+  const pm = new Map(prog.map(p => [p.id, p])), out = [];
+  for (const b of books) {
+    const p = pm.get(b.id);
+    const e = { fp: fpOf(b), title: b.title, kind: b.kind, chapters: b.chapters.length, ui: b.ui || null, look: b.look || null, created: b.created, lastRead: b.lastRead,
+      marks: (b.marks || []).map(m => { const { chId, ...r } = m; return { ...r, ch: chRef(b, chId) }; }).filter(m => m.ch),
+      prog: p ? { ch: chRef(b, p.chId), frac: p.frac || 0, at: p.at || 0 } : null };
+    if (b.ui && b.ui.ownCover) { const bl = await Store.file(`${b.id}/ucover`).catch(() => null); if (bl) e.cover = await toDataUrl(bl); }
+    out.push(e);
+  }
+  const ls = {};
+  try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith('kt-') && k !== 'kt-pending') ls[k] = localStorage.getItem(k); } } catch {}
+  ls['kt-bk-at'] = JSON.stringify(Date.now()); delete ls['kt-bk-snooze'];
+  return { app: 'ke-truyen', v: 1, at: Date.now(), books: out, pending: lsGet('kt-pending', []), ls };
+}
+function mergeStats(raw) {
+  let v; try { v = JSON.parse(raw); } catch { return; }
+  for (const g of ['days', 'pages', 'ch']) {
+    if (!v || !v[g]) continue; ST[g] ||= {};
+    for (const k in v[g]) { const a = ST[g][k], b = v[g][k]; ST[g][k] = typeof a === 'number' && typeof b === 'number' ? Math.max(a, b) : a ?? b; }
+  }
+  lsSet('kt-stats', ST);
+}
+async function applyEntry(b, e) {
+  if (e.title) b.title = e.title;
+  if (e.ui) b.ui = Object.assign({}, e.ui, { ownCover: false });
+  if (e.look) b.look = e.look;
+  if (e.cover) { try { const bl = await (await fetch(e.cover)).blob(); await Store.putFile(`${b.id}/ucover`, bl); b.ui = Object.assign({}, b.ui, { ownCover: true }); } catch {} }
+  if (e.marks && e.marks.length) {
+    const key = m => m.chId + ':' + (+m.frac || 0).toFixed(3), have = new Set((b.marks || []).map(key));
+    const add = e.marks.map(m => { const id = chFind(b, m.ch); if (!id) return null; const { ch, ...r } = m; return { ...r, chId: id }; }).filter(m => m && !have.has(key(m)));
+    b.marks = [...(b.marks || []), ...add];
+  }
+  if (e.lastRead) b.lastRead = Math.max(b.lastRead || 0, e.lastRead);
+  await Store.putBook(b); COLS.delete(b.id);
+  if (e.prog && e.prog.ch) {
+    const id = chFind(b, e.prog.ch), cur = await Store.progress(b.id).catch(() => null);
+    if (id && (!cur || (cur.at || 0) < (e.prog.at || 0))) await Store.putProgress({ id: b.id, chId: id, frac: e.prog.frac || 0, at: e.prog.at || Date.now() });
+  }
+}
+async function applyBackup(data, step) {
+  for (const [k, v] of Object.entries(data.ls || {})) { if (k === 'kt-stats') mergeStats(v); else try { localStorage.setItem(k, v); } catch {} }
+  const books = await Store.books(), byFp = new Map(books.map(b => [fpOf(b), b]));
+  const list = [...(data.books || []), ...(data.pending || [])], pend = lsGet('kt-pending', []).filter(p => !list.some(e => e.fp === p.fp));
+  let i = 0, matched = 0;
+  for (const e of list) {
+    const b = byFp.get(e.fp);
+    if (b) { await applyEntry(b, e); matched++; } else if (!pend.some(p => p.fp === e.fp)) pend.push(e);
+    step(++i / Math.max(1, list.length));
+  }
+  try { lsSet('kt-pending', pend); } catch {}
+  return { matched, pending: pend.length };
+}
+// Thêm lại đúng file trên máy mới → tự áp dụng phần sao lưu đang chờ của truyện đó
+async function applyPendingFor(book) {
+  const list = lsGet('kt-pending', []); if (!list.length) return;
+  const k = list.findIndex(e => e.fp === fpOf(book)); if (k < 0) return;
+  try { await applyEntry(book, list[k]); list.splice(k, 1); lsSet('kt-pending', list); setTimeout(() => toast('Đã khôi phục chỗ đọc và tuỳ chỉnh của truyện này từ bản sao lưu.'), 900); } catch {}
+}
+const fmtAgo = t => { if (!t) return 'chưa sao lưu lần nào'; const d = Math.floor((Date.now() - t) / 864e5); return d <= 0 ? 'hôm nay' : d === 1 ? 'hôm qua' : `${d} ngày trước`; };
+const dmy = (d = new Date()) => `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+
+/* Lucian UX/UI Prompt #004 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#004
+   Nút tải có tiến độ: bấm thì mũi tên rơi xuống và chính nút biến thành thanh tiến độ; xong thì gập thành vòng tròn,
+   vẽ dấu tích rồi mở ra lại với chữ "đã lưu". */
+const SVG_DN = '<svg viewBox="0 0 24 24"><g class="d004-a"><path d="M12 4.5v11M7 11l5 5 5-5"/></g><path d="M5 19.5h14"/></svg>';
+const SVG_UP = '<svg viewBox="0 0 24 24"><g class="d004-a"><path d="M12 16V5M7 9.5l5-5 5 5"/></g><path d="M5 19.5h14"/></svg>';
+function btn004(o) {
+  const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const pct = el('b', { text: '0%' }), eta = el('small', { text: o.runText }), lab = el('b', { text: o.label }), sz = el('small', { text: o.size || '' }), okT = el('span', { text: o.doneText });
+  const b = el('button', { type: 'button', class: 'd004-btn', 'aria-label': o.label },
+    el('span', { class: 'd004-track', 'aria-hidden': 'true' }, el('span', { class: 'd004-bar' })),
+    el('span', { class: 'd004-idle', 'aria-hidden': 'true' }, el('span', { class: 'd004-arw', html: o.up ? SVG_UP : SVG_DN }), lab, sz),
+    el('span', { class: 'd004-run', 'aria-hidden': 'true' }, pct, eta),
+    el('span', { class: 'd004-ok', 'aria-hidden': 'true' }, el('i', { html: '<svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.4"/></svg>' }), okT));
+  const live = el('span', { class: 'd004-live', 'aria-live': 'polite' });
+  const w = el('div', { class: 'd004' + (o.alt ? ' alt' : ''), 'data-state': 'idle' }, b, live);
+  let raf = 0, p = 0, target = 0;
+  const set = v => { p = v; b.style.setProperty('--p', v.toFixed(4)); pct.textContent = Math.round(v * 100) + '%'; };
+  const loop = () => { if (p < target) set(Math.min(target, p + Math.max(.004, (target - p) * .12))); if (w.dataset.state === 'run') raf = requestAnimationFrame(loop); };
+  return {
+    el: w, btn: b,
+    label: t => { lab.textContent = t; b.setAttribute('aria-label', t); },
+    size: t => { sz.textContent = t; },
+    start(text) { cancelAnimationFrame(raf); set(0); target = 0; eta.textContent = text || o.runText; w.dataset.state = 'run'; live.textContent = text || o.runText; raf = requestAnimationFrame(loop); },
+    to(v, text) { target = Math.max(target, Math.min(1, v)); if (text) eta.textContent = text; },
+    async finish(text) {
+      target = 1; await sleep(rm ? 0 : 420); cancelAnimationFrame(raf); set(1);
+      if (text) okT.textContent = text; live.textContent = okT.textContent;
+      w.dataset.state = 'fold'; await sleep(rm ? 80 : 650); w.dataset.state = 'done';
+    },
+    reset() { cancelAnimationFrame(raf); w.dataset.state = 'idle'; set(0); okT.textContent = o.doneText; },
+  };
+}
+const canShareFiles = () => /iPhone|iPad|iPod|Android/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+function openBackup() {
+  openSheet('Sao lưu & khôi phục', body => {
+    body.classList.add('bk');
+    let file = null;
+    const name = `Ke-Truyen-sao-luu-${dmy()}.json`;
+    const fsz = el('small', { text: 'đang tính…' }), last = el('p', { class: 'bk-last', text: `Lần sao lưu gần nhất: ${fmtAgo(lsGet('kt-bk-at', 0))}` });
+    const bk = btn004({ label: 'Sao lưu', size: '', runText: 'Đang gói dữ liệu…', doneText: canShareFiles() ? 'Đã tạo file sao lưu' : 'Đã lưu vào Tải xuống' });
+    bk.btn.disabled = true;
+    buildBackup().then(d => {
+      file = new File([JSON.stringify(d)], name, { type: 'application/json' });
+      const t = fmtBytes(file.size); fsz.textContent = `${d.books.length} truyện · ${t}`; bk.size(t); bk.btn.disabled = false;
+    }).catch(e => { fsz.textContent = 'Không đọc được dữ liệu: ' + (e.message || e); });
+    bk.btn.addEventListener('click', async () => {
+      const st = bk.el.dataset.state;
+      if (st === 'run' || !file) return;
+      if (st !== 'idle') { bk.reset(); return; }
+      bk.start('Đang gói dữ liệu…'); bk.to(.6);
+      let ok = true, creep = 0;
+      try {
+        if (canShareFiles() && navigator.canShare?.({ files: [file] })) {
+          creep = setInterval(() => bk.to(Math.min(.94, (parseFloat(bk.btn.style.getPropertyValue('--p')) || .6) + .02), 'Chọn “Lưu vào Tệp”…'), 260);
+          await navigator.share({ files: [file], title: 'Sao lưu Kệ Truyện' });
+        } else {
+          const a = el('a', { href: URL.createObjectURL(file), download: name }); document.body.append(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(a.href), 5000); bk.to(.9, 'Đang lưu…'); await sleep(600);
+        }
+      } catch (e) {
+        ok = false; bk.reset();
+        toast(e && e.name === 'AbortError' ? 'Đã huỷ sao lưu.' : 'Không lưu được: ' + ((e && e.message) || e));
+      } finally { clearInterval(creep); }
+      if (!ok) return;
+      lsSet('kt-bk-at', Date.now()); last.textContent = 'Lần sao lưu gần nhất: hôm nay';
+      await bk.finish();
+    });
+    // — khôi phục
+    let data = null;
+    const pick = el('input', { type: 'file', accept: '.json,application/json', hidden: '' });
+    const sum = el('div', { class: 'bk-sum', hidden: '' });
+    const rs = btn004({ label: 'Khôi phục từ file', up: true, alt: true, runText: 'Đang khôi phục…', doneText: 'Đã khôi phục' });
+    rs.btn.addEventListener('click', async () => {
+      const st = rs.el.dataset.state;
+      if (st === 'run' || st === 'fold') return;
+      if (st === 'done') { location.reload(); return; }
+      if (!data) { pick.value = ''; pick.click(); return; }
+      rs.start('Đang khôi phục…');
+      try {
+        const r = await applyBackup(data, f => rs.to(f * .95, `Đang khôi phục… ${Math.round(f * 100)}%`));
+        await rs.finish(r.pending ? `Xong · ${r.pending} truyện chờ thêm file` : 'Đã khôi phục, đang mở lại…');
+        setTimeout(() => location.reload(), 1600);
+      } catch (e) { rs.reset(); toast('Không khôi phục được: ' + (e.message || e)); }
+    });
+    pick.addEventListener('change', async () => {
+      const f = pick.files && pick.files[0]; if (!f) return;
+      try {
+        const d = JSON.parse(await f.text());
+        if (!d || d.app !== 'ke-truyen' || !Array.isArray(d.books)) throw new Error('Đây không phải file sao lưu của Kệ Truyện');
+        const books = await Store.books(), have = new Set(books.map(fpOf)), list = [...d.books, ...(d.pending || [])];
+        const on = list.filter(e => have.has(e.fp)).length, off = list.length - on;
+        data = d;
+        sum.replaceChildren(
+          el('b', { text: `Bản sao lưu ngày ${fmtDate(new Date(d.at))}` }),
+          el('span', { text: `${list.length} truyện · cài đặt giao diện · thống kê đọc` }),
+          el('span', { class: 'ok', text: `${on} truyện đã có trên máy: khôi phục ngay chỗ đọc, dấu trang, màu, ảnh bìa riêng.` }),
+          off ? el('span', { class: 'wait', text: `${off} truyện chưa có: khi bạn thêm lại đúng file của chúng, app sẽ tự khôi phục.` }) : null);
+        sum.hidden = false; rs.label('Khôi phục ngay'); rs.size('');
+        setTimeout(() => rs.el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60);
+      } catch (e) { data = null; sum.hidden = true; rs.label('Khôi phục từ file'); toast(e.message || 'File không đọc được.'); }
+    });
+    const pend = lsGet('kt-pending', []);
+    body.append(
+      el('p', { class: 'bk-file' }, el('span', { class: 'bk-ic', 'aria-hidden': 'true', text: 'KT' }), el('span', {}, el('b', { text: name }), fsz)),
+      bk.el, last,
+      el('ul', { class: 'bk-what' },
+        el('li', { text: 'Gồm: chỗ đang đọc, dấu trang, thống kê đọc, giao diện app, màu / biểu tượng / ảnh bìa riêng của từng truyện.' }),
+        el('li', { text: 'Không gồm file truyện (EPUB, CBZ, TXT) vì rất nặng, bạn giữ file gốc như hiện tại.' }),
+        el('li', { text: canShareFiles() ? 'Trên iPhone: bấm “Lưu vào Tệp” và chọn iCloud Drive để file nằm an toàn trên mạng.' : 'Nên chép file vào Google Drive / OneDrive / USB để giữ an toàn.' })),
+      el('div', { class: 'bk-sep' }),
+      el('div', { class: 'ui-h', text: 'Khôi phục' }), sum, rs.el, pick,
+      ...(pend.length ? [el('p', { class: 'bk-last', text: `Đang chờ ${pend.length} truyện: thêm lại đúng file là tự khôi phục.` })] : []));
+  }, 'Xong');
+}
+function backupNote() {
+  const at = lsGet('kt-bk-at', 0), snooze = lsGet('kt-bk-snooze', 0);
+  if (Date.now() - at < 14 * 864e5 || Date.now() < snooze) return null;
+  const n = el('div', { class: 'bk-note' },
+    el('span', { class: 'bk-note-ic', 'aria-hidden': 'true', html: SVG_DN }),
+    el('div', {}, el('b', { text: at ? `Đã ${Math.floor((Date.now() - at) / 864e5)} ngày chưa sao lưu` : 'Bạn chưa sao lưu lần nào' }), el('small', { text: 'Giữ lại chỗ đọc và tuỳ chỉnh khi đổi máy.' })),
+    el('button', { type: 'button', class: 'bk-note-go', text: 'Sao lưu', onclick: openBackup }),
+    el('button', { type: 'button', class: 'bk-note-x', 'aria-label': 'Nhắc lại sau', text: '×', onclick: () => { lsSet('kt-bk-snooze', Date.now() + 7 * 864e5); n.remove(); } }));
+  return n;
+}
 function coverEl(b) {
   const ck = coverKey(b);
   const cover = el('div', { class: 'cover' + (ck ? '' : ' gen'), style: ck ? null : `background:${coverBg(b)}` });
@@ -2410,6 +2681,7 @@ function coverEl(b) {
 const WD = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'], WDL = ['thứ 2', 'thứ 3', 'thứ 4', 'thứ 5', 'thứ 6', 'thứ 7', 'chủ nhật'];
 function libTop(books, pmap) {
   const out = UI.scene ? [greetEl()] : [], b = books.find(x => pmap.has(x.id));
+  { const n = backupNote(); if (n) out.push(n); }
   if (b) {
     const p = pmap.get(b.id), total = b.chapters.length, ci = Math.max(0, b.chapters.findIndex(c => c.id === p.chId));
     const pct = clamp((ci + (p.frac || 0)) / total, 0, 1);
