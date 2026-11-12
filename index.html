@@ -970,7 +970,7 @@ html[data-layout="list"] .xc-em{top:auto;bottom:6px;left:42px;right:auto;width:2
 html[data-layout="list"] .xc-pin{left:auto;right:12px;top:12px;background:none;color:var(--muted)}
 /* Bảng tuỳ chọn khi nhấn giữ */
 .ba .hd-file{background:var(--surface)}
-.ba-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ba-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .ba-it{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 6px 12px;border-radius:18px;background:var(--bg);box-shadow:0 0 0 1px var(--line);font-size:12.5px;font-weight:700;color:var(--ink);transition:transform .35s var(--ux-spring)}
 .ba-it:active{transform:scale(.94)}
 .ba-it i{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--k-soft,color-mix(in srgb,var(--accent) 12%,var(--surface)));color:var(--k-soft-ink,var(--accent))}
@@ -1242,6 +1242,280 @@ html.c314-on,html.c314-on *{cursor:none!important}
 .chx.edge .chx-tt{opacity:.7}
 .flow.chx-on{will-change:transform,opacity}
 @media (prefers-reduced-motion: reduce){.chx.ready .chx-g{animation:none}}
+/* ----- Lọc chữ ----- */
+.lf{gap:12px}
+.lf-scan{position:relative;display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:18px;text-align:left;color:var(--ink);background:var(--bg);box-shadow:0 0 0 1px var(--line);overflow:hidden;transition:transform .3s var(--ux-spring)}
+.lf-scan:active{transform:scale(.98)}
+.lf-scan-ic{width:42px;height:42px;flex:none;border-radius:14px;display:grid;place-items:center;background:var(--k-soft,color-mix(in srgb,var(--accent) 12%,var(--surface)));color:var(--k-soft-ink,var(--accent))}
+.lf-scan-ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.lf-scan.run .lf-scan-ic svg{animation:lf-look 1s ease-in-out infinite}
+@keyframes lf-look{0%,100%{transform:translate(-2px,0)}50%{transform:translate(2px,-2px)}}
+.lf-scan > span:nth-child(2){flex:1;min-width:0}
+.lf-scan b{display:block;font-size:15px;font-weight:780}
+.lf-scan span span{display:block;margin-top:2px;font-size:12.5px;color:var(--muted)}
+.lf-bar{position:absolute;left:0;right:0;bottom:0;height:3px;opacity:0;transition:opacity .3s}
+.lf-bar i{position:absolute;inset:0;background:var(--k-grad,var(--accent));transform-origin:0 50%;transform:scaleX(0);transition:transform .2s linear}
+.lf-scan.run .lf-bar,.lf-scan.done .lf-bar{opacity:1}
+.lf-sug{display:grid;gap:8px}
+.lf-row{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:16px;background:var(--bg);box-shadow:0 0 0 1px var(--line);transition:box-shadow .25s,background .25s;cursor:pointer}
+.lf-row.on{background:color-mix(in srgb,#E11D48 7%,var(--surface));box-shadow:0 0 0 1.5px color-mix(in srgb,#E11D48 45%,var(--line))}
+.lf-row > div{flex:1;min-width:0}
+.lf-row q{display:block;font-size:14.5px;font-weight:650;line-height:1.4;overflow-wrap:anywhere;quotes:"“" "”"}
+.lf-row.on q{text-decoration:line-through;text-decoration-color:#E11D48;text-decoration-thickness:2px}
+.lf-row small{display:block;margin-top:4px;font-size:12px;color:var(--muted)}
+.lf-ck{width:26px;height:26px;flex:none;margin-top:1px;border-radius:8px;display:grid;place-items:center;box-shadow:inset 0 0 0 2px var(--line);color:#fff;transition:background .2s,box-shadow .2s,transform .3s cubic-bezier(.3,1.6,.5,1)}
+.lf-ck svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:18;stroke-dashoffset:18;transition:stroke-dashoffset .3s ease}
+.lf-row.on .lf-ck{background:#E11D48;box-shadow:none;transform:scale(1.06)}
+.lf-row.on .lf-ck svg{stroke-dashoffset:0}
+.lf-apply{justify-self:stretch}
+.sheet-body p.lf-clean{margin:0;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,#12B886 9%,var(--surface));font-size:13px;line-height:1.5;color:var(--ink)}
+.lf-pv{padding:12px 14px;border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);font-family:Georgia,'Times New Roman',serif}
+.lf-pv b{display:block;margin-bottom:6px;font:800 11.5px/1.3 system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.sheet-body .lf-pv p{margin:0 0 4px;font-size:13.5px;line-height:1.5;color:var(--ink);transition:opacity .3s}
+.sheet-body .lf-pv p.gone{opacity:.55;color:#E11D48;text-decoration:line-through}
+.lf-rules{display:grid;gap:6px}
+.lf-rule{display:flex;align-items:center;gap:8px;padding:8px 6px 8px 12px;border-radius:12px;background:var(--bg);box-shadow:0 0 0 1px var(--line);font-size:13.5px}
+.lf-rule span{flex:1;min-width:0;overflow-wrap:anywhere}
+.lf-rule button{width:30px;height:30px;flex:none;border-radius:50%;font-size:20px;line-height:1;color:var(--muted)}
+.sheet-body p.lf-none{margin:0;font-size:13px}
+.lf-pill{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 86px);z-index:24;display:flex;align-items:center;transform:translateX(-50%);padding:4px;border-radius:999px;background:var(--rink,#222);color:var(--rbg,#fff);box-shadow:0 14px 30px -12px rgba(0,0,0,.5);animation:lf-in .3s cubic-bezier(.3,1.4,.5,1)}
+.lf-pill[hidden]{display:none}
+.lf-pill button{height:38px;padding:0 14px;border-radius:999px;font-size:14px;font-weight:700;color:inherit;white-space:nowrap}
+.lf-pill i{width:1px;height:18px;background:currentColor;opacity:.25}
+@keyframes lf-in{from{opacity:0;transform:translate(-50%,10px) scale(.9)}}
+.content .lf-gone{transition:opacity .35s,transform .35s;opacity:0;transform:translateX(-12px)}
+.sheet-body.lf,.sheet-body.bk,.sheet-body.cz-body,.sheet-body.ui-set,.sheet-body.ba{grid-auto-rows:max-content}
+/* ----- Lọc chữ: bản Lucian (#269 · #048 · #071) ----- */
+.sheet.lf-card{position:relative;overflow:hidden}
+.lf-pc{display:flex;align-items:center;gap:12px;padding:12px 12px 12px 13px;border-radius:18px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--line)}
+.lf-th{width:44px;height:58px;flex:none;border-radius:11px;background:var(--bg);box-shadow:0 6px 14px -8px rgba(0,0,0,.45)}
+.lf-pc > div{flex:1;min-width:0}
+.lf-pc b{display:block;font-size:15px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lf-pc small{display:block;margin-top:3px;font-size:12px;font-weight:650;color:var(--muted)}
+.lf-tw{position:relative;border-bottom:1px solid var(--line);margin:0 calc(-1 * var(--gutter-r)) 0 calc(-1 * var(--gutter-l));padding:0 var(--gutter-r) 0 var(--gutter-l)}
+.lf-tabs{position:relative;display:flex;gap:2px}
+.lf-tab{position:relative;flex:none;height:44px;padding:0 10px;font-size:15px;font-weight:750;letter-spacing:-.02em;color:var(--muted);transition:color .3s;display:flex;align-items:center;gap:6px}
+.lf-tab[aria-selected="true"]{color:var(--ink)}
+.lf-tab small{min-width:20px;height:20px;padding:0 6px;border-radius:999px;display:grid;place-items:center;background:color-mix(in srgb,var(--ink) 8%,transparent);font-size:11.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.lf-line{position:absolute;left:0;bottom:-1px;width:40px;height:3px;border-radius:3px 3px 0 0;background:var(--k-grad,var(--accent));pointer-events:none}
+.lf-pages{display:flex;align-items:flex-start;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;touch-action:pan-x pan-y;margin:0 calc(-1 * var(--gutter-r)) 0 calc(-1 * var(--gutter-l));transition:height .35s var(--ux-ease)}
+.lf-pages::-webkit-scrollbar{display:none}
+.lf-pg{position:relative;flex:none;width:100%;scroll-snap-align:start;scroll-snap-stop:always;display:grid;gap:10px;align-content:start;padding:4px var(--gutter-r) 6px var(--gutter-l);box-sizing:border-box}
+.lf-row{display:flex;align-items:flex-start;gap:12px;width:100%;padding:12px;border-radius:16px;text-align:left;color:var(--ink);background:var(--bg);box-shadow:0 0 0 1px var(--line);animation:lf-rin .5s cubic-bezier(.3,1.3,.5,1) var(--d,0ms) backwards;transition:box-shadow .25s,background .25s,transform .3s var(--ux-spring),opacity .3s}
+.lf-row:active{transform:scale(.98)}
+@keyframes lf-rin{from{opacity:0;transform:translateY(12px) scale(.97)}}
+.lf-row.fly{transform:translateX(40%) scale(.9);opacity:0;transition:transform .42s cubic-bezier(.6,0,.8,.4),opacity .35s}
+.lf-rtx{flex:1;min-width:0}
+.lf-row small em{font-style:normal;font-weight:800;padding:1px 7px;border-radius:999px;margin-right:4px;background:color-mix(in srgb,#E11D48 12%,transparent);color:#BE123C}
+.lf-apply{height:48px;border-radius:14px;background:var(--ink);color:var(--bg);font-size:15px;font-weight:800;transition:opacity .2s,transform .3s var(--ux-spring)}
+.lf-apply:disabled{opacity:.35}
+.lf-apply:not(:disabled):active{transform:scale(.97)}
+.lf-rl{margin:0;padding:0;list-style:none;display:grid}
+.lf-it{display:grid;grid-template-rows:1fr;transition:grid-template-rows .4s var(--ux-ease),opacity .3s}
+.lf-it.gone{grid-template-rows:0fr;opacity:0}
+.lf-it > div{position:relative;min-height:0;overflow:hidden;border-radius:16px}
+.lf-bg{position:absolute;inset:5px 3px;border-radius:13px;background:#E11D48;display:flex;align-items:center;justify-content:flex-end;padding-right:22px;color:#fff}
+.lf-bg svg,.lf-del svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lf-bg svg{transform:scale(var(--k,.6));transition:transform .2s}
+.lf-rw{position:relative;display:flex;align-items:center;gap:12px;min-height:66px;padding:8px 10px;border-radius:16px;background:var(--surface);outline:none;transform:translateX(var(--x,0px));transition:transform .45s var(--ux-spring);touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.lf-rw.drag{transition:none}
+.lf-rw:focus-visible{box-shadow:inset 0 0 0 2px var(--accent)}
+.lf-av{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;color:#fff}
+.lf-av.hide{background:linear-gradient(140deg,#FF7A93,#E11D48)}
+.lf-av.rep{background:linear-gradient(140deg,#8B6CFF,#3D8BFF)}
+.lf-av svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.lf-tx{flex:1;min-width:0}
+.lf-tx b{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:var(--muted)}
+.lf-tx b small{padding:1px 6px;border-radius:999px;background:color-mix(in srgb,var(--ink) 8%,transparent);font-size:10.5px}
+.lf-tx > span{display:block;margin-top:2px;font-size:14.5px;font-weight:700;color:var(--ink);overflow-wrap:anywhere}
+.lf-del{width:36px;height:36px;flex:none;border-radius:11px;display:grid;place-items:center;color:#E11D48;box-shadow:0 0 0 1px var(--line);opacity:0;transform:scale(.8);transition:opacity .2s,transform .3s var(--ux-spring)}
+.lf-rw:hover .lf-del,.lf-rw:focus-within .lf-del{opacity:1;transform:none}
+@media (hover:none){.lf-del{display:none}}
+.sheet-body p.lf-empty{margin:0;padding:22px 0;text-align:center;font-size:13.5px;font-weight:650}
+.sheet-body p.lf-tip{margin:0 4px;font-size:12px;line-height:1.45}
+.lf-dg{margin-top:6px;padding:13px 14px;border-radius:16px;box-shadow:inset 0 0 0 1px color-mix(in srgb,#E11D48 35%,transparent)}
+.lf-dg b{display:block;font-size:12.5px;font-weight:850;color:#BE123C}
+.lf-dg > div{display:flex;align-items:center;gap:10px;margin-top:6px}
+.lf-dg span{flex:1;font-size:12.5px;line-height:1.4;font-weight:650;color:var(--muted)}
+.lf-dz{height:36px;padding:0 14px;border-radius:10px;background:#E11D48;color:#fff;font-size:13px;font-weight:850}
+.lf-fr{position:absolute;pointer-events:none}
+.lf-fr span{position:absolute;border-radius:3px;background:color-mix(in srgb,var(--ink) 18%,var(--surface))}
+.lf-dim{position:absolute;inset:0;z-index:6;background:rgba(10,10,20,.42);opacity:0;pointer-events:none;transition:opacity .3s}
+.sheet.lf-m .lf-dim{opacity:1;pointer-events:auto}
+.lf-md{position:absolute;left:16px;right:16px;top:50%;z-index:7;margin-top:-130px;padding:18px;border-radius:22px;background:var(--surface);color:var(--ink);box-shadow:0 30px 60px -20px rgba(0,0,0,.45);transform:translateY(16px) scale(.96);opacity:0;pointer-events:none;transition:transform .35s cubic-bezier(.3,1.3,.5,1),opacity .2s}
+.sheet.lf-m .lf-md{transform:none;opacity:1;pointer-events:auto}
+.lf-md h4{display:flex;align-items:center;gap:8px;margin:0;font-size:16.5px;font-weight:900}
+.lf-md h4 i{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:color-mix(in srgb,#E11D48 15%,transparent);color:#E11D48;font-style:normal;font-weight:900}
+.lf-md p{margin:8px 0 0;font-size:13px;line-height:1.5;font-weight:600;color:var(--muted)}
+.lf-nm{display:inline-flex;margin-top:12px;padding:6px 10px;border-radius:9px;background:var(--bg);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;font-weight:800;color:var(--muted);white-space:pre}
+.lf-nm span{transition:color .15s}
+.lf-nm span.ok{color:#E11D48}
+.lf-in{display:block;width:100%;height:46px;margin-top:8px;padding:0 12px;border:0;border-radius:12px;background:var(--bg);box-shadow:inset 0 0 0 1.5px var(--line);color:var(--ink);font:700 16px ui-monospace,SFMono-Regular,Menlo,monospace;outline:none;box-sizing:border-box}
+.lf-in:focus{box-shadow:inset 0 0 0 2px #E11D48}
+.lf-shake{animation:lf-sh .35s}
+@keyframes lf-sh{25%,75%{transform:translateX(-4px)}50%{transform:translateX(4px)}}
+.lf-bs{display:flex;gap:8px;margin-top:14px}
+.lf-bs button{flex:1;height:44px;border-radius:12px;font-size:14px;font-weight:850}
+.lf-cx{background:var(--bg);color:var(--muted)}
+.lf-go{background:#E11D48;color:#fff;transition:opacity .2s}
+.lf-go:disabled{opacity:.3}
+.lf-snack{position:absolute;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);z-index:5;display:flex;align-items:center;gap:10px;height:58px;padding:0 8px 0 16px;border-radius:18px;background:var(--ink);color:var(--bg);box-shadow:0 18px 30px -16px rgba(0,0,0,.5);transform:translateY(160%);transition:transform .5s var(--ux-spring)}
+.lf-snack.on{transform:none}
+.lf-snack p{flex:1;margin:0;font-size:14px;font-weight:700;color:inherit}
+.lf-snack p b{display:inline-block;min-width:1ch;font-variant-numeric:tabular-nums}
+.lf-undo{height:42px;padding:0 10px 0 6px;border-radius:12px;display:inline-flex;align-items:center;gap:8px;color:color-mix(in srgb,var(--accent) 60%,#fff);font-size:14px;font-weight:800}
+.lf-undo svg{width:22px;height:22px;transform:rotate(-90deg)}
+.lf-undo circle{fill:none;stroke-width:2.6}
+.lf-undo .t{stroke:color-mix(in srgb,var(--bg) 22%,transparent)}
+.lf-undo .p{stroke:currentColor;stroke-dasharray:100;stroke-dashoffset:calc(100 - var(--left,1) * 100);stroke-linecap:round}
+@media (prefers-reduced-motion: reduce){.lf-row,.lf-it,.lf-rw,.lf-md,.lf-dim,.lf-snack,.lf-pages{transition:none;animation:none}.lf-shake{animation:none}}
+
+/* ===== Chuỗi ngày & Tổng kết ===== */
+.stats-top .sk-chips{display:flex;gap:6px;align-items:center}
+.sk-chip{height:30px;padding:0 11px;border-radius:999px;font-size:12.5px;font-weight:750;display:inline-flex;align-items:center;gap:5px;transition:transform .2s cubic-bezier(.3,1.4,.5,1)}
+.sk-chip:active{transform:scale(.94)}
+.sk-chip.fire{background:color-mix(in srgb,#ff7a1a 14%,var(--surface));color:#d9530c}
+.sk-chip.fire.zero{background:color-mix(in srgb,var(--ink) 6%,var(--surface));color:var(--muted)}
+.sk-chip.rc{background:var(--ink);color:var(--bg)}
+.sheet-body.sk,.sheet-body.rp{grid-auto-rows:max-content}
+/* số lăn (#098) */
+.rn{display:inline-flex;align-items:flex-start;font-variant-numeric:tabular-nums;line-height:1;height:1em;overflow:hidden}
+.rn-w{display:inline-block;height:1em;overflow:hidden}
+.rn-c{display:flex;flex-direction:column;transform:translateY(calc(var(--d,0) * -1em));transition:transform .9s cubic-bezier(.2,1.25,.35,1) calc(var(--i) * 45ms)}
+.rn-c i{font-style:normal;height:1em;display:block;text-align:center}
+.rn-s{display:inline-block}
+@media (prefers-reduced-motion:reduce){.rn-c{transition:none}}
+/* ngọn lửa (#379) */
+.fl{position:relative;width:120px;height:144px;transform:scale(var(--s,.8));transform-origin:50% 90%;transition:transform .8s cubic-bezier(.3,1.4,.5,1)}
+.fl svg{position:relative;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 6px 18px rgba(255,110,30,.35))}
+.fl-glow{position:absolute;left:50%;bottom:-6px;width:150px;height:70px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(255,140,40,.45),transparent);filter:blur(6px)}
+.sk-hero{position:relative;display:grid;justify-items:center;gap:10px;padding:18px 14px 18px;border-radius:26px;color:#fff3e4;overflow:hidden;
+  background:radial-gradient(120% 80% at 50% 10%,#3b1d0d,#1b0d06 70%);box-shadow:inset 0 0 0 1px rgba(255,170,90,.14),0 14px 34px -18px rgba(80,30,5,.6)}
+.sk-hero .fl{margin-top:-8px;margin-bottom:-26px}
+.sk-ct{display:flex;align-items:baseline;gap:8px}
+.sk-ct .rn.big{font-size:56px;font-weight:850;letter-spacing:-.03em;color:#fff}
+.sk-ct b{font-size:15px;font-weight:700;color:#ffc89a}
+.sk-wk{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;width:100%;max-width:330px}
+.sk-wk>div{display:grid;justify-items:center;gap:6px}
+.sk-dy{font-size:11px;font-weight:700;color:#d7a985}
+.sk-dt{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1.5px rgba(255,190,130,.18);position:relative}
+.sk-dt.on{background:linear-gradient(160deg,#ffb547,#f5462a);box-shadow:0 4px 12px -4px rgba(255,100,30,.8);animation:skPop .5s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--k) * 70ms + .2s)}
+.sk-dt.on::after{content:"";position:absolute;inset:0;margin:auto;width:12px;height:7px;border:solid #fff;border-width:0 0 2.5px 2.5px;transform:translateY(-2px) rotate(-45deg)}
+.sk-dt.today{outline:2px solid #ffd08a;outline-offset:3px}
+.sk-dt.fut{opacity:.45}
+@keyframes skPop{from{transform:scale(.3);opacity:0}}
+.sk-bd{position:absolute;top:14px;right:14px;padding:5px 10px;border-radius:999px;background:linear-gradient(135deg,#ffd27a,#ff8a1f);color:#3b1600;font-size:11.5px;font-weight:850;transform:scale(0) rotate(-12deg);transition:transform .6s cubic-bezier(.3,1.7,.5,1) .9s}
+.sk-hero.week .sk-bd{transform:none}
+.sk-msg{margin:2px 6px 0;font-size:13px;line-height:1.45;text-align:center;color:#f1d3b8}
+.sk-card{padding:14px;border-radius:20px;background:var(--surface);box-shadow:var(--k-sh,0 0 0 1px var(--line))}
+/* lưới (#151) */
+.sk-mo{display:grid;grid-template-columns:repeat(3,1fr);font-size:11px;color:var(--muted);font-weight:650;margin-bottom:6px}
+.sk-heat{display:grid;grid-template-rows:repeat(7,1fr);grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;touch-action:manipulation}
+.sk-heat i{aspect-ratio:1;border-radius:4px;background:color-mix(in srgb,var(--accent) calc(var(--v) * 22% + 4%),var(--surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 6%,transparent);transition:transform .15s,box-shadow .15s}
+.sk-heat i[style*="--v:0"]{background:color-mix(in srgb,var(--ink) 6%,var(--surface))}
+.sk-heat i.fut{opacity:.25}
+.sk-heat i.pick{transform:scale(1.25);box-shadow:0 0 0 2px var(--ink);z-index:1;position:relative}
+.sk-card input[type=range]{width:100%;margin:12px 0 4px;accent-color:var(--accent)}
+.sk-row{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px}
+.sk-row time{font-weight:700}
+.sk-row output{font-weight:750;color:var(--accent);font-variant-numeric:tabular-nums}
+.sk-row output.zero{color:var(--muted);font-weight:600}
+.sk-lg{display:flex;align-items:center;gap:4px;justify-content:flex-end;margin-top:8px;font-size:11px;color:var(--muted)}
+.sk-lg i{width:11px;height:11px;border-radius:3px;background:color-mix(in srgb,var(--accent) calc(var(--v) * 22% + 4%),var(--surface))}
+.sk-lg i[style*="--v:0"]{background:color-mix(in srgb,var(--ink) 6%,var(--surface))}
+.sk-tot{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sk-tot>div{padding:12px 8px;border-radius:16px;background:var(--surface);box-shadow:var(--k-sh,0 0 0 1px var(--line));text-align:center}
+.sk-tot b{display:block;font-size:22px;font-weight:850;font-variant-numeric:tabular-nums}
+.sk-tot small{font-size:11.5px;color:var(--muted)}
+.sk-go{height:46px;border-radius:16px;background:var(--ink);color:var(--bg);font-weight:800;font-size:14.5px;margin-top:4px}
+/* huy hiệu (#386) */
+.bg-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.bg-b{position:relative;height:138px;perspective:700px;border-radius:18px}
+.bg-f,.bg-bk{position:absolute;inset:0;border-radius:18px;display:grid;justify-items:center;align-content:center;gap:5px;padding:8px 6px;backface-visibility:hidden;transition:transform .55s cubic-bezier(.3,1.25,.5,1);background:var(--surface);box-shadow:var(--k-sh,0 0 0 1px var(--line));text-align:center}
+.bg-bk{transform:rotateY(180deg);align-content:center}
+.bg-b.flip .bg-f{transform:rotateY(-180deg)}.bg-b.flip .bg-bk{transform:none}
+.bg-f b,.bg-bk b{font-size:12.5px;font-weight:800;line-height:1.2}
+.bg-f small,.bg-bk small{font-size:11px;color:var(--muted);line-height:1.3}
+.bg-bk em{font-style:normal;font-size:11.5px;font-weight:800;color:var(--accent)}
+.bg-m{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(150deg,var(--c1),var(--c2));box-shadow:0 6px 16px -6px var(--c2),inset 0 -3px 0 rgba(0,0,0,.15);overflow:visible}
+.bg-m::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.65) 50%,transparent 65%);background-size:250% 100%;background-position:120% 0;pointer-events:none}
+.bg-md{font-size:26px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.2));transition:transform .4s}
+.bg-lk{position:absolute;right:-4px;bottom:-4px;width:24px;height:24px;border-radius:50%;background:var(--surface);display:grid;place-items:center;box-shadow:0 1px 4px rgba(0,0,0,.2);opacity:0;transform:scale(.4);transition:opacity .3s,transform .4s cubic-bezier(.3,1.5,.5,1)}
+.bg-lk svg{width:14px;height:14px;fill:none;stroke:var(--muted);stroke-width:1.8;stroke-linecap:round}
+.bg-b.lock .bg-m{background:color-mix(in srgb,var(--ink) 12%,var(--surface));box-shadow:none}
+.bg-b.lock .bg-md{filter:grayscale(1);opacity:.4}
+.bg-b.lock .bg-lk{opacity:1;transform:none}
+.bg-b.lock .bg-f b{color:var(--muted)}
+.bg-pb{width:70%;height:5px;border-radius:9px;background:color-mix(in srgb,var(--ink) 9%,var(--surface));overflow:hidden}
+.bg-pb i{display:block;height:100%;background:linear-gradient(90deg,var(--c1),var(--c2));transform-origin:0 50%;border-radius:9px}
+.bg-b.new .bg-m{animation:bgPop .7s cubic-bezier(.3,1.6,.5,1)}
+.bg-b.new .bg-m::after{animation:bgShine 1s .35s ease-out}
+.bg-b.new .bg-lk{animation:bgLk .6s ease-in}
+@keyframes bgPop{0%{transform:scale(.6) rotate(-14deg)}55%{transform:scale(1.15) rotate(8deg)}100%{transform:none}}
+@keyframes bgShine{to{background-position:-60% 0}}
+@keyframes bgLk{0%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-26px) rotate(25deg) scale(.6)}}
+.bg-sp{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;animation:bgSp .9s cubic-bezier(.2,.8,.3,1) forwards;pointer-events:none}
+@keyframes bgSp{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+/* chọn kỳ tổng kết */
+.rp-it{display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;background:var(--surface);box-shadow:var(--k-sh,0 0 0 1px var(--line));text-align:left;animation:skUp .45s cubic-bezier(.3,1.3,.5,1) both;animation-delay:calc(var(--k) * 70ms)}
+.rp-it:disabled{opacity:.5}
+.rp-it>span:nth-child(2){flex:1;min-width:0}
+.rp-it b{display:block;font-size:15px;font-weight:800}
+.rp-it small{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.rp-it em{font-style:normal;font-size:24px;color:var(--muted)}
+.rp-ic{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:22px;background:color-mix(in srgb,var(--accent) 12%,var(--surface))}
+@keyframes skUp{from{opacity:0;transform:translateY(14px)}}
+/* stories (#376) */
+.st{position:fixed;inset:0;z-index:90;background:#000;color:#fff;perspective:1100px;overflow:hidden;opacity:0;transform:scale(.96);transition:opacity .3s,transform .35s cubic-bezier(.3,1.2,.5,1);user-select:none;-webkit-user-select:none}
+.st.on{opacity:1;transform:none}.st.out{opacity:0;transform:scale(.96)}
+.st-cube{position:absolute;inset:0;transform-style:preserve-3d;transform:translateZ(-50vw) rotateY(var(--ry,0deg));transition:transform .7s cubic-bezier(.45,.05,.2,1)}
+.st-face{position:absolute;inset:0;background:var(--bg,#222);backface-visibility:hidden;transform:rotateY(calc(var(--k) * 90deg)) translateZ(50vw);display:grid;place-items:center;overflow:hidden}
+.st-face::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 40% at 80% 10%,rgba(255,255,255,.18),transparent),radial-gradient(70% 50% at 10% 95%,rgba(0,0,0,.3),transparent);pointer-events:none}
+.st-in{position:relative;width:min(100%,460px);padding:96px 28px 70px;display:grid;justify-items:start;gap:14px;text-align:left}
+.st-in>*{animation:stIn .6s cubic-bezier(.25,1.2,.4,1) both}
+.st-in>*:nth-child(2){animation-delay:.12s}.st-in>*:nth-child(3){animation-delay:.24s}.st-in>*:nth-child(4){animation-delay:.36s}.st-in>*:nth-child(5){animation-delay:.48s}
+@keyframes stIn{from{opacity:0;transform:translateY(22px)}}
+.st-k{font-size:12.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.8}
+.st-in h1{margin:0;font-size:56px;line-height:1;font-weight:900;letter-spacing:-.03em}
+.st-in h2{margin:0;font-size:28px;line-height:1.15;font-weight:850;letter-spacing:-.015em}
+.st-in p{margin:0;font-size:16.5px;line-height:1.45;opacity:.92;max-width:34ch}
+.st-big{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.st-big .rn.xl{font-size:84px;font-weight:900;letter-spacing:-.04em}
+.st-big>span:not(.rn){font-size:20px;font-weight:750;opacity:.85;margin-right:6px}
+.st-bars{display:flex;align-items:flex-end;gap:5px;width:100%;height:190px}
+.st-bars.days{gap:2px}
+.st-bars i{flex:1;height:var(--h);min-height:3px;border-radius:5px 5px 2px 2px;background:rgba(255,255,255,.4);transform:scaleY(0);transform-origin:50% 100%;transition:transform .7s cubic-bezier(.3,1.3,.5,1) calc(var(--i) * 22ms)}
+.st-bars.on i{transform:none}
+.st-bars i.fut{opacity:.35}
+.st-bars i.top{background:#fff;box-shadow:0 0 18px rgba(255,255,255,.6)}
+.st-clock{position:relative;width:210px;height:210px;justify-self:center;border-radius:50%;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
+.st-clock i{position:absolute;left:50%;top:50%;width:8px;height:calc(12px + var(--h) * 58px);margin-left:-4px;border-radius:5px;background:rgba(255,255,255,.45);transform-origin:50% 0;transform:rotate(calc(var(--a) + 180deg)) translateY(26px) scaleY(0);transition:transform .6s cubic-bezier(.3,1.3,.5,1) calc(var(--i) * 25ms)}
+.st-clock.on i{transform:rotate(calc(var(--a) + 180deg)) translateY(26px)}
+.st-clock i.top{background:#ffd43b;box-shadow:0 0 14px #ffd43b}
+.st-clock span{position:absolute;inset:0;display:grid;place-items:center;font-size:40px}
+.st-cv{width:150px;aspect-ratio:2/3;border-radius:14px;background:var(--bg);box-shadow:0 24px 40px -18px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.2);animation:stCv 1s cubic-bezier(.3,1.4,.5,1) .1s both!important}
+@keyframes stCv{from{opacity:0;transform:rotate(-8deg) scale(.7)}}
+.st-top{margin:4px 0 0;padding:0;list-style:none;display:grid;gap:6px;width:100%;counter-reset:t 1}
+.st-top li{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.12);font-size:14px;counter-increment:t}
+.st-top li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-top li span::before{content:counter(t) ". ";font-weight:800;opacity:.7}
+.st-top em{font-style:normal;opacity:.8;flex:none}
+.st-in .fl{justify-self:center;margin:-10px 0 -30px}
+.st-bars-top{position:absolute;top:calc(env(safe-area-inset-top) + 10px);left:12px;right:12px;display:flex;gap:4px;z-index:3}
+.st-bars-top i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.3);overflow:hidden}
+.st-bars-top b{display:block;height:100%;background:#fff;transform-origin:0 50%;transform:scaleX(0)}
+.st-hd{position:absolute;top:calc(env(safe-area-inset-top) + 22px);left:12px;right:8px;display:flex;align-items:center;gap:10px;z-index:3}
+.st-hd>i{width:32px;height:32px;border-radius:50%;background:linear-gradient(150deg,#ffd27a,#ff7a1a);box-shadow:0 0 0 2px rgba(255,255,255,.7)}
+.st-hd>span{flex:1;min-width:0}
+.st-hd b{display:block;font-size:13.5px;font-weight:800}
+.st-hd small{font-size:11.5px;opacity:.75}
+.st-x{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff}
+.st-x svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.st-hit{position:absolute;top:80px;bottom:0;z-index:2;background:none;-webkit-tap-highlight-color:transparent}
+.st-hit.l{left:0;width:32%}.st-hit.r{right:0;width:68%}
+.st.hold .st-bars-top,.st.hold .st-hd{opacity:0;transition:opacity .25s}
+.rc-note .bk-note-ic{font-size:20px}
+@media (prefers-reduced-motion:reduce){.st-cube{transition:none}.st-in>*,.sk-dt.on,.rp-it{animation:none}}
 </style>
 </head>
 <body>
@@ -2101,7 +2375,8 @@ function bookActions(b) {
       act(ICO.pin, pinned ? 'Bỏ ghim' : 'Ghim lên đầu', async () => { await saveBookUi(b, { pin: !pinned }); closeSheet(); renderLibrary(); toast(pinned ? 'Đã bỏ ghim.' : 'Đã ghim lên đầu kệ.'); }),
       act(ICO.add, 'Thêm chương', () => { closeSheet(); pickFiles(b); }),
       act(ICO.redo, 'Đọc lại từ đầu', async () => { await Store.delProgress(b.id); closeSheet(); renderLibrary(); toast('Đã đưa về chương đầu.'); }),
-      act(ICO.rename, 'Đổi tên', () => renameSheet(b, 'Đổi tên truyện'))),
+      act(ICO.rename, 'Đổi tên', () => renameSheet(b, 'Đổi tên truyện')),
+      b.kind === 'comic' ? null : act('<svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>', 'Lọc chữ', () => { closeSheet(); openFilter(b); })),
       el('p', { class: 'ba-hint', text: 'Giữ nút đỏ khoảng 1 giây để xoá truyện khỏi kệ (file gốc không bị ảnh hưởng).' })], []);
   }, 'Đóng');
 }
@@ -2299,7 +2574,7 @@ function glassGo(label, b) {
 const finePtr = matchMedia('(hover: hover) and (pointer: fine)');
 (() => {
   const cur = el('div', { class: 'c314', 'aria-hidden': 'true' }, el('span')), cl = cur.firstChild; document.body.append(cur);
-  const BTN = '.btn,.ui-btn,.xd-x,.xd-nav button,.useg button,.fab-main,.fab-it,.xd-opt,.xd-go,.sheet-head button,.ba-it,.cz-nv button,.b361-pv,.b361-nx,.b361-dot,.sw,.emo,.swx-c,.xd-next,.hd-btn,.hd-undo,.wk button,.note button,.czb button,.f292-f,.f292-sort,.srt button,.xd-cz,.d004-btn,.bk-note-go,.bk-note-x,.ps-go';
+  const BTN = '.btn,.ui-btn,.xd-x,.xd-nav button,.useg button,.fab-main,.fab-it,.xd-opt,.xd-go,.sheet-head button,.ba-it,.cz-nv button,.b361-pv,.b361-nx,.b361-dot,.sw,.emo,.swx-c,.xd-next,.hd-btn,.hd-undo,.wk button,.note button,.czb button,.f292-f,.f292-sort,.srt button,.xd-cz,.d004-btn,.bk-note-go,.bk-note-x,.ps-go,.lf-scan,.lf-row,.lf-tab,.lf-del,.lf-dz,.lf-apply,.lf-bs button,.lf-undo,.lf-pill button,.sk-chip,.sk-go,.bg-b,.rp-it,.st-x';
   const pos = { x: -99, y: -99 }, sp = { x: -99, y: -99 }, vel = { x: 0, y: 0 };
   let mode = '', tgt = null, raf = 0, last = 0, live = false;
   const enabled = () => UI.cursor !== false && finePtr.matches && !R.book;
@@ -2520,7 +2795,7 @@ async function buildBackup() {
   const pm = new Map(prog.map(p => [p.id, p])), out = [];
   for (const b of books) {
     const p = pm.get(b.id);
-    const e = { fp: fpOf(b), title: b.title, kind: b.kind, chapters: b.chapters.length, ui: b.ui || null, look: b.look || null, created: b.created, lastRead: b.lastRead,
+    const e = { fp: fpOf(b), title: b.title, kind: b.kind, chapters: b.chapters.length, ui: b.ui || null, look: b.look || null, filter: b.filter || null, created: b.created, lastRead: b.lastRead,
       marks: (b.marks || []).map(m => { const { chId, ...r } = m; return { ...r, ch: chRef(b, chId) }; }).filter(m => m.ch),
       prog: p ? { ch: chRef(b, p.chId), frac: p.frac || 0, at: p.at || 0 } : null };
     if (b.ui && b.ui.ownCover) { const bl = await Store.file(`${b.id}/ucover`).catch(() => null); if (bl) e.cover = await toDataUrl(bl); }
@@ -2543,6 +2818,7 @@ async function applyEntry(b, e) {
   if (e.title) b.title = e.title;
   if (e.ui) b.ui = Object.assign({}, e.ui, { ownCover: false });
   if (e.look) b.look = e.look;
+  if (e.filter) b.filter = e.filter;
   if (e.cover) { try { const bl = await (await fetch(e.cover)).blob(); await Store.putFile(`${b.id}/ucover`, bl); b.ui = Object.assign({}, b.ui, { ownCover: true }); } catch {} }
   if (e.marks && e.marks.length) {
     const key = m => m.chId + ':' + (+m.frac || 0).toFixed(3), have = new Set((b.marks || []).map(key));
@@ -2742,7 +3018,7 @@ function coverEl(b) {
 const WD = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'], WDL = ['thứ 2', 'thứ 3', 'thứ 4', 'thứ 5', 'thứ 6', 'thứ 7', 'chủ nhật'];
 function libTop(books, pmap) {
   const out = UI.scene ? [greetEl()] : [], b = books.find(x => pmap.has(x.id));
-  { const n = backupNote(); if (n) out.push(n); }
+  { const n = backupNote(); if (n) out.push(n); else { const r = recapNote(); if (r) out.push(r); } }
   if (b) {
     const p = pmap.get(b.id), total = b.chapters.length, ci = Math.max(0, b.chapters.findIndex(c => c.id === p.chId));
     const pct = clamp((ci + (p.frac || 0)) / total, 0, 1);
@@ -2766,7 +3042,7 @@ function libTop(books, pmap) {
   mins.forEach((m, k) => wk.append(el('button', { type: 'button', class: k === dow ? 'on' : '', 'aria-label': `${WDL[k]}: ${m} phút`, style: `height:${Math.max(7, m / max * 100)}%`,
     onclick: ev => { [...wk.children].forEach(x => x.classList.remove('on')); ev.currentTarget.classList.add('on'); big.textContent = m; cap.textContent = k === dow ? 'phút hôm nay' : 'phút ' + WDL[k]; } })));
   if (UI.stats) out.push(el('div', { class: 'stats' },
-    el('div', { class: 'stats-top' }, el('span', { text: 'Tuần này' }), el('span', { class: 'streak', text: streak ? `🔥 ${streak} ngày liên tục` : '' })),
+    el('div', { class: 'stats-top' }, el('span', { text: 'Tuần này' }), el('span', { class: 'sk-chips' }, el('button', { type: 'button', class: 'sk-chip fire' + (streak ? '' : ' zero'), 'aria-label': `Chuỗi ${streak} ngày, mở chi tiết`, text: `🔥 ${streak} ngày`, onclick: openStreak }), el('button', { type: 'button', class: 'sk-chip rc', text: 'Tổng kết ›', onclick: openRecapPick }))),
     el('div', { class: 'stats-nums' }, el('div', {}, big, cap), el('div', {}, el('b', { text: String(pagesWeek) }), el('small', { text: 'trang tuần này' }))),
     wk, el('div', { class: 'wk-l' }, ...WD.map(w => el('span', { text: w })))));
   return out;
@@ -3142,7 +3418,7 @@ setInterval(() => { if (R.book && S.night.on && isDark() !== R.wasDark) keepPlac
 /* ----- Thống kê đọc, tốc độ đọc, giữ màn hình sáng ----- */
 const today = (d = new Date()) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 const ST = Object.assign({ days: {}, pages: {}, ch: {} }, lsGet('kt-stats', {}));
-(() => { const old = today(new Date(Date.now() - 70 * 864e5)); for (const g of [ST.days, ST.pages, ST.ch]) for (const k in g) if (k < old) delete g[k]; })();
+(() => { const old = today(new Date(Date.now() - 400 * 864e5)); for (const g of [ST.days, ST.pages, ST.ch]) for (const k in g) if (k < old) delete g[k]; for (const g of [ST.bk, ST.hr]) if (g) for (const k in g) if (k < old.slice(0, 7)) delete g[k]; })();
 let lastAct = Date.now();
 const act = () => { lastAct = Date.now(); };
 ['pointerdown', 'keydown', 'wheel'].forEach(t => document.addEventListener(t, act, { passive: true, capture: true }));
@@ -3239,6 +3515,7 @@ async function buildSection(i) {
     }
     sec.append(box);
   }
+  if (ch.type !== 'images') { const bx = sec.querySelector('.content'); if (bx) filterBox(bx, R.book); }
   const nx = R.book.chapters[i + 1];
   sec.append(el('div', { class: 'chap-end' },
     el('div', { class: 'ec-sub', text: 'Hết ' + shortTitle(ch.title) }),
@@ -3679,6 +3956,570 @@ document.addEventListener('keydown', e => {
   else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); turn(-1); }
 });
 function followLink(a) { const t = a.dataset.target; const idx = R.book.chapters.findIndex(c => c.entries?.includes(t)); if (idx >= 0) jumpTo(idx, 0); }
+
+/* ================= Chuỗi ngày đọc & Tổng kết tháng/năm =================
+   Dữ liệu: ST.days (giây đọc/ngày), ST.ch (chương đọc xong/ngày), ST.pages, cộng thêm (từ bản này)
+   ST.bk[YYYY-MM][id] = giây đọc từng truyện trong tháng, ST.hr[YYYY-MM][giờ] = giây đọc theo giờ, ST.bt[id] = tên truyện. */
+const ymOf = (d = new Date()) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+setInterval(() => {                                  // cùng nhịp 5 giây với bộ đếm phút đọc sẵn có
+  if (!R.book || reader.hidden || document.visibilityState !== 'visible' || Date.now() - lastAct > 120000) return;
+  const now = new Date(), m = ymOf(now), id = R.book.id;
+  ST.bk ||= {}; ST.hr ||= {}; ST.bt ||= {};
+  (ST.bk[m] ||= {})[id] = (ST.bk[m][id] || 0) + 5;
+  (ST.hr[m] ||= Array(24).fill(0))[now.getHours()] += 5;
+  ST.bt[id] = R.book.title;
+}, 5000);
+const READ_MIN = 60;                                  // một ngày "có đọc" = ít nhất 1 phút
+const dayOn = k => (ST.days[k] || 0) >= READ_MIN;
+function streakNow() { let s = 0; const d = new Date(); if (!dayOn(today(d))) d.setDate(d.getDate() - 1); while (dayOn(today(d))) { s++; d.setDate(d.getDate() - 1); } return s; }
+function streakBest(keys = Object.keys(ST.days)) {
+  let best = 0, run = 0, prev = null;
+  for (const k of keys.filter(dayOn).sort()) { const d = new Date(k + 'T12:00:00'); run = prev && (d - prev) / 864e5 < 1.5 ? run + 1 : 1; best = Math.max(best, run); prev = d; }
+  return best;
+}
+const sumG = (g, pre) => Object.entries(ST[g] || {}).reduce((s, [k, v]) => s + (!pre || k.startsWith(pre) ? v : 0), 0);
+
+/* ---- số lăn (Lucian UX/UI Prompt #098 · MIT License (c) 2026 Seokwoooo): mỗi chữ số là một dải 0–9, lăn lệch nhau 45ms, hơi vượt rồi dừng ---- */
+function rollNum(str, cls = '') {
+  const box = el('span', { class: 'rn ' + cls, 'aria-label': str }), cols = [];
+  [...str].forEach((ch, i) => {
+    if (/\d/.test(ch)) { const c = el('span', { class: 'rn-c', style: `--i:${i}`, 'aria-hidden': 'true' }); for (let k = 0; k <= 9; k++) c.append(el('i', { text: String(k) })); box.append(el('span', { class: 'rn-w', 'aria-hidden': 'true' }, c)); cols.push([c, +ch]); }
+    else box.append(el('span', { class: 'rn-s', 'aria-hidden': 'true', text: ch }));
+  });
+  return { el: box, go: () => cols.forEach(([c, d]) => c.style.setProperty('--d', d)), reset: () => cols.forEach(([c]) => c.style.setProperty('--d', 0)) };
+}
+
+/* ---- Lucian UX/UI Prompt #379 · MIT License (c) 2026 Seokwoooo · ngọn lửa chuỗi ngày: 3 lớp lửa đung đưa, tia lửa bay lên, càng dài càng to ---- */
+function flame(level) {
+  const uid = 'fl' + Math.random().toString(36).slice(2, 7);
+  const tmp = el('div'); tmp.innerHTML = `<svg viewBox="0 0 120 144"><defs><linearGradient id="${uid}o" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FF7A1A"/><stop offset=".55" stop-color="#F5462A"/><stop offset="1" stop-color="#D9262B"/></linearGradient><linearGradient id="${uid}m" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FFC24A"/><stop offset="1" stop-color="#FF8A1F"/></linearGradient><linearGradient id="${uid}c" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FFFBEA"/><stop offset="1" stop-color="#FFE27A"/></linearGradient></defs><g class="fl-sp"></g><path class="fl-o" fill="url(#${uid}o)"/><path class="fl-m" fill="url(#${uid}m)"/><path class="fl-c" fill="url(#${uid}c)"/></svg>`;
+  const svg = tmp.firstChild;
+  const box = el('div', { class: 'fl', 'aria-hidden': 'true' }, el('div', { class: 'fl-glow' }), svg);
+  const LY = [[svg.querySelector('.fl-o'), 40, 126, 0, 1], [svg.querySelector('.fl-m'), 28, 88, 1.7, .8], [svg.querySelector('.fl-c'), 15, 48, 3.1, .55]];
+  const PRO = [[.05, .6], [.19, .96], [.37, 1], [.55, .8], [.71, .52], [.85, .26]], CX = 60, BASE = 138;
+  let flare = 0;
+  const outline = ([node, W, H, ph, swk], t) => {
+    const w = W * (1 + flare * .08), h = H * (1 + flare * .2), sw = f => (Math.sin(t * 1.7 + ph) * .6 + Math.sin(t * 2.9 + ph * 2) * .4) * h * .13 * swk * Math.pow(f, 1.5);
+    const Rr = [], Ll = [];
+    for (const [f, q] of PRO) { const y = BASE - f * h, x = q * w, s0 = sw(f); Rr.push([CX + x + s0 + Math.sin(t * 6.1 + f * 7 + ph) * w * .07 * f, y]); Ll.unshift([CX - x + s0 - Math.sin(t * 5.3 + f * 6 + ph + 2) * w * .07 * f, y]); }
+    const tip = [CX + sw(1) + Math.sin(t * 4.3 + ph) * w * .12, BASE - h * (1 + Math.sin(t * 5.2 + ph) * .035)];
+    const P = [[CX, BASE], ...Rr, tip, tip, ...Ll], n = P.length; let d = `M${P[0][0].toFixed(1)} ${P[0][1].toFixed(1)}`;
+    for (let i = 0; i < n; i++) { const a = P[(i - 1 + n) % n], b = P[i], c = P[(i + 1) % n], e = P[(i + 2) % n]; d += ` C${(b[0] + (c[0] - a[0]) / 6).toFixed(1)} ${(b[1] + (c[1] - a[1]) / 6).toFixed(1)} ${(c[0] - (e[0] - b[0]) / 6).toFixed(1)} ${(c[1] - (e[1] - b[1]) / 6).toFixed(1)} ${c[0].toFixed(1)} ${c[1].toFixed(1)}`; }
+    node.setAttribute('d', d + 'Z');
+  };
+  const spg = svg.querySelector('.fl-sp'), SP = [];
+  for (let k = 0; k < 8; k++) { const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('fill', '#FFD08A'); spg.append(c); SP.push({ el: c, t0: -1 }); }
+  const sparks = now => SP.forEach((p, k) => {
+    const on = k < 2 + Math.round(Math.min(6, level * .7) + flare * 3);
+    if (p.t0 < 0 || now - p.t0 > p.life) { if (!on) { p.el.setAttribute('r', 0); p.t0 = -1; return; } p.t0 = now + Math.random() * 600; p.life = 900 + Math.random() * 700; p.x = CX + (Math.random() - .5) * 30; p.dx = (Math.random() - .5) * 30; p.r = 1 + Math.random() * 1.6; }
+    const q = (now - p.t0) / p.life; if (q < 0) { p.el.setAttribute('r', 0); return; }
+    p.el.setAttribute('cx', (p.x + p.dx * q + Math.sin(q * 9 + k) * 3).toFixed(1)); p.el.setAttribute('cy', (BASE - 70 - q * 80).toFixed(1)); p.el.setAttribute('r', (p.r * (1 - q)).toFixed(2)); p.el.setAttribute('opacity', (1 - q).toFixed(2));
+  });
+  const size = lv => { box.style.setProperty('--s', (.72 + Math.min(lv, 30) * .012 + (lv >= 7 ? .04 : 0)).toFixed(3)); };
+  size(level);
+  const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const frame = now => { if (!box.isConnected) return; const t = now / 1000; flare = Math.max(0, flare - .02); LY.forEach(L => outline(L, t)); sparks(now); requestAnimationFrame(frame); };
+  if (rm) LY.forEach(L => outline(L, 0)); else requestAnimationFrame(t => { LY.forEach(L => outline(L, t / 1000)); requestAnimationFrame(frame); });
+  return { el: box, flare: () => { flare = 1; }, level: lv => { level = lv; size(lv); } };
+}
+
+/* ---- Huy hiệu (Lucian UX/UI Prompt #386 · MIT License (c) 2026 Seokwoooo): mở khoá thì ổ khoá bay lên, huy chương lắc, vệt sáng quét qua, tia lửa toả ra ---- */
+const BADGES = [
+  ['s3', 'Khởi động', 'Đọc 3 ngày liên tục', () => streakBest(), 3, ['#FFB547', '#FF7A45'], '🔥'],
+  ['s7', 'Tròn tuần', 'Đọc 7 ngày liên tục', () => streakBest(), 7, ['#FF922B', '#F03E3E'], '🗓️'],
+  ['s30', 'Bền bỉ', 'Đọc 30 ngày liên tục', () => streakBest(), 30, ['#B197FC', '#7048E8'], '💎'],
+  ['c100', 'Trăm chương', 'Đọc xong 100 chương', () => sumG('ch'), 100, ['#38D9A9', '#0CA678'], '📚'],
+  ['c1000', 'Nghìn chương', 'Đọc xong 1.000 chương', () => sumG('ch'), 1000, ['#4DABF7', '#1C7ED6'], '🏯'],
+  ['h50', 'Mọt truyện', '50 giờ đọc', () => Math.floor(sumG('days') / 3600), 50, ['#F783AC', '#D6336C'], '🌙'],
+];
+function badgeGrid() {
+  const seen = lsGet('kt-badges', {}), grid = el('div', { class: 'bg-g' }), fresh = [];
+  for (const [id, name, desc, val, goal, [c1, c2], ic] of BADGES) {
+    const v = val(), on = v >= goal; if (on && !seen[id]) { seen[id] = today(); fresh.push(id); }
+    const b = el('button', { type: 'button', class: 'bg-b' + (on ? '' : ' lock'), style: `--c1:${c1};--c2:${c2}`, 'aria-label': `${name}: ${desc}. ${on ? 'Đã đạt' : `${Math.min(v, goal)}/${goal}`}` },
+      el('span', { class: 'bg-f' }, el('span', { class: 'bg-m' }, el('span', { class: 'bg-md', text: ic }), el('span', { class: 'bg-lk', html: '<svg viewBox="0 0 16 16"><rect x="3.5" y="7" width="9" height="7" rx="1.6"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>' })),
+        el('b', { text: name }), on ? el('small', { text: seen[id] ? 'Đạt ' + seen[id].slice(8, 10) + '/' + seen[id].slice(5, 7) : 'Đã đạt' }) : el('span', { class: 'bg-pb' }, el('i', { style: `transform:scaleX(${Math.min(1, v / goal).toFixed(3)})` }))),
+      el('span', { class: 'bg-bk' }, el('b', { text: name }), el('small', { text: desc }), el('em', { text: on ? 'Đã mở khoá' : `${Math.min(v, goal).toLocaleString('vi-VN')} / ${goal.toLocaleString('vi-VN')}` })));
+    b.addEventListener('click', () => b.classList.toggle('flip'));
+    b.dataset.id = id; grid.append(b);
+  }
+  lsSet('kt-badges', seen);
+  const pop = () => fresh.forEach((id, k) => setTimeout(() => {
+    const b = grid.querySelector(`[data-id="${id}"]`); if (!b || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    b.classList.add('lock'); requestAnimationFrame(() => { b.classList.remove('lock'); b.classList.add('new'); });
+    const m = b.querySelector('.bg-m');
+    for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, r = 34 + Math.random() * 26; const s = el('span', { class: 'bg-sp', style: `--dx:${(Math.cos(a) * r).toFixed(0)}px;--dy:${(Math.sin(a) * r).toFixed(0)}px;background:${i % 2 ? 'var(--c1)' : 'var(--c2)'}` }); m.append(s); setTimeout(() => s.remove(), 1200); }
+  }, 200 + k * 450));
+  return { el: grid, pop, fresh };
+}
+
+/* ---- Bảng "Chuỗi ngày đọc" ---- */
+function openStreak() {
+  openSheet('Chuỗi ngày đọc', body => {
+    body.classList.add('sk');
+    const cur = streakNow(), best = streakBest(), todayOn = dayOn(today());
+    const fl = flame(cur);
+    const num = rollNum(String(cur), 'big');
+    const now = new Date(), dow = (now.getDay() + 6) % 7, wk = el('div', { class: 'sk-wk' });
+    WD.forEach((w, k) => { const d = new Date(now); d.setDate(now.getDate() - dow + k); const key = today(d), on = dayOn(key);
+      wk.append(el('div', {}, el('span', { class: 'sk-dy', text: w }), el('span', { class: 'sk-dt' + (on ? ' on' : '') + (k === dow ? ' today' : '') + (k > dow ? ' fut' : ''), style: `--k:${k}` }))); });
+    const full = [...wk.querySelectorAll('.sk-dt')].every(x => x.classList.contains('on'));
+    const hero = el('div', { class: 'sk-hero' + (full ? ' week' : '') }, fl.el,
+      el('div', { class: 'sk-ct', 'aria-live': 'polite' }, num.el, el('b', { text: 'ngày liên tục' })), wk,
+      el('span', { class: 'sk-bd', text: 'Đủ tuần!' }),
+      el('p', { class: 'sk-msg', text: cur === 0 ? 'Đọc ít nhất 1 phút hôm nay để nhóm lửa 🔥' : todayOn ? `Hôm nay đã đọc, giữ lửa thêm ngày mai nhé. Kỷ lục: ${best} ngày.` : `Hôm nay chưa đọc: đọc 1 phút để chuỗi lên ${cur + 1} ngày. Kỷ lục: ${best} ngày.` }));
+    // Lucian UX/UI Prompt #151 · MIT License (c) 2026 Seokwoooo · lưới 12 tuần, kéo thanh hoặc chạm ô để xem từng ngày
+    const start = new Date(now); start.setDate(now.getDate() - dow - 77);
+    const cells = [], heat = el('div', { class: 'sk-heat', role: 'img', 'aria-label': 'Số phút đọc mỗi ngày trong 12 tuần' });
+    for (let i = 0; i < 84; i++) { const d = new Date(start); d.setDate(start.getDate() + i); const key = today(d), m = Math.round((ST.days[key] || 0) / 60), fut = d > now;
+      const lv = fut ? -1 : m === 0 ? 0 : m < 10 ? 1 : m < 30 ? 2 : m < 60 ? 3 : 4; const c = el('i', { 'data-i': String(i), style: `--v:${Math.max(0, lv)}`, class: fut ? 'fut' : '' }); cells.push([c, d, key, m]); heat.append(c); }
+    const months = el('div', { class: 'sk-mo' }, ...[0, 4, 8].map(w => { const d = new Date(start); d.setDate(start.getDate() + w * 7); return el('span', { text: `Th${d.getMonth() + 1}` }); }));
+    const todayIdx = cells.findIndex(c => c[2] === today());
+    const range = el('input', { type: 'range', min: '0', max: String(todayIdx), step: '1', value: String(todayIdx), 'aria-label': 'Chọn ngày' });
+    const dt = el('time'), ct = el('output', { 'aria-live': 'polite' });
+    const draw = () => { const i = +range.value, [, d, key, m] = cells[i]; cells.forEach(([c], n) => c.classList.toggle('pick', n === i));
+      const chN = ST.ch[key] || 0; dt.textContent = `${WDL[(d.getDay() + 6) % 7].replace(/^./, s => s.toUpperCase())}, ${d.getDate()}/${d.getMonth() + 1}`; ct.textContent = m ? `${m} phút${chN ? ` · ${chN} chương` : ''}` : 'không đọc'; ct.classList.toggle('zero', !m); };
+    range.addEventListener('input', draw);
+    heat.addEventListener('pointerdown', e => { const t = e.target.closest('[data-i]'); if (t && +t.dataset.i <= todayIdx) { range.value = t.dataset.i; draw(); } });
+    draw();
+    const legend = el('div', { class: 'sk-lg' }, el('span', { text: 'Ít' }), ...[0, 1, 2, 3, 4].map(v => el('i', { style: `--v:${v}` })), el('span', { text: 'Nhiều' }));
+    const bg = badgeGrid();
+    const totH = Math.floor(sumG('days') / 3600), totC = sumG('ch');
+    body.append(hero,
+      el('div', { class: 'ui-h', text: '12 tuần gần đây' }), el('div', { class: 'sk-card' }, months, heat, range, el('div', { class: 'sk-row' }, dt, ct), legend),
+      el('div', { class: 'sk-tot' }, el('div', {}, el('b', { text: String(best) }), el('small', { text: 'kỷ lục ngày' })), el('div', {}, el('b', { text: totH.toLocaleString('vi-VN') }), el('small', { text: 'giờ đã đọc' })), el('div', {}, el('b', { text: totC.toLocaleString('vi-VN') }), el('small', { text: 'chương xong' }))),
+      el('div', { class: 'ui-h', text: 'Huy hiệu' }), bg.el,
+      el('button', { type: 'button', class: 'sk-go', text: 'Xem tổng kết tháng này', onclick: () => { closeSheet(); openRecap(); } }));
+    requestAnimationFrame(() => setTimeout(() => { num.go(); if (todayOn) fl.flare(); }, 250));
+    if (bg.fresh.length) { const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); bg.pop(); } }, { threshold: .6 }); io.observe(bg.el); }
+  }, 'Xong');
+}
+
+/* ---- Tổng kết (Lucian UX/UI Prompt #376 · MIT License (c) 2026 Seokwoooo): xem như stories — thanh tiến độ trên cùng tự chạy,
+        chạm phải/trái để qua lại, nhấn giữ để dừng, các cảnh xoay như khối lập phương ---- */
+function recapData(kind, y, m) {          // kind: 'month' | 'year'
+  const pre = kind === 'month' ? `${y}-${String(m).padStart(2, '0')}` : String(y);
+  const keys = Object.keys(ST.days).filter(k => k.startsWith(pre));
+  const secs = keys.reduce((s, k) => s + ST.days[k], 0), ch = sumG('ch', pre), pages = sumG('pages', pre), daysOn = keys.filter(dayOn).length;
+  const bk = {}, hr = Array(24).fill(0);
+  for (const [mk, o] of Object.entries(ST.bk || {})) if (mk.startsWith(pre)) for (const [id, s] of Object.entries(o)) bk[id] = (bk[id] || 0) + s;
+  for (const [mk, a] of Object.entries(ST.hr || {})) if (mk.startsWith(pre)) a.forEach((s, h) => { hr[h] += s; });
+  const top = Object.entries(bk).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  let peakDay = null; for (const k of keys) if (!peakDay || ST.days[k] > ST.days[peakDay]) peakDay = k;
+  let prevSecs = 0;
+  if (kind === 'month') { const p = new Date(y, m - 2, 1), pp = ymOf(p); prevSecs = Object.keys(ST.days).filter(k => k.startsWith(pp)).reduce((s, k) => s + ST.days[k], 0); }
+  const series = kind === 'month'
+    ? Array.from({ length: new Date(y, m, 0).getDate() }, (_, i) => (ST.days[`${pre}-${String(i + 1).padStart(2, '0')}`] || 0) / 60)
+    : Array.from({ length: 12 }, (_, i) => Object.keys(ST.days).filter(k => k.startsWith(`${y}-${String(i + 1).padStart(2, '0')}`)).reduce((s, k) => s + ST.days[k], 0) / 60);
+  return { kind, y, m, pre, secs, ch, pages, daysOn, top, hr, peakDay, prevSecs, series, best: streakBest(keys) };
+}
+function openRecapPick() {
+  const now = new Date(), y = now.getFullYear(), m = now.getMonth() + 1, pm = new Date(y, m - 2, 1);
+  const opts = [['month', y, m, `Tháng ${m} này`], ['month', pm.getFullYear(), pm.getMonth() + 1, `Tháng ${pm.getMonth() + 1}${pm.getFullYear() !== y ? '/' + pm.getFullYear() : ''}`], ['year', y, 0, `Năm ${y}`]];
+  openSheet('Tổng kết', body => {
+    body.classList.add('rp');
+    opts.forEach(([kind, yy, mm, label], k) => {
+      const d = recapData(kind, yy, mm), h = Math.floor(d.secs / 3600), mi = Math.round(d.secs % 3600 / 60);
+      body.append(el('button', { type: 'button', class: 'rp-it', style: `--k:${k}`, disabled: d.secs < 60 ? '' : null, onclick: () => { closeSheet(); openRecap(kind, yy, mm); } },
+        el('span', { class: 'rp-ic', 'aria-hidden': 'true', text: kind === 'year' ? '🏆' : '📖' }),
+        el('span', {}, el('b', { text: label }), el('small', { text: d.secs < 60 ? 'Chưa có dữ liệu đọc' : `${h ? h + ' giờ ' : ''}${mi} phút · ${d.ch} chương · ${d.daysOn} ngày đọc` })),
+        el('em', { 'aria-hidden': 'true', text: '›' })));
+    });
+    body.append(el('p', { class: 'ui-note', text: 'Thống kê theo truyện và theo khung giờ được ghi từ bản cập nhật này trở đi; số phút, số chương và chuỗi ngày thì có từ trước.' }));
+  }, 'Xong');
+}
+function openRecap(kind = 'month', y, m) {
+  const now = new Date(); y ??= now.getFullYear(); m ??= now.getMonth() + 1;
+  const D = recapData(kind, y, m), rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const label = kind === 'year' ? `Năm ${y}` : `Tháng ${m}`, H = Math.floor(D.secs / 3600), Mi = Math.round(D.secs % 3600 / 60);
+  const HUE = ['linear-gradient(160deg,#7B61FF,#3D8BFF 55%,#22C3A6)', 'linear-gradient(165deg,#FF8A5B,#F03E3E 60%,#7A1F3D)', 'linear-gradient(160deg,#0B7285,#1864AB 55%,#3B1F6E)', 'linear-gradient(165deg,#F59F00,#E8590C 60%,#862E9C)', 'linear-gradient(160deg,#12B886,#0B7285 60%,#1B1035)', 'linear-gradient(160deg,#364FC7,#1B1035 70%)', 'radial-gradient(90% 70% at 50% 30%,#3B1F0E,#170B05 75%)', 'linear-gradient(160deg,#F783AC,#7048E8 60%,#1B1035)'];
+  const S = [];                                      // các cảnh: [nền, hàm dựng nội dung]
+  const sc = (bg, build) => S.push([bg, build]);
+  if (D.secs < 60) sc(HUE[5], () => [el('small', { class: 'st-k', text: label }), el('h2', { text: 'Chưa có đủ dữ liệu' }), el('p', { text: 'Đọc thêm vài hôm rồi quay lại xem tổng kết nhé.' })]);
+  else {
+    sc(HUE[0], () => [el('small', { class: 'st-k', text: 'Kệ Truyện · Tổng kết' }), el('h1', { text: kind === 'year' ? `Năm ${y}` : `Tháng ${m}` }), el('h2', { text: 'của bạn' }), el('p', { text: `${D.daysOn} ngày cầm truyện lên đọc. Cùng nhìn lại nhé →` })]);
+    sc(HUE[1], () => { const a = rollNum(String(H), 'xl'), b = rollNum(String(Mi), 'xl'); const diff = D.prevSecs > 60 ? Math.round((D.secs - D.prevSecs) / D.prevSecs * 100) : null;
+      return [el('small', { class: 'st-k', text: 'Thời gian đọc' }), el('div', { class: 'st-big' }, a.el, el('span', { text: 'giờ' }), b.el, el('span', { text: 'phút' })),
+        el('p', { text: diff == null ? `Trung bình ${Math.round(D.secs / 60 / Math.max(1, D.daysOn))} phút mỗi ngày có đọc.` : diff >= 0 ? `Nhiều hơn tháng trước ${diff}% 📈` : `Ít hơn tháng trước ${-diff}%, tháng sau bù lại nhé.` }), { go: () => { a.go(); b.go(); } }]; });
+    sc(HUE[2], () => { const a = rollNum(D.ch.toLocaleString('vi-VN'), 'xl');
+      return [el('small', { class: 'st-k', text: 'Chương đã đọc xong' }), el('div', { class: 'st-big' }, a.el), el('p', { text: D.pages ? `và lật qua ${D.pages.toLocaleString('vi-VN')} trang.` : 'Mỗi chương là một bước trên con đường tu luyện 📜' }), { go: a.go }]; });
+    sc(HUE[3], () => { const mx = Math.max(1, ...D.series), bars = el('div', { class: 'st-bars' + (D.series.length > 12 ? ' days' : '') }, ...D.series.map((v, i) => el('i', { class: v === mx ? 'top' : (kind === 'month' && y === now.getFullYear() && m === now.getMonth() + 1 && i >= now.getDate()) || (kind === 'year' && y === now.getFullYear() && i > now.getMonth()) ? 'fut' : '', style: `--h:${(v / mx * 100).toFixed(1)}%;--i:${i}` })));
+      const pd = D.peakDay ? new Date(D.peakDay + 'T12:00:00') : null;
+      return [el('small', { class: 'st-k', text: kind === 'year' ? 'Từng tháng trong năm' : 'Từng ngày trong tháng' }), bars,
+        el('p', { text: pd ? `Ngày đọc nhiều nhất: ${pd.getDate()}/${pd.getMonth() + 1}, ${Math.round(ST.days[D.peakDay] / 60)} phút.` : '' }), { go: () => bars.classList.add('on') }]; });
+    if (D.hr.some(Boolean)) sc(HUE[5], () => { const mx = Math.max(...D.hr), ph = D.hr.indexOf(mx);
+      const who = ph >= 22 || ph < 4 ? ['Cú đêm', '🦉'] : ph < 9 ? ['Chim sớm', '🐦'] : ph < 13 ? ['Đọc giữa ngày', '☀️'] : ph < 18 ? ['Đọc buổi chiều', '🍵'] : ['Đọc buổi tối', '🌙'];
+      const clock = el('div', { class: 'st-clock' }, ...D.hr.map((v, h) => el('i', { class: h === ph ? 'top' : '', style: `--a:${h * 15}deg;--h:${(v / mx).toFixed(3)};--i:${h}` })), el('span', { text: who[1] }));
+      return [el('small', { class: 'st-k', text: 'Khung giờ hay đọc' }), clock, el('h2', { text: who[0] }), el('p', { text: `Bạn đọc nhiều nhất lúc ${ph}–${ph + 1} giờ.` }), { go: () => clock.classList.add('on') }]; });
+    if (D.top.length) sc(HUE[4], () => { const [id, s] = D.top[0], b = SHELF.find(x => x.b.id === id)?.b || LIB.all.find(x => x.b.id === id)?.b, cv = el('div', { class: 'st-cv' }); if (b) paintCover(cv, b); else cv.style.setProperty('--bg', 'linear-gradient(150deg,#7B61FF,#22C3A6)');
+      return [el('small', { class: 'st-k', text: kind === 'year' ? 'Truyện của năm' : 'Truyện của tháng' }), cv, el('h2', { text: b ? b.title : (ST.bt?.[id] || 'Truyện đã xoá') }), el('p', { text: `${Math.round(s / 60)} phút đọc` }),
+        D.top.length > 1 ? el('ol', { class: 'st-top' }, ...D.top.slice(1).map(([i2, s2]) => el('li', {}, el('span', { text: (LIB.all.find(x => x.b.id === i2)?.b.title) || ST.bt?.[i2] || '—' }), el('em', { text: `${Math.round(s2 / 60)} phút` })))) : null]; });
+    sc(HUE[6], () => { const f = flame(D.best), a = rollNum(String(D.best), 'xl');
+      return [el('small', { class: 'st-k', text: 'Chuỗi dài nhất' }), f.el, el('div', { class: 'st-big' }, a.el, el('span', { text: 'ngày liền' })), el('p', { text: D.best >= 7 ? 'Lửa cháy đều cả tuần, tuyệt vời!' : 'Thử giữ lửa 7 ngày liền ở kỳ tới nhé.' }), { go: () => { a.go(); f.flare(); } }]; });
+    sc(HUE[7], () => [el('small', { class: 'st-k', text: 'Hết rồi' }), el('h1', { text: kind === 'year' ? `Hẹn năm ${y + 1}` : `Hẹn tháng ${m % 12 + 1}` }), el('p', { text: 'Chạm bên trái để xem lại, hoặc đóng để về kệ.' })]);
+  }
+  // khung xem
+  const faces = [0, 1, 2, 3].map(k => el('div', { class: 'st-face', style: `--k:${k}` }));
+  const cube = el('div', { class: 'st-cube' }, ...faces);
+  const bars = el('div', { class: 'st-bars-top' }, ...S.map(() => el('i', {}, el('b'))));
+  const close = el('button', { type: 'button', class: 'st-x', 'aria-label': 'Đóng tổng kết', html: '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>' });
+  const hd = el('div', { class: 'st-hd' }, el('i', { 'aria-hidden': 'true' }), el('span', {}, el('b', { text: UI.name || 'Kệ Truyện' }), el('small', { text: label })), close);
+  const prevB = el('button', { type: 'button', class: 'st-hit l', 'aria-label': 'Cảnh trước' }), nextB = el('button', { type: 'button', class: 'st-hit r', 'aria-label': 'Cảnh sau, nhấn giữ để dừng' });
+  const sr = el('span', { class: 'd004-live', role: 'status' });
+  const box = el('div', { class: 'st', role: 'dialog', 'aria-modal': 'true', 'aria-label': `Tổng kết ${label}` }, cube, bars, hd, prevB, nextB, sr);
+  document.body.append(box); document.documentElement.style.overflow = 'hidden';
+  const W = () => box.clientWidth;
+  let s = 0, t = 0, last = 0, hold = false, raf = 0, rot = 0, goFn = null; const DUR = 5200;
+  function paint(k, dir) {
+    const face = faces[((rot % 4) + 4) % 4], [bg, build] = S[k], parts = build(), goObj = parts.find(p => p && p.go && !(p instanceof Node));
+    face.style.setProperty('--bg', bg); face.replaceChildren(el('div', { class: 'st-in' }, ...parts.filter(p => p instanceof Node)));
+    goFn = goObj ? goObj.go : null;
+    sr.textContent = `Cảnh ${k + 1}/${S.length}`;
+    setTimeout(() => { if (goFn && s === k) goFn(); }, rm ? 0 : dir ? 650 : 200);
+  }
+  function to(k, dir) {
+    if (k < 0) k = 0; if (k >= S.length) { shut(); return; }
+    if (dir) { rot += dir; cube.style.setProperty('--ry', `${-rot * 90}deg`); }
+    s = k; t = 0; paint(k, dir); bar();
+  }
+  const bar = () => [...bars.children].forEach((b, k) => b.firstChild.style.transform = `scaleX(${k < s ? 1 : k > s ? 0 : Math.min(1, t / DUR).toFixed(3)})`);
+  const tick = now => { if (!box.isConnected) return; const dt = Math.max(0, Math.min(50, now - (last || now))); last = now; if (!hold && !rm) { t += dt; if (t >= DUR) to(s + 1, 1); else bar(); } raf = requestAnimationFrame(tick); };
+  let downAt = 0, holdT = 0;
+  nextB.addEventListener('pointerdown', () => { downAt = performance.now(); holdT = setTimeout(() => { hold = true; box.classList.add('hold'); }, 260); });
+  const release = () => { clearTimeout(holdT); if (hold) setTimeout(() => { hold = false; box.classList.remove('hold'); }, 0); };
+  nextB.addEventListener('pointerup', release); nextB.addEventListener('pointercancel', release); nextB.addEventListener('pointerleave', release);
+  nextB.addEventListener('click', () => { if (!downAt || performance.now() - downAt < 260) to(s + 1, 1); downAt = 0; });
+  prevB.addEventListener('click', () => to(s - 1, s > 0 ? -1 : 0));
+  const key = e => { if (e.key === 'Escape') shut(); else if (e.key === 'ArrowRight') to(s + 1, 1); else if (e.key === 'ArrowLeft') to(s - 1, s > 0 ? -1 : 0); };
+  document.addEventListener('keydown', key);
+  function shut() { cancelAnimationFrame(raf); document.removeEventListener('keydown', key); box.classList.add('out'); setTimeout(() => { box.remove(); document.documentElement.style.overflow = ''; }, rm ? 0 : 320); lsSet('kt-recap-seen', ymOf()); }
+  close.addEventListener('click', shut);
+  requestAnimationFrame(() => box.classList.add('on'));
+  to(0, 0); raf = requestAnimationFrame(tick);
+}
+// Đầu tháng: nhắc xem tổng kết tháng trước (một lần)
+function recapNote() {
+  const now = new Date(); if (now.getDate() > 10 || lsGet('kt-recap-seen', '') === ymOf()) return null;
+  const p = new Date(now.getFullYear(), now.getMonth() - 1, 1), d = recapData('month', p.getFullYear(), p.getMonth() + 1);
+  if (d.secs < 600) return null;
+  const n = el('div', { class: 'bk-note rc-note' },
+    el('span', { class: 'bk-note-ic', 'aria-hidden': 'true', text: '🎉' }),
+    el('div', {}, el('b', { text: `Tổng kết tháng ${p.getMonth() + 1} đã sẵn sàng` }), el('small', { text: `${Math.round(d.secs / 3600)} giờ · ${d.ch} chương` })),
+    el('button', { type: 'button', class: 'bk-note-go', text: 'Xem', onclick: () => openRecap('month', p.getFullYear(), p.getMonth() + 1) }),
+    el('button', { type: 'button', class: 'bk-note-x', 'aria-label': 'Ẩn', text: '×', onclick: () => { lsSet('kt-recap-seen', ymOf()); n.remove(); } }));
+  return n;
+}
+function openRecap0() { openRecapPick(); }
+
+/* ---------------- Lọc chữ: ẩn dòng rác, thay chữ (theo từng truyện) ----------------
+   Quy tắc lưu trong truyện (book.filter) và chỉ áp dụng lúc hiển thị: file gốc không bị sửa, tắt đi là chữ trở lại như cũ.
+   - line: ẩn đoạn có nội dung đúng y như vậy      - has: ẩn đoạn ngắn có chứa cụm này (vd. tên trang web)
+   - rep : thay chữ (tuỳ chọn chỉ khớp nguyên từ)
+   App tự quét gợi ý, nhưng chỉ đánh dấu sẵn những dòng chắc chắn là rác (tên trang web, "Nguồn:", "Converter:"…).
+   Câu lặp lại nhiều như "Oanh!", "Phanh!" là nội dung truyện nên không bao giờ bị gợi ý. */
+const normLine = s => String(s || '').normalize('NFC').replace(/[\s ​]+/g, ' ').trim();
+const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const DOMAIN_RE = /\b(?:[a-z0-9-]+\.)+(?:com|net|pro|vn|org|info|io|xyz|me|cc|club|site|top|online|asia|biz|tv|co)\b/gi;
+const SOURCE_RE = /^(?:nguồn|source|converter|convert|cvt|biên tập|btv|editor|edit|beta|người dịch|dịch giả|dịch|tác giả convert)\s*[:：]/i;
+const PROMO_RE = /(đọc truyện|truyện được (?:đăng|cập nhật|đọc)|chúc (?:các )?bạn đọc truyện|ủng hộ (?:nhóm|converter|tác giả)|bấm (?:like|theo dõi)|nhớ (?:like|bình luận))/i;
+function filterOf(b) { return b && b.filter && b.filter.on !== false ? b.filter : null; }
+function compileFilter(f) {
+  const hide = new Set(), has = [], reps = [];
+  for (const r of f.hide || []) { if (r.k === 'line') hide.add(r.v); else if (r.k === 'has' && r.v) has.push(r.v.toLowerCase()); }
+  for (const r of f.rep || []) { if (!r.f) continue; reps.push({ re: new RegExp(r.w ? `(?<![\\p{L}\\p{N}])${reEsc(r.f)}(?![\\p{L}\\p{N}])` : reEsc(r.f), 'gu'), t: r.t || '' }); }
+  return { hide, has, reps, bad: t => hide.has(t) || (t.length < 220 && has.some(h => t.toLowerCase().includes(h))) };
+}
+function filterBox(box, b) {
+  const f = filterOf(b); if (!f) return 0;
+  const c = compileFilter(f); let n = 0;
+  if (c.hide.size || c.has.length) {
+    for (const p of [...box.querySelectorAll('p,div,h1,h2,h3,h4,h5,h6,li,center,blockquote')]) {
+      if (!p.isConnected || p.querySelector('p,div,img,li,blockquote')) continue;
+      const t = normLine(p.textContent); if (t && c.bad(t)) { p.remove(); n++; }
+    }
+    const w = document.createTreeWalker(box, NodeFilter.SHOW_TEXT), kill = [];      // dòng ngăn bằng <br> trong cùng một đoạn
+    for (let nd; (nd = w.nextNode());) { const t = normLine(nd.data); if (t && c.bad(t)) kill.push(nd); }
+    for (const nd of kill) { const nx = nd.nextSibling; if (nx && nx.nodeName === 'BR') nx.remove(); nd.remove(); n++; }
+  }
+  if (c.reps.length) {
+    const w = document.createTreeWalker(box, NodeFilter.SHOW_TEXT);
+    for (let nd; (nd = w.nextNode());) { let s = nd.data; for (const r of c.reps) s = s.replace(r.re, r.t); if (s !== nd.data) nd.data = s; }
+  }
+  return n;
+}
+const decodeEnt = s => s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e) => e[0] === '#' ? String.fromCodePoint(e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : +e.slice(1)) : ({ amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' })[e.toLowerCase()] ?? m);
+async function chapterLines(ch) {
+  if (ch.type === 'text') { const bl = await Store.file(ch.textKey); return bl ? (await bl.text()).split(/\n/).map(normLine).filter(Boolean) : []; }
+  if (ch.type !== 'html') return [];
+  const zip = await zipFor(ch.file); const out = [];
+  for (const e of ch.entries) {
+    let h; try { h = await zip.text(e); } catch { continue; }
+    h = h.replace(/<(script|style|head)[\s\S]*?<\/\1>/gi, '').replace(/<br\s*\/?>|<\/(p|div|h\d|li|tr|blockquote|center)>/gi, '\n').replace(/<[^>]+>/g, '');
+    for (const l of decodeEnt(h).split('\n')) { const t = normLine(l); if (t) out.push(t); }
+  }
+  return out;
+}
+async function scanJunk(b, prog) {
+  const n = b.chapters.length, cnt = new Map(), dom = new Map(), first = new Map();
+  let ly = performance.now();
+  for (let i = 0; i < n; i++) {
+    if (b.chapters[i].type === 'images') continue;
+    let lines; try { lines = await chapterLines(b.chapters[i]); } catch { continue; }
+    const seen = new Set();
+    for (const l of lines) {
+      if (l.length > 200 || seen.has(l)) continue; seen.add(l);
+      cnt.set(l, (cnt.get(l) || 0) + 1); if (!first.has(l)) first.set(l, i);
+      for (const m of l.matchAll(DOMAIN_RE)) { const d = m[0].toLowerCase(); const e = dom.get(d) || { n: 0, ch: new Set(), line: l, i }; if (!e.ch.has(i)) { e.ch.add(i); e.n++; } dom.set(d, e); }
+    }
+    if (performance.now() - ly > 16) { prog((i + 1) / n); await yieldNow(); ly = performance.now(); }
+  }
+  prog(1);
+  const out = [], covered = new Set();
+  for (const [d, e] of dom) {                                                       // 1) tên trang web
+    if (/^(?:\d+\.)+\w+$/.test(d)) continue;
+    out.push({ k: 'has', v: d, n: e.n, why: 'trang web', sample: e.line, i: e.i, on: true });
+    for (const [l] of cnt) if (l.toLowerCase().includes(d)) covered.add(l);
+  }
+  const min = Math.max(5, Math.ceil(n * .35)), looksTalk = l => /^["“”'‘«(\[]/.test(l) || /[!?…]$/.test(l) || !/\p{L}{2}/u.test(l) || l.length < 8;
+  for (const [l, c] of cnt) {
+    if (covered.has(l)) continue;
+    if (SOURCE_RE.test(l) || (PROMO_RE.test(l) && l.length < 160)) out.push({ k: 'line', v: l, n: c, why: SOURCE_RE.test(l) ? 'ghi nguồn' : 'lời quảng cáo', sample: l, i: first.get(l), on: true });  // 2) ghi nguồn / quảng cáo
+    else if (c >= min && !looksTalk(l)) out.push({ k: 'line', v: l, n: c, why: 'lặp ở nhiều chương', sample: l, i: first.get(l), on: false });  // 3) lặp nhiều, chưa chắc → không tích sẵn
+  }
+  return out.sort((a, b) => (b.on - a.on) || (b.n - a.n)).slice(0, 40);
+}
+function ruleText(r) { return r.k === 'has' ? `Ẩn dòng có chứa “${r.v}”` : r.k === 'line' ? `Ẩn dòng “${r.v}”` : `Thay “${r.f}” → “${r.t || '(xoá)'}”${r.w ? ' · nguyên từ' : ''}`; }
+function ruleKey(r) { return r.k + '|' + (r.v ?? r.f); }
+async function saveFilter(b, f) { b.filter = f; await Store.putBook(b); }
+/* Bảng Lọc chữ — ghép các thẻ Lucian UX/UI Prompt (MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/):
+   #269 thẻ truyện + vùng nguy hiểm "gõ đúng chữ mới cho xoá", thẻ vỡ vụn khi xoá, thông báo có nút Hoàn tác đếm lùi
+   #048 ba thẻ Gợi ý / Quy tắc / Thêm: vuốt ngang để chuyển, vạch chân co giãn theo ngón tay
+   #071 vuốt một quy tắc sang trái để xoá: lớp đỏ lộ ra, thùng rác to dần, dòng gập lại; thanh Hoàn tác có vòng đếm lùi */
+const LF_TRASH = '<svg viewBox="0 0 22 22"><path d="M4 6.5h14M9 6.5V4.5h4v2M6 6.5l1 11a1.5 1.5 0 0 0 1.5 1.4h5a1.5 1.5 0 0 0 1.5-1.4l1-11"/></svg>';
+function openFilter(b, pre) {
+  if (!b) return;
+  const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const f = { on: true, hide: [], rep: [], ...(b.filter || {}) }; f.hide = [...(f.hide || [])]; f.rep = [...(f.rep || [])];
+  let changed = false, hdr = () => {}, paintRules = () => {};
+  const save = async () => { changed = true; await saveFilter(b, { on: f.on, hide: f.hide, rep: f.rep }); hdr(); };
+  openSheet('Lọc chữ', body => {
+    body.classList.add('lf');
+    const card = body.parentElement; card.classList.add('lf-card');
+    // — #269: thẻ truyện
+    const thumb = el('i', { class: 'lf-th', 'aria-hidden': 'true' }); paintCover(thumb, b);
+    const sub = el('small'), ruleN = el('small');
+    const onSw = sw(f.on, async v => { f.on = v; await save(); });
+    hdr = () => { const n = f.hide.length + f.rep.length; sub.textContent = n ? `${n} quy tắc · ${f.on ? 'đang bật' : 'đang tắt'}` : 'Chưa có quy tắc nào'; ruleN.textContent = String(n); };
+    const head = el('div', { class: 'lf-pc' }, thumb, el('div', {}, el('b', { text: b.title }), sub), onSw.el);
+    // — #048: ba thẻ
+    const line = el('span', { class: 'lf-line', 'aria-hidden': 'true' });
+    const tabsEl = el('div', { class: 'lf-tabs', role: 'tablist', 'aria-label': 'Lọc chữ' });
+    const tabs = ['Gợi ý', 'Quy tắc', 'Thêm'].map((t, i) => { const bt = el('button', { type: 'button', class: 'lf-tab', role: 'tab', 'aria-selected': String(i === 0) }, t, i === 1 ? ruleN : null); bt.addEventListener('click', () => goTab(i)); tabsEl.append(bt); return bt; });
+    tabsEl.append(line);
+    const p1 = el('section', { class: 'lf-pg', role: 'tabpanel' }), p2 = el('section', { class: 'lf-pg', role: 'tabpanel' }), p3 = el('section', { class: 'lf-pg', role: 'tabpanel' });
+    const pages = el('div', { class: 'lf-pages' }, p1, p2, p3);
+    let act = 0;
+    const fitH = () => { const pg = pages.children[act]; if (pg) pages.style.height = pg.scrollHeight + 'px'; };
+    function syncTab() {
+      const w = pages.clientWidth || 1, fr = clamp(pages.scrollLeft / w, 0, 2), i = Math.floor(fr), t = fr - i, a = tabs[i], c = tabs[Math.min(i + 1, 2)];
+      const l = a.offsetLeft + (c.offsetLeft - a.offsetLeft) * t + 10, wd = a.offsetWidth + (c.offsetWidth - a.offsetWidth) * t - 20 + Math.sin(t * Math.PI) * 26;
+      line.style.transform = `translateX(${(l - Math.sin(t * Math.PI) * 6).toFixed(1)}px)`; line.style.width = Math.max(8, wd).toFixed(1) + 'px';
+      const n = Math.round(fr);
+      if (n !== act) { act = n; tabs.forEach((x, k) => x.setAttribute('aria-selected', String(k === n))); [p1, p2, p3].forEach((p, k) => { p.inert = k !== n; }); fitH(); }
+    }
+    const goTab = (i, now) => pages.scrollTo({ left: i * pages.clientWidth, behavior: rm || now ? 'auto' : 'smooth' });
+    pages.addEventListener('scroll', syncTab, { passive: true });
+    if (window.ResizeObserver) { const ro = new ResizeObserver(() => fitH()); [p1, p2, p3].forEach(p => ro.observe(p)); }
+    // — trang 1: gợi ý
+    const bar = el('i'), pct = el('span', { text: 'App quét cả truyện và chỉ gợi ý những dòng chắc chắn là rác' });
+    const scanBtn = el('button', { type: 'button', class: 'lf-scan' }, el('span', { class: 'lf-scan-ic', 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>' }), el('span', {}, el('b', { text: 'Tự tìm dòng rác' }), pct), el('span', { class: 'lf-bar', 'aria-hidden': 'true' }, bar));
+    const sug = el('div', { class: 'lf-sug' }), pv = el('div', { class: 'lf-pv', hidden: '' });
+    let cands = [];
+    scanBtn.addEventListener('click', async () => {
+      if (scanBtn.classList.contains('run')) return;
+      scanBtn.classList.add('run'); scanBtn.classList.remove('done'); sug.replaceChildren(); pv.hidden = true;
+      cands = await scanJunk(b, p => { bar.style.transform = `scaleX(${p})`; pct.textContent = `Đang quét ${b.chapters.length.toLocaleString('vi-VN')} chương… ${Math.round(p * 100)}%`; });
+      scanBtn.classList.remove('run'); scanBtn.classList.add('done');
+      const have = new Set(f.hide.map(ruleKey)); cands = cands.filter(c => !have.has(ruleKey(c)));
+      pct.textContent = cands.length ? `Tìm thấy ${cands.length} dòng nghi là rác` : 'Không thấy dòng rác nào, truyện này sạch';
+      paintSug();
+    });
+    function paintSug() {
+      if (!cands.length) { sug.replaceChildren(el('p', { class: 'lf-clean', text: 'Các câu lặp lại nhiều như “Oanh!”, “Phanh!”, “Cái gì?!” là nội dung truyện nên app không đụng tới. Thấy dòng lạ khi đọc thì bôi đen nó rồi chọn “Ẩn dòng này”.' })); return; }
+      const applyBtn = el('button', { type: 'button', class: 'lf-apply' });
+      const paintApply = () => { const k = cands.filter(x => x.on).length; applyBtn.disabled = !k; applyBtn.textContent = k ? `Ẩn ${k} dòng đã tích` : 'Tích dòng muốn ẩn'; };
+      const rows = cands.map((c, k) => {
+        const ck = el('span', { class: 'lf-ck', 'aria-hidden': 'true', html: '<svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.4"/></svg>' });
+        const row = el('button', { type: 'button', class: 'lf-row' + (c.on ? ' on' : ''), role: 'checkbox', 'aria-checked': String(c.on), style: `--d:${k * 45}ms` }, ck,
+          el('span', { class: 'lf-rtx' }, el('q', { text: c.k === 'has' ? c.sample : c.v }), el('small', {}, el('em', { text: c.why }), ` ${c.n.toLocaleString('vi-VN')} chương${c.k === 'has' ? ` · ẩn mọi dòng ngắn có “${c.v}”` : ''}`)));
+        row.addEventListener('click', () => { c.on = !c.on; row.classList.toggle('on', c.on); row.setAttribute('aria-checked', String(c.on)); paintApply(); paintPv(); });
+        return row;
+      });
+      applyBtn.addEventListener('click', async () => {
+        const add = cands.filter(c => c.on); if (!add.length) return;
+        rows.forEach((r, k) => { if (cands[k].on) r.classList.add('fly'); });
+        await sleep(rm ? 0 : 420);
+        for (const c of add) f.hide.push({ k: c.k, v: c.v });
+        cands = cands.filter(c => !c.on); await save(); paintRules(); paintSug(); paintPv();
+        toast(`Đã ẩn ${add.length} loại dòng rác. Đóng bảng để xem chương đã lọc.`);
+        if (!cands.length) setTimeout(() => goTab(1), 350);
+      });
+      paintApply();
+      sug.replaceChildren(...rows, applyBtn);
+      paintPv();
+    }
+    async function paintPv() {
+      const c = cands.find(x => x.on) || cands[0]; if (!c) { pv.hidden = true; return; }
+      const lines = (await chapterLines(b.chapters[c.i])).slice(0, 9), cf = compileFilter({ hide: [...f.hide, ...cands.filter(x => x.on).map(x => ({ k: x.k, v: x.v }))], rep: f.rep });
+      pv.replaceChildren(el('b', { text: `Xem trước · ${b.chapters[c.i].title}` }), ...lines.map(l => el('p', { class: cf.bad(l) ? 'gone' : '', text: l.length > 140 ? l.slice(0, 140) + '…' : l })));
+      pv.hidden = false;
+    }
+    p1.append(scanBtn, sug, pv);
+    // — trang 2: quy tắc (#071 vuốt để xoá) + vùng nguy hiểm (#269)
+    const rulesUl = el('ul', { class: 'lf-rl' }), empty = el('p', { class: 'lf-empty', text: 'Chưa có quy tắc nào. Dùng “Gợi ý” hoặc “Thêm”.' });
+    const frag = el('div', { class: 'lf-fr', 'aria-hidden': 'true' });
+    const snackP = el('p'), undoBtn = el('button', { type: 'button', class: 'lf-undo', tabindex: '-1', html: '<svg viewBox="0 0 22 22" aria-hidden="true"><circle class="t" cx="11" cy="11" r="8.5"/><circle class="p" cx="11" cy="11" r="8.5" pathLength="100"/></svg>Hoàn tác' });
+    const snack = el('div', { class: 'lf-snack', role: 'status', 'aria-live': 'polite' }, snackP, undoBtn);
+    card.append(snack);
+    let batch = [], left = 0, last = 0, raf = 0, paused = false; const DUR = 5000;
+    const hideSnack = () => { snack.classList.remove('on'); undoBtn.tabIndex = -1; batch = []; cancelAnimationFrame(raf); };
+    const tick = now => { if (!snack.isConnected) return; if (!paused) left -= now - last; last = now; undoBtn.style.setProperty('--left', Math.max(0, left / DUR).toFixed(3)); if (left <= 0) { hideSnack(); return; } raf = requestAnimationFrame(tick); };
+    const showSnack = text => { snackP.innerHTML = text; snack.classList.add('on'); undoBtn.tabIndex = 0; left = DUR; last = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); };
+    snack.addEventListener('pointerenter', () => { paused = true; }); snack.addEventListener('pointerleave', () => { paused = false; });
+    undoBtn.addEventListener('click', async () => {
+      const back = batch; hideSnack();
+      for (const o of back) (o.g === 'rep' ? f.rep : f.hide).push(o.r);
+      await save(); paintRules(true);
+    });
+    function ruleRow(o) {
+      const isRep = o.g === 'rep', kind = isRep ? 'Thay chữ' : o.r.k === 'has' ? 'Ẩn dòng có chứa' : 'Ẩn dòng';
+      const delB = el('button', { type: 'button', class: 'lf-del', 'aria-label': 'Xoá quy tắc này', html: LF_TRASH });
+      const row = el('div', { class: 'lf-rw', tabindex: '0', 'aria-label': `${kind}: ${isRep ? o.r.f + ' thành ' + (o.r.t || 'trống') : o.r.v}. Bấm Delete để xoá` },
+        el('span', { class: 'lf-av ' + (isRep ? 'rep' : 'hide'), 'aria-hidden': 'true', html: isRep ? '<svg viewBox="0 0 20 20"><path d="M4 7h10l-3-3M16 13H6l3 3"/></svg>' : '<svg viewBox="0 0 20 20"><path d="M3 10s2.6-5 7-5 7 5 7 5-2.6 5-7 5-7-5-7-5z"/><path d="M4 16L16 4"/></svg>' }),
+        el('span', { class: 'lf-tx' }, el('b', {}, kind, isRep && o.r.w ? el('small', { text: 'nguyên từ' }) : null), el('span', { text: isRep ? `“${o.r.f}” → “${o.r.t || '(xoá)'}”` : `“${o.r.v}”` })), delB);
+      const bg = el('span', { class: 'lf-bg', 'aria-hidden': 'true', html: LF_TRASH });
+      const li = el('li', { class: 'lf-it' }, el('div', {}, bg, row));
+      const del = async () => {
+        if (li.classList.contains('gone')) return;
+        row.style.setProperty('--x', '-110%');
+        setTimeout(() => { li.classList.add('gone'); li.inert = true; }, rm ? 0 : 160);
+        const arr = isRep ? f.rep : f.hide, k = arr.indexOf(o.r); if (k >= 0) arr.splice(k, 1);
+        batch.push(o); await save();
+        showSnack(batch.length > 1 ? `Đã xoá <b>${batch.length}</b> quy tắc` : 'Đã xoá quy tắc');
+        if (!rm && batch.length > 1) snackP.querySelector('b')?.animate([{ transform: 'scale(1.5)' }, { transform: 'none' }], { duration: 350, easing: 'cubic-bezier(.34,1.5,.64,1)' });
+        setTimeout(() => { if (!f.hide.length && !f.rep.length) { empty.hidden = false; danger.hidden = true; } }, 420);
+      };
+      let sx = 0, sy = 0, dx = 0, down = false, horiz = null;
+      row.addEventListener('pointerdown', e => { if (e.target.closest('button') || e.button !== 0) return; down = true; horiz = null; sx = e.clientX; sy = e.clientY; dx = 0; });
+      row.addEventListener('pointermove', e => {
+        if (!down) return;
+        const mx = e.clientX - sx, my = e.clientY - sy;
+        if (horiz === null) { if (Math.abs(mx) < 6 && Math.abs(my) < 6) return; horiz = Math.abs(mx) > Math.abs(my) && mx < 0; if (!horiz) { down = false; return; } try { row.setPointerCapture(e.pointerId); } catch {} row.classList.add('drag'); }
+        dx = Math.min(0, mx);
+        row.style.setProperty('--x', (dx < -100 ? -100 + (dx + 100) * .6 : dx) + 'px');
+        bg.style.setProperty('--k', Math.min(1.25, .6 + -dx / 160).toFixed(2));
+      });
+      const end = () => { if (!down) return; down = false; row.classList.remove('drag'); if (horiz && dx < -100) del(); else { row.style.setProperty('--x', '0px'); bg.style.setProperty('--k', .6); } };
+      row.addEventListener('pointerup', end); row.addEventListener('pointercancel', end);
+      row.addEventListener('keydown', e => { if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); del(); } });
+      delB.addEventListener('click', del);
+      return li;
+    }
+    paintRules = pop => {
+      const all = [...f.hide.map(r => ({ g: 'hide', r })), ...f.rep.map(r => ({ g: 'rep', r }))];
+      rulesUl.replaceChildren(...all.map(ruleRow));
+      empty.hidden = all.length > 0; danger.hidden = !all.length; hdr();
+      if (pop && !rm) [...rulesUl.children].forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(10px) scale(.96)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: i * 50, easing: 'cubic-bezier(.3,1.3,.5,1)', fill: 'backwards' }));
+    };
+    // #269: gõ đúng chữ mới cho xoá hết
+    const NAME = 'xoá hết', NF = foldVi(NAME);
+    const nm = el('div', { class: 'lf-nm', 'aria-hidden': 'true' }), L = [...NAME].map(ch => { const s = el('span', { text: ch }); nm.append(s); return s; });
+    const inp = el('input', { class: 'lf-in', autocomplete: 'off', spellcheck: 'false', autocapitalize: 'off', 'aria-label': `Gõ “${NAME}” để xác nhận` });
+    const goBtn = el('button', { type: 'button', class: 'lf-go', disabled: '', text: 'Xoá vĩnh viễn' }), cxBtn = el('button', { type: 'button', class: 'lf-cx', text: 'Huỷ' });
+    const dim = el('div', { class: 'lf-dim', 'aria-hidden': 'true' });
+    const md = el('div', { class: 'lf-md', role: 'alertdialog', 'aria-modal': 'true', 'aria-hidden': 'true', 'aria-label': 'Xoá toàn bộ quy tắc?' },
+      el('h4', {}, el('i', { 'aria-hidden': 'true', text: '!' }), 'Xoá toàn bộ quy tắc?'),
+      el('p', { text: 'Mọi dòng đã ẩn sẽ hiện lại, mọi chữ đã thay trở về như cũ. Gõ chữ bên dưới để xác nhận.' }), nm, inp, el('div', { class: 'lf-bs' }, cxBtn, goBtn));
+    card.append(dim, md);
+    let lastLen = 0;
+    const dlg = v => { card.classList.toggle('lf-m', v); md.setAttribute('aria-hidden', String(!v)); if (v) { inp.value = ''; lastLen = 0; syncNm(); setTimeout(() => inp.focus({ preventScroll: true }), rm ? 0 : 200); } };
+    function syncNm() {
+      const v = foldVi(inp.value.toLowerCase()); let k = 0; while (k < v.length && v[k] === NF[k]) k++;
+      L.forEach((s, i) => s.classList.toggle('ok', i < k));
+      if (v.length > lastLen && k < v.length && !rm) { inp.classList.remove('lf-shake'); void inp.offsetWidth; inp.classList.add('lf-shake'); }
+      lastLen = v.length; goBtn.disabled = v.trim() !== NF;
+    }
+    inp.addEventListener('input', syncNm);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !goBtn.disabled) goBtn.click(); if (e.key === 'Escape') { e.stopPropagation(); dlg(false); } });
+    cxBtn.addEventListener('click', () => dlg(false)); dim.addEventListener('click', () => dlg(false));
+    goBtn.addEventListener('click', async () => {
+      if (goBtn.disabled) return;
+      dlg(false);
+      const old = [...f.hide.map(r => ({ g: 'hide', r })), ...f.rep.map(r => ({ g: 'rep', r }))];
+      if (!rm) {                                                            // thẻ quy tắc vỡ vụn
+        const R0 = rulesUl.getBoundingClientRect(), P0 = p2.getBoundingClientRect();
+        Object.assign(frag.style, { left: R0.left - P0.left + 'px', top: R0.top - P0.top + 'px', width: R0.width + 'px', height: R0.height + 'px' }); frag.replaceChildren();
+        for (let y = 0; y < R0.height; y += 12) for (let x = 0; x < R0.width; x += 18) {
+          const s = el('span', { style: `left:${x}px;top:${y}px;width:18px;height:12px` }); frag.append(s);
+          s.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${((Math.random() - .3) * 90).toFixed(0)}px,${(40 + Math.random() * 140).toFixed(0)}px) rotate(${((Math.random() - .5) * 200).toFixed(0)}deg) scale(.4)`, opacity: 0 }], { duration: 700 + Math.random() * 300, delay: x / R0.width * 220 + Math.random() * 80, easing: 'cubic-bezier(.5,0,.8,.6)', fill: 'forwards' });
+        }
+        rulesUl.style.visibility = 'hidden'; setTimeout(() => { frag.replaceChildren(); rulesUl.style.visibility = ''; }, 1300);
+      }
+      f.hide = []; f.rep = []; await save();
+      setTimeout(() => paintRules(), rm ? 0 : 450);
+      batch = old; showSnack(`Đã xoá <b>${old.length}</b> quy tắc`);
+    });
+    const danger = el('div', { class: 'lf-dg' }, el('b', { text: 'Vùng nguy hiểm' }), el('div', {}, el('span', { text: 'Xoá toàn bộ quy tắc lọc của truyện này' }), el('button', { type: 'button', class: 'lf-dz', text: 'Xoá hết', onclick: () => dlg(true) })));
+    p2.append(rulesUl, empty, danger, frag, el('p', { class: 'lf-tip', text: 'Mẹo: vuốt một quy tắc sang trái để xoá.' }));
+    // — trang 3: thêm quy tắc
+    let mode = 'rep', whole = false;
+    const fIn = el('input', { class: 'cz-in', placeholder: 'Chữ cần tìm', autocomplete: 'off', value: pre && pre.text ? pre.text : '' });
+    const tIn = el('input', { class: 'cz-in', placeholder: 'Thay bằng (để trống = xoá)', autocomplete: 'off' });
+    const wRow = el('div', { class: 'cz-rw' }, el('div', {}, el('b', { text: 'Chỉ khớp nguyên từ' }), el('small', { text: 'Thay “Mục” sẽ không đụng vào “Triệu Mục Nhiên”' })), sw(false, v => { whole = v; }).el);
+    const segM = seg([['rep', 'Thay chữ'], ['has', 'Ẩn dòng có chứa']], mode, v => { mode = v; tIn.hidden = wRow.hidden = v !== 'rep'; }, 'Kiểu quy tắc');
+    const addBtn = el('button', { type: 'button', class: 'lf-apply', text: 'Thêm quy tắc', onclick: async () => {
+      const v = fIn.value.trim(); if (!v) { fIn.focus(); fIn.classList.remove('lf-shake'); void fIn.offsetWidth; fIn.classList.add('lf-shake'); return; }
+      if (mode === 'rep') f.rep.push({ f: v, t: tIn.value, w: whole }); else f.hide.push({ k: 'has', v });
+      fIn.value = tIn.value = ''; await save(); paintRules(); goTab(1);
+      setTimeout(() => { const li = rulesUl.lastElementChild; li && !rm && li.animate([{ opacity: 0, transform: 'scale(.9)' }, { opacity: 1, transform: 'none' }], { duration: 450, easing: 'cubic-bezier(.3,1.4,.5,1)' }); }, 380);
+    } });
+    p3.append(segM, el('label', { class: 'cz-lb' }, 'Tìm', fIn), tIn, wRow, addBtn, el('p', { class: 'lf-tip', text: 'Chỉ áp dụng khi hiển thị: file truyện gốc không bị sửa, tắt công tắc ở trên là chữ trở lại như cũ. Quy tắc nằm trong file sao lưu.' }));
+    body.append(head, el('div', { class: 'lf-tw' }, tabsEl), pages);
+    paintRules(); hdr();
+    requestAnimationFrame(() => { [p2, p3].forEach(p => { p.inert = true; }); if (pre && pre.mode) goTab(2, true); syncTab(); fitH(); });
+  }, 'Xong');
+  sheetOnClose = () => { if (changed && R.book && R.book.id === b.id) refreshReader(); };
+}
+async function refreshReader() {
+  const p = readPos(); if (!p) return;
+  try { await jumpTo(p.i, p.frac); } catch {}
+}
+// Bôi đen chữ trong lúc đọc → hiện nút nhỏ "Ẩn dòng này" / "Thay chữ…"
+(() => {
+  const pill = el('div', { class: 'lf-pill', hidden: '' },
+    el('button', { type: 'button', 'data-a': 'hide', text: 'Ẩn dòng này' }), el('i'), el('button', { type: 'button', 'data-a': 'rep', text: 'Thay chữ…' }));
+  reader.append(pill);
+  let selP = null, selT = '';
+  document.addEventListener('selectionchange', () => {
+    const s = getSelection(), t = s && String(s).trim();
+    const n = s && s.anchorNode && (s.anchorNode.nodeType === 1 ? s.anchorNode : s.anchorNode.parentElement);
+    if (!R.book || reader.hidden || !t || !n || !n.closest('#flow .content, #pg-view .content') || t.length > 300) { pill.hidden = true; return; }
+    selT = t; selP = n.closest('p,div,li,h1,h2,h3,h4,h5,h6,center,blockquote'); pill.hidden = false;
+  });
+  pill.addEventListener('pointerdown', e => e.preventDefault());
+  pill.addEventListener('click', async e => {
+    const a = e.target.closest('button')?.dataset.a; if (!a || !R.book) return;
+    const b = R.book; pill.hidden = true;
+    if (a === 'rep') { getSelection().removeAllRanges(); openFilter(b, { text: selT, mode: 'rep' }); return; }
+    const line = normLine(selP ? selP.textContent : selT);
+    if (!line) return;
+    const f = { on: true, hide: [], rep: [], ...(b.filter || {}) }; f.hide = [...(f.hide || [])];
+    if (!f.hide.some(r => r.k === 'line' && r.v === line)) f.hide.push({ k: 'line', v: line });
+    f.on = true; await saveFilter(b, f); getSelection().removeAllRanges();
+    selP && selP.classList.add('lf-gone'); setTimeout(() => refreshReader(), 380);
+    toast(`Đã ẩn dòng “${line.length > 40 ? line.slice(0, 40) + '…' : line}” ở mọi chương. Mở ⋯ → Lọc chữ để bỏ.`);
+  });
+})();
 
 /* ---------------- Nhớ chỗ đọc của từng chương ----------------
    Sang chương bên cạnh (vuốt ngang, nút/phím chương trước–sau) rồi quay lại thì về đúng chỗ đang đọc dở của chương đó,
@@ -4243,6 +5084,7 @@ function openMenu() {
       comic ? null : tile('Tìm kiếm', ICON.search, openFind),
       comic ? null : tile('Màu nền', ICON.sun, openThemes),
       comic ? null : tile('Phông chữ', 'Aa', openFonts),
+      comic ? null : tile('Lọc chữ', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>', () => openFilter(R.book)),
       tile(comic ? 'Cài đặt' : 'Giao diện', ICON.gear, openLook),
       tile('Đầu chương', ICON.top, toChapStart),
       tile('Quay lại', ICON.undo, goBack, { off: !(R.hist && R.hist.length) }),
