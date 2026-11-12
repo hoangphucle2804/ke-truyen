@@ -1528,6 +1528,16 @@ html.c314-on,html.c314-on *{cursor:none!important}
 @media (prefers-reduced-motion:reduce){.rv-ic{animation:none}}
 /* iPhone (mở từ màn hình chính): tiêu đề kệ chừa chỗ cho thanh trạng thái thay vì đè lên lời chào */
 .lib-head{margin-top:env(safe-area-inset-top,0px)}
+/* sao lưu: chọn bản nhẹ / kèm cả truyện (viên trượt) */
+.bk-seg{position:relative;display:grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:16px;background:color-mix(in srgb,var(--ink) 7%,var(--surface));box-shadow:inset 0 0 0 1px var(--line)}
+.bk-seg>i{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:12px;background:var(--surface);box-shadow:0 2px 8px -2px rgba(0,0,0,.18),0 0 0 1px var(--line);transition:transform .45s cubic-bezier(.3,1.35,.5,1)}
+.bk-seg[data-v="1"]>i{transform:translateX(100%)}
+.bk-seg button{position:relative;height:40px;border-radius:12px;font-size:13.5px;font-weight:700;color:var(--muted);transition:color .25s}
+.bk-seg button.on{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.bk-seg>i{transition:none}}
+/* khôi phục bản đầy đủ chạy lâu: chữ tiến độ phải đọc được trên nền sáng */
+.d004.alt .d004-run{color:var(--ink)}
+.d004.alt .d004-bar{background:color-mix(in srgb,var(--bar,var(--accent)) 38%,var(--surface))}
 </style>
 </head>
 <body>
@@ -2820,6 +2830,48 @@ async function buildBackup() {
   ls['kt-bk-at'] = JSON.stringify(Date.now()); delete ls['kt-bk-snooze'];
   return { app: 'ke-truyen', v: 1, at: Date.now(), books: out, pending: lsGet('kt-pending', []), ls };
 }
+/* Sao lưu ĐẦY ĐỦ (kèm truyện): file .ketruyen = "KTB1" + độ dài đầu (4 byte) + đầu JSON (danh sách truyện, cài đặt, vị trí từng file) + nội dung các file nối liền.
+   Đọc lại bằng cách cắt từng đoạn của file, nên không cần nạp cả file vào bộ nhớ (quan trọng với iPhone). */
+const fileKeys = id => idb('files', 'readonly', s => s.getAllKeys(IDBKeyRange.bound(id + '/', id + '/￿')));
+const fullSize = books => books.reduce((s, b) => s + (b.files || []).reduce((t, f) => t + (f.size || 0), 0), 0);
+async function buildFull(step) {
+  const meta = await buildBackup(), books = await Store.books(), files = [], parts = []; let off = 0;
+  for (let i = 0; i < books.length; i++) {
+    for (const k of (await fileKeys(books[i].id)) || []) {
+      const bl = await Store.file(k).catch(() => null); if (!(bl instanceof Blob)) continue;
+      files.push({ k, t: bl.type || '', s: bl.size, o: off }); parts.push(bl); off += bl.size;
+    }
+    step((i + 1) / books.length);
+  }
+  const head = new TextEncoder().encode(JSON.stringify({ app: 'ke-truyen', v: 1, kind: 'full', at: Date.now(), meta, books, files }));
+  const pre = new DataView(new ArrayBuffer(8)); [75, 84, 66, 49].forEach((c, i) => pre.setUint8(i, c)); pre.setUint32(4, head.length, true);
+  return { blob: new Blob([pre, head, ...parts], { type: 'application/octet-stream' }), n: books.length, size: 8 + head.length + off };
+}
+async function readFullHead(f) {
+  if (f.size < 12) return null;
+  const pre = new DataView(await f.slice(0, 8).arrayBuffer());
+  if (pre.getUint32(0, false) !== 0x4B544231) return null;                 // "KTB1"
+  const n = pre.getUint32(4, true), h = JSON.parse(await f.slice(8, 8 + n).text());
+  if (!h || h.app !== 'ke-truyen' || h.kind !== 'full' || !Array.isArray(h.books)) throw new Error('File sao lưu bị hỏng');
+  h.base = 8 + n; return h;
+}
+async function restoreFull(f, h, step) {
+  const books = await Store.books(), have = new Set(books.map(fpOf)), ids = new Set(books.map(b => b.id));
+  const byBook = new Map(); for (const x of h.files) { const id = x.k.slice(0, x.k.indexOf('/')); if (!byBook.has(id)) byBook.set(id, []); byBook.get(id).push(x); }
+  const todo = h.books.filter(b => !have.has(fpOf(b))), total = todo.reduce((s, b) => s + (byBook.get(b.id) || []).reduce((t, x) => t + x.s, 0), 0) || 1;
+  let done = 0, added = 0;
+  for (const b0 of todo) {
+    let b = b0, nid = b0.id;
+    if (ids.has(nid)) { nid = uid(); b = JSON.parse(JSON.stringify(b0).split(`"${b0.id}/`).join(`"${nid}/`)); b.id = nid; }   // trùng mã với truyện khác: đổi mã
+    for (const x of byBook.get(b0.id) || []) {
+      await Store.putFile(nid + x.k.slice(b0.id.length), f.slice(h.base + x.o, h.base + x.o + x.s, x.t));
+      done += x.s; step(.9 * done / total, b.title);
+    }
+    await Store.putBook(b); ids.add(nid); added++;
+  }
+  const r = await applyBackup(h.meta, v => step(.9 + .1 * v));
+  return { added, skipped: h.books.length - todo.length, ...r };
+}
 function mergeStats(raw) {
   let v; try { v = JSON.parse(raw); } catch { return; }
   for (const g of ['days', 'pages', 'ch']) {
@@ -2905,28 +2957,51 @@ const canShareFiles = () => /iPhone|iPad|iPod|Android/.test(navigator.userAgent)
 function openBackup() {
   openSheet('Sao lưu & khôi phục', body => {
     body.classList.add('bk');
-    let file = null;
-    const name = `Ke-Truyen-sao-luu-${dmy()}.json`;
+    let file = null, full = false, light = null, fullEst = 0;
+    const name = `Ke-Truyen-sao-luu-${dmy()}.json`, nameFull = `Ke-Truyen-day-du-${dmy()}.ketruyen`;
+    const fname = el('b', { text: name });
     const fsz = el('small', { text: 'đang tính…' }), last = el('p', { class: 'bk-last', text: `Lần sao lưu gần nhất: ${fmtAgo(lsGet('kt-bk-at', 0))}` });
     const bk = btn004({ label: 'Sao lưu', size: '', runText: 'Đang gói dữ liệu…', doneText: canShareFiles() ? 'Đã tạo file sao lưu' : 'Đã lưu vào Tải xuống' });
     bk.btn.disabled = true;
-    buildBackup().then(d => {
+    const paint = () => {
+      fname.textContent = full ? nameFull : name; bk.label(full ? 'Sao lưu kèm truyện' : 'Sao lưu');
+      if (!light) return;
+      const t = full ? 'khoảng ' + fmtBytes(fullEst) : fmtBytes(light.size);
+      fsz.textContent = `${light.n} truyện · ${t}`; bk.size(t);
+      what.replaceChildren(...(full ? [
+        el('li', { text: 'Gồm tất cả ở bản nhẹ, cộng thêm nội dung mọi truyện trên kệ.' }),
+        el('li', { text: 'Khôi phục trên máy khác là có đủ truyện, khỏi thêm lại từng file. Truyện đã có trên máy đó sẽ được bỏ qua.' }),
+        el('li', { text: canShareFiles() ? `File nặng ${t}: cần đủ chỗ trống trong iCloud Drive / Tệp.` : `File nặng ${t}: nên chép vào Google Drive / OneDrive / USB.` })] : [
+        el('li', { text: 'Gồm: chỗ đang đọc, dấu trang, thống kê đọc, giao diện app, màu / biểu tượng / ảnh bìa riêng của từng truyện.' }),
+        el('li', { text: 'Không gồm file truyện. Muốn mang cả truyện sang máy khác, chọn “Kèm cả truyện”.' }),
+        el('li', { text: canShareFiles() ? 'Trên iPhone: bấm “Lưu vào Tệp” và chọn iCloud Drive để file nằm an toàn trên mạng.' : 'Nên chép file vào Google Drive / OneDrive / USB để giữ an toàn.' })]));
+    };
+    const segB = [false, true].map(v => el('button', { type: 'button', role: 'radio', 'aria-checked': String(v === full), class: v === full ? 'on' : '', text: v ? 'Kèm cả truyện' : 'Nhẹ · chỉ chỗ đọc',
+      onclick: () => { if (bk.el.dataset.state === 'run') return; full = v; segB.forEach((b, k) => { b.classList.toggle('on', !!k === v); b.setAttribute('aria-checked', String(!!k === v)); }); seg.dataset.v = v ? 1 : 0; bk.reset(); paint(); } }));
+    const seg = el('div', { class: 'bk-seg', role: 'radiogroup', 'aria-label': 'Kiểu sao lưu', 'data-v': '0' }, el('i', { 'aria-hidden': 'true' }), ...segB);
+    const what = el('ul', { class: 'bk-what' });
+    Promise.all([buildBackup(), Store.books()]).then(([d, books]) => {
       file = new File([JSON.stringify(d)], name, { type: 'application/json' });
-      const t = fmtBytes(file.size); fsz.textContent = `${d.books.length} truyện · ${t}`; bk.size(t); bk.btn.disabled = false;
+      light = { size: file.size, n: d.books.length }; fullEst = fullSize(books); bk.btn.disabled = false; paint();
     }).catch(e => { fsz.textContent = 'Không đọc được dữ liệu: ' + (e.message || e); });
     bk.btn.addEventListener('click', async () => {
       const st = bk.el.dataset.state;
       if (st === 'run' || !file) return;
       if (st !== 'idle') { bk.reset(); return; }
-      bk.start('Đang gói dữ liệu…'); bk.to(.6);
-      let ok = true, creep = 0;
+      let ok = true, creep = 0, out = file, outName = name;
       try {
-        if (canShareFiles() && navigator.canShare?.({ files: [file] })) {
+        if (full) {
+          bk.start('Đang gói truyện…');
+          const r = await buildFull(f => bk.to(f * .55, `Đang gói truyện… ${Math.round(f * 100)}%`));
+          out = new File([r.blob], nameFull, { type: 'application/octet-stream' }); outName = nameFull;
+          fsz.textContent = `${r.n} truyện · ${fmtBytes(r.size)}`; bk.size(fmtBytes(r.size)); bk.to(.6);
+        } else { bk.start('Đang gói dữ liệu…'); bk.to(.6); }
+        if (canShareFiles() && navigator.canShare?.({ files: [out] })) {
           creep = setInterval(() => bk.to(Math.min(.94, (parseFloat(bk.btn.style.getPropertyValue('--p')) || .6) + .02), 'Chọn “Lưu vào Tệp”…'), 260);
-          await navigator.share({ files: [file], title: 'Sao lưu Kệ Truyện' });
+          await navigator.share({ files: [out], title: 'Sao lưu Kệ Truyện' });
         } else {
-          const a = el('a', { href: URL.createObjectURL(file), download: name }); document.body.append(a); a.click(); a.remove();
-          setTimeout(() => URL.revokeObjectURL(a.href), 5000); bk.to(.9, 'Đang lưu…'); await sleep(600);
+          const a = el('a', { href: URL.createObjectURL(out), download: outName }); document.body.append(a); a.click(); a.remove();
+          setTimeout(() => URL.revokeObjectURL(a.href), full ? 120000 : 5000); bk.to(.9, 'Đang lưu…'); await sleep(600);
         }
       } catch (e) {
         ok = false; bk.reset();
@@ -2938,7 +3013,7 @@ function openBackup() {
     });
     // — khôi phục
     let data = null;
-    const pick = el('input', { type: 'file', accept: '.json,application/json', hidden: '' });
+    const pick = el('input', { type: 'file', hidden: '' });       // không giới hạn đuôi file: iPhone hay làm mờ file .ketruyen nếu có accept
     const sum = el('div', { class: 'bk-sum', hidden: '' });
     const rs = btn004({ label: 'Khôi phục từ file', up: true, alt: true, runText: 'Đang khôi phục…', doneText: 'Đã khôi phục' });
     rs.btn.addEventListener('click', async () => {
@@ -2948,36 +3023,49 @@ function openBackup() {
       if (!data) { pick.value = ''; pick.click(); return; }
       rs.start('Đang khôi phục…');
       try {
-        const r = await applyBackup(data, f => rs.to(f * .95, `Đang khôi phục… ${Math.round(f * 100)}%`));
-        await rs.finish(r.pending ? `Xong · ${r.pending} truyện chờ thêm file` : 'Đã khôi phục, đang mở lại…');
+        const r = data.full
+          ? await restoreFull(data.file, data.full, (f, t) => rs.to(f * .97, t ? `Đang chép “${shortTitle(t)}”… ${Math.round(f * 100)}%` : `Đang khôi phục… ${Math.round(f * 100)}%`))
+          : await applyBackup(data, f => rs.to(f * .95, `Đang khôi phục… ${Math.round(f * 100)}%`));
+        await rs.finish(data.full ? `Đã thêm ${r.added} truyện, đang mở lại…` : r.pending ? `Xong · ${r.pending} truyện chờ thêm file` : 'Đã khôi phục, đang mở lại…');
         setTimeout(() => location.reload(), 1600);
       } catch (e) { rs.reset(); toast('Không khôi phục được: ' + (e.message || e)); }
     });
     pick.addEventListener('change', async () => {
       const f = pick.files && pick.files[0]; if (!f) return;
       try {
+        const h = await readFullHead(f);
+        if (h) {
+          const books = await Store.books(), have = new Set(books.map(fpOf)), on = h.books.filter(b => have.has(fpOf(b))).length, nw = h.books.length - on;
+          data = { full: h, file: f };
+          sum.replaceChildren(...[
+            el('b', { text: `Bản sao lưu đầy đủ ngày ${fmtDate(new Date(h.at))}` }),
+            el('span', { text: `${h.books.length} truyện kèm nội dung · ${fmtBytes(f.size)} · cài đặt & thống kê đọc` }),
+            nw ? el('span', { class: 'ok', text: `${nw} truyện sẽ được thêm vào kệ, kèm chỗ đọc, dấu trang và tuỳ chỉnh.` }) : null,
+            on ? el('span', { class: 'wait', text: `${on} truyện đã có trên máy: giữ nguyên, chỉ khôi phục chỗ đọc và tuỳ chỉnh.` }) : null].filter(Boolean));
+          sum.hidden = false; rs.label(nw ? `Khôi phục & thêm ${nw} truyện` : 'Khôi phục ngay'); rs.size('');
+          setTimeout(() => rs.el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60);
+          return;
+        }
+        if (f.size > 20e6) throw new Error('Đây không phải file sao lưu của Kệ Truyện');
         const d = JSON.parse(await f.text());
         if (!d || d.app !== 'ke-truyen' || !Array.isArray(d.books)) throw new Error('Đây không phải file sao lưu của Kệ Truyện');
         const books = await Store.books(), have = new Set(books.map(fpOf)), list = [...d.books, ...(d.pending || [])];
         const on = list.filter(e => have.has(e.fp)).length, off = list.length - on;
         data = d;
-        sum.replaceChildren(
+        sum.replaceChildren(...[
           el('b', { text: `Bản sao lưu ngày ${fmtDate(new Date(d.at))}` }),
           el('span', { text: `${list.length} truyện · cài đặt giao diện · thống kê đọc` }),
           el('span', { class: 'ok', text: `${on} truyện đã có trên máy: khôi phục ngay chỗ đọc, dấu trang, màu, ảnh bìa riêng.` }),
-          off ? el('span', { class: 'wait', text: `${off} truyện chưa có: khi bạn thêm lại đúng file của chúng, app sẽ tự khôi phục.` }) : null);
+          off ? el('span', { class: 'wait', text: `${off} truyện chưa có: khi bạn thêm lại đúng file của chúng, app sẽ tự khôi phục.` }) : null].filter(Boolean));
         sum.hidden = false; rs.label('Khôi phục ngay'); rs.size('');
         setTimeout(() => rs.el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60);
       } catch (e) { data = null; sum.hidden = true; rs.label('Khôi phục từ file'); toast(e.message || 'File không đọc được.'); }
     });
     const pend = lsGet('kt-pending', []);
     body.append(persistRow(),
-      el('p', { class: 'bk-file' }, el('span', { class: 'bk-ic', 'aria-hidden': 'true', text: 'KT' }), el('span', {}, el('b', { text: name }), fsz)),
-      bk.el, last,
-      el('ul', { class: 'bk-what' },
-        el('li', { text: 'Gồm: chỗ đang đọc, dấu trang, thống kê đọc, giao diện app, màu / biểu tượng / ảnh bìa riêng của từng truyện.' }),
-        el('li', { text: 'Không gồm file truyện (EPUB, CBZ, TXT) vì rất nặng, bạn giữ file gốc như hiện tại.' }),
-        el('li', { text: canShareFiles() ? 'Trên iPhone: bấm “Lưu vào Tệp” và chọn iCloud Drive để file nằm an toàn trên mạng.' : 'Nên chép file vào Google Drive / OneDrive / USB để giữ an toàn.' })),
+      seg,
+      el('p', { class: 'bk-file' }, el('span', { class: 'bk-ic', 'aria-hidden': 'true', text: 'KT' }), el('span', {}, fname, fsz)),
+      bk.el, last, what,
       el('div', { class: 'bk-sep' }),
       el('div', { class: 'ui-h', text: 'Khôi phục' }), sum, rs.el, pick,
       ...(pend.length ? [el('p', { class: 'bk-last', text: `Đang chờ ${pend.length} truyện: thêm lại đúng file là tự khôi phục.` })] : []));
