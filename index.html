@@ -957,6 +957,149 @@ html[data-layout="list"] .xc-pb i{background:var(--accent);border-radius:2px}
 .ui-row b{display:block;font-size:15px;font-weight:700}
 .ui-row small{display:block;margin-top:1px;color:var(--muted);font-size:12.5px}
 @media (prefers-reduced-motion: reduce){.scene .cl,.greet > *,.xd-next em svg{animation:none}.scene .pl{transform:none}.p389-p,.p389-lb,.p389-ds,.useg-mk{transition:none}}
+
+/* ----- Thẻ truyện: nhấn giữ (#003), biểu tượng, ghim ----- */
+.xc{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.xc.is-press{transform:scale(.955);transition:transform .48s cubic-bezier(.2,.8,.2,1)}
+.xc.is-pop{animation:xc-pop .45s cubic-bezier(.3,1.5,.5,1)}
+@keyframes xc-pop{0%{transform:scale(.955)}55%{transform:scale(1.035)}100%{transform:none}}
+.xc-em{position:absolute;top:10px;right:10px;z-index:2;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:18px;line-height:1;background:rgba(255,255,255,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 12px -4px rgba(0,0,0,.4);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.xc-pin{position:absolute;top:10px;left:10px;z-index:2;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.35);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.xc-pin svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+html[data-layout="list"] .xc-em{top:auto;bottom:6px;left:42px;right:auto;width:24px;height:24px;font-size:13px;background:var(--surface);box-shadow:0 0 0 1px var(--line)}
+html[data-layout="list"] .xc-pin{left:auto;right:12px;top:12px;background:none;color:var(--muted)}
+/* Bảng tuỳ chọn khi nhấn giữ */
+.ba .hd-file{background:var(--surface)}
+.ba-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ba-it{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 6px 12px;border-radius:18px;background:var(--bg);box-shadow:0 0 0 1px var(--line);font-size:12.5px;font-weight:700;color:var(--ink);transition:transform .35s var(--ux-spring)}
+.ba-it:active{transform:scale(.94)}
+.ba-it i{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--k-soft,color-mix(in srgb,var(--accent) 12%,var(--surface)));color:var(--k-soft-ink,var(--accent))}
+.ba-it svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.sheet-body p.ba-hint{font-size:12.5px;margin:2px 4px -2px}
+
+/* ----- Trang truyện mang màu riêng của truyện ----- */
+.xd.tint{background:color-mix(in srgb,var(--sc,var(--accent)) 13%,var(--bg))}
+.xd.tint .xd-hero::before{content:"";position:absolute;left:0;right:0;bottom:-1px;height:70px;z-index:1;background:linear-gradient(transparent,color-mix(in srgb,var(--sc,var(--accent)) 13%,var(--bg)));pointer-events:none}
+.xd.tint .xd-m,.xd.tint .xd-opt,.xd.tint .xd-next{background:color-mix(in srgb,var(--sc,var(--accent)) 5%,var(--surface));box-shadow:0 0 0 1px color-mix(in srgb,var(--sc,var(--accent)) 16%,var(--line))}
+.xd.tint .xd-bar{background:color-mix(in srgb,var(--sc,var(--accent)) 18%,var(--line))}
+.xd.tint .xd-bar i{background:var(--sc,var(--accent))}
+.xd.tint .xd-est{background:color-mix(in srgb,var(--sc,var(--accent)) 20%,var(--surface));box-shadow:none}
+.xd.tint .xd-est small{color:color-mix(in srgb,var(--sc,var(--accent)) 70%,var(--ink))}
+
+/* ----- Lucian UX/UI Prompt #001 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#001 ----- */
+.g001{position:relative;isolation:isolate;height:54px;--g1:rgba(255,255,255,.66);--g2:rgba(255,255,255,.16);--g3:rgba(255,255,255,.4);--hi:rgba(255,255,255,.95);--rim:rgba(255,255,255,.65);--drop:rgba(40,30,80,.38);--blob:.62}
+@media (prefers-color-scheme:dark){html:not([data-theme="light"]) .g001{--g1:rgba(255,255,255,.2);--g2:rgba(255,255,255,.03);--g3:rgba(255,255,255,.1);--hi:rgba(255,255,255,.5);--rim:rgba(255,255,255,.16);--drop:rgba(0,0,0,.75);--blob:.55}}
+html[data-theme="dark"] .g001{--g1:rgba(255,255,255,.2);--g2:rgba(255,255,255,.03);--g3:rgba(255,255,255,.1);--hi:rgba(255,255,255,.5);--rim:rgba(255,255,255,.16);--drop:rgba(0,0,0,.75);--blob:.55}
+.g001-blobs{position:absolute;inset:-12px -4px;z-index:-1;pointer-events:none}
+.g001-blobs i{position:absolute;border-radius:50%;filter:blur(16px);opacity:var(--blob);animation:g001-drift 12s ease-in-out infinite alternate}
+.g001-blobs i:nth-child(1){left:2%;top:8%;width:46%;height:84%;background:var(--sc,var(--accent))}
+.g001-blobs i:nth-child(2){right:4%;bottom:0;width:50%;height:80%;background:var(--accent);animation-delay:-4s}
+.g001-blobs i:nth-child(3){left:38%;top:0;width:28%;height:70%;background:color-mix(in srgb,var(--sc,var(--accent)) 45%,#fff);opacity:calc(var(--blob) * .7);animation-delay:-8s}
+@keyframes g001-drift{from{transform:translate3d(-8px,-4px,0) scale(1)}to{transform:translate3d(10px,6px,0) scale(1.12)}}
+.g001-mag{height:100%;transition:translate .8s var(--ux-spring)}
+.g001-float{height:100%;display:flex;justify-content:center;animation:g001-float 6s ease-in-out infinite}
+@keyframes g001-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.xd .g001 .xd-go{position:relative;display:block;width:100%;height:54px;padding:0;border-radius:999px;overflow:hidden;isolation:isolate;color:var(--ink);font-size:16px;font-weight:760;
+  background:linear-gradient(150deg,var(--g1),var(--g2) 55%,var(--g3));-webkit-backdrop-filter:blur(18px) saturate(180%);backdrop-filter:blur(18px) saturate(180%);
+  box-shadow:inset 0 1.5px 0 var(--hi),inset 0 -12px 20px -14px var(--hi),inset 0 0 0 1px var(--rim),0 22px 38px -22px var(--drop),0 3px 8px -4px var(--drop);
+  transition:width .7s var(--ux-ease),transform .55s var(--ux-spring)}
+.g001 .xd-go::before{content:"";position:absolute;left:9%;right:9%;top:7%;height:42%;border-radius:999px;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,0))}
+.g001 .xd-go::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .4s var(--ux-ease);background:radial-gradient(130px 70px at var(--mx,50%) var(--my,0%),rgba(255,255,255,.4),transparent 70%)}
+.g001 .xd-go:hover::after{opacity:1}
+.g001 .xd-go:active{transform:scale(1.03,.92)}
+.g001-sheen{position:absolute;top:-40%;bottom:-40%;left:0;width:38%;pointer-events:none;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45) 50%,transparent);transform:translateX(-150%) skewX(-12deg);animation:g001-sheen 4.5s var(--ux-ease) 1s infinite}
+@keyframes g001-sheen{0%,60%{transform:translateX(-150%) skewX(-12deg)}100%{transform:translateX(320%) skewX(-12deg)}}
+.g001-txt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;white-space:nowrap;letter-spacing:-.02em;transition:opacity .35s var(--ux-ease),transform .55s var(--ux-ease),filter .4s var(--ux-ease)}
+.g001-spin{position:absolute;left:50%;top:50%;width:28px;height:28px;margin:-14px 0 0 -14px;opacity:0;transform:scale(.5);transition:opacity .35s var(--ux-ease),transform .6s var(--ux-spring)}
+.g001-spin svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;animation:g001-rot 1s linear infinite}
+.g001-spin circle{stroke-dasharray:1 56;animation:g001-arc 1.4s ease-in-out infinite}
+@keyframes g001-rot{to{transform:rotate(360deg)}}
+@keyframes g001-arc{0%,100%{stroke-dasharray:1 56}50%{stroke-dasharray:38 19}}
+.g001[data-state="load"] .xd-go{width:54px;cursor:progress}
+.g001[data-state="load"] .g001-txt{opacity:0;transform:translateY(-14px);filter:blur(5px)}
+.g001[data-state="load"] .g001-spin{opacity:1;transform:none}
+
+/* ----- Tuỳ chỉnh truyện (#250 thanh chưa lưu) ----- */
+.sheet.cz{position:relative;overflow:hidden}
+.cz-body{gap:12px}
+.cz-nv{display:flex;gap:4px;padding:4px;border-radius:14px;background:var(--bg);box-shadow:0 0 0 1px var(--line)}
+.cz-nv button{flex:1;height:36px;border-radius:10px;font-size:13.5px;font-weight:800;color:var(--muted)}
+.cz-nv button[aria-current]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.cz-p{display:grid;gap:10px}
+.cz-lb{display:block;font-size:12px;font-weight:800;color:var(--muted);margin-top:4px}
+.cz-in{display:block;width:100%;height:44px;margin-top:6px;padding:0 13px;border:0;border-radius:12px;background:var(--bg);box-shadow:inset 0 0 0 1.5px var(--line);color:var(--ink);font:inherit;font-size:16px;font-weight:650;outline:none}
+.cz-in:focus{box-shadow:inset 0 0 0 2px var(--accent)}
+.cz-rw{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--bg);box-shadow:0 0 0 1px var(--line)}
+.cz-rw > div{flex:1;min-width:0}
+.cz-rw b{display:block;font-size:14.5px;font-weight:750}
+.cz-rw small{display:block;margin-top:1px;font-size:12px;color:var(--muted)}
+.cz-row2{display:flex;gap:8px;flex-wrap:wrap}
+.cz-pv{height:110px;border-radius:18px;background:var(--cu,#888);color:var(--cu-ink,#fff);display:grid;place-items:center;text-align:center;padding:0 16px;transition:background .4s}
+.cz-pv b{display:block;font-size:21px;font-weight:900;letter-spacing:-.04em;line-height:1.15}
+.cz-pv small{display:block;margin-top:4px;font-size:12px;font-weight:700;opacity:.8}
+.is-flash{animation:cz-fl .8s ease}
+@keyframes cz-fl{25%{box-shadow:0 0 0 3px color-mix(in srgb,#F59E0B 60%,transparent);border-radius:14px}}
+.czb{position:absolute;left:8px;right:8px;top:8px;z-index:5;display:flex;align-items:center;gap:6px;height:48px;padding:0 6px 0 16px;border-radius:15px;background:var(--ink);color:var(--surface);font-size:13.5px;font-weight:800;transform:translateY(-150%);transition:transform .45s cubic-bezier(.3,1.3,.5,1),background .3s}
+.sheet.cz.is-dirty .czb{transform:none}
+.czb.is-warn{animation:czb-sh .45s;background:#BE123C;color:#fff}
+@keyframes czb-sh{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.czb.is-ok{background:#059669;color:#fff}
+.czb > span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.czb button{height:36px;padding:0 14px;border-radius:10px;font-size:13.5px;font-weight:850}
+.czb-cx{background:color-mix(in srgb,var(--surface) 14%,transparent);color:inherit}
+.czb-sv{position:relative;min-width:58px;background:var(--surface);color:var(--ink)}
+.czb-sv i{display:none;width:14px;height:14px;margin:0 auto;border-radius:50%;border:2px solid color-mix(in srgb,var(--ink) 25%,transparent);border-top-color:var(--ink);animation:czb-sp .7s linear infinite}
+.czb-sv.is-busy i{display:block}
+.czb-sv.is-busy b{display:none}
+.czb.is-ok button{visibility:hidden}
+@keyframes czb-sp{to{transform:rotate(360deg)}}
+/* Ô màu, biểu tượng */
+.swx{display:flex;flex-wrap:wrap;gap:9px}
+.swx-c{position:relative;width:34px;height:34px;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(255,255,255,.35);transition:transform .2s cubic-bezier(.3,1.6,.5,1),box-shadow .2s}
+.swx-c[aria-checked="true"]{transform:scale(1.1);box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--ink)}
+.swx-c.auto{background:conic-gradient(from 200deg,var(--h1,#ccc),var(--accent),var(--h3,#999),var(--h1,#ccc));color:#fff;font-size:12px;font-weight:900}
+.swx-c.auto span{text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.swx-c.any{background:var(--c,conic-gradient(red,#ff0,lime,cyan,blue,#f0f,red))}
+.swx-c.any input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.emo-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:6px}
+.emo{height:42px;border-radius:12px;font-size:20px;background:var(--bg);box-shadow:0 0 0 1px var(--line);transition:transform .2s cubic-bezier(.3,1.6,.5,1)}
+.emo:first-child{font-size:11.5px;font-weight:800;color:var(--muted)}
+.emo[aria-checked="true"]{background:color-mix(in srgb,var(--accent) 14%,var(--surface));box-shadow:0 0 0 2px var(--accent);transform:scale(1.06)}
+
+/* ----- Lucian UX/UI Prompt #361 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#361 ----- */
+@property --b361-e{syntax:"<number>";inherits:true;initial-value:0}
+.b361{display:flex;flex-direction:column;padding:10px;border-radius:24px;background:var(--bg);box-shadow:0 0 0 1px var(--line)}
+.b361-fr{position:relative;height:190px;display:flex;border-radius:16px;overflow:hidden;perspective:800px}
+.b361-s{position:relative;flex:1;margin-right:-.6px;transform-style:preserve-3d}
+.b361-s i{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background-size:800% auto;background-color:#333;background-repeat:no-repeat}
+.b361-s i.b{transform:rotateY(180deg)}
+.b361-s i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,var(--b361-e)),transparent 30%,transparent 70%,rgba(0,0,0,var(--b361-e)))}
+.b361-tx{position:absolute;left:16px;bottom:14px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.45);pointer-events:none;transition:opacity .3s,transform .5s var(--ux-spring)}
+.b361-tx.swap{opacity:0;transform:translateY(10px)}
+.b361-tx b{display:block;font-size:26px;font-weight:900;letter-spacing:-.04em}
+.b361-tx span{font-size:13px;font-weight:700}
+.b361-ft{display:flex;align-items:center;gap:8px;margin-top:10px}
+.b361-pv,.b361-nx{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--surface);box-shadow:0 0 0 1px var(--line);color:var(--ink)}
+.b361-ft svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.b361-dots{flex:1;display:flex;justify-content:center;flex-wrap:wrap}
+.b361-dot{width:22px;height:26px;display:grid;place-items:center}
+.b361-dot::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--line);transition:width .4s var(--ux-spring),background-color .3s,border-radius .3s}
+.b361-dot[aria-pressed="true"]::before{width:18px;border-radius:4px;background:var(--ink)}
+
+/* ----- Lucian UX/UI Prompt #314 · MIT License (c) 2026 Seokwoooo · con trỏ biến hình (máy tính) ----- */
+html.c314-on,html.c314-on *{cursor:none!important}
+.c314{position:fixed;left:0;top:0;z-index:200;width:16px;height:16px;border-radius:999px;background:color-mix(in srgb,var(--ink) 85%,transparent);pointer-events:none;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:800;opacity:0;
+  transition:width .28s cubic-bezier(.3,1.4,.5,1),height .28s cubic-bezier(.3,1.4,.5,1),border-radius .28s,background .2s,opacity .2s}
+.c314.is-on{opacity:1}
+.c314.is-btn{background:color-mix(in srgb,var(--ink) 10%,transparent)}
+.c314.is-text,.c314.is-link{background:var(--accent)}
+.c314.is-img{background:rgba(255,255,255,.92);color:#22201C;box-shadow:0 10px 24px -8px rgba(0,0,0,.4)}
+.c314 span{opacity:0;transition:opacity .2s;white-space:nowrap}
+.c314.is-img span,.c314.is-link span{opacity:1}
+.cur{color:var(--cu-ink,#fff)}
+@media (prefers-reduced-motion: reduce){.c314{transition:opacity .2s}.g001-blobs i,.g001-float,.g001-sheen{animation:none}.xc.is-pop{animation:none}.czb,.b361-tx{transition:none}}
+.brand{min-width:0;flex:1}
+.brand h1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 </style>
 </head>
 <body>
@@ -1072,6 +1215,15 @@ let SKIN = UI.skin;
 function applyUI() {
   const h = document.documentElement; h.dataset.skin = SKIN = UI.skin; h.dataset.layout = UI.layout;
   if (UI.mode === 'light' || UI.mode === 'dark') h.dataset.theme = UI.mode; else delete h.dataset.theme;
+  const A = UI.accent, st = h.style;
+  for (const k of ['--accent', '--k-cur', '--k-fab', '--k-fab-sh', '--k-grad', '--k-soft', '--k-soft-ink']) st.removeProperty(k);
+  if (A) {
+    st.setProperty('--accent', A); st.setProperty('--k-cur', A);
+    st.setProperty('--k-fab', `linear-gradient(145deg,color-mix(in srgb,${A} 78%,#fff),color-mix(in srgb,${A} 84%,#000))`);
+    st.setProperty('--k-fab-sh', `0 18px 32px -16px color-mix(in srgb,${A} 70%,transparent)`);
+    st.setProperty('--k-grad', `linear-gradient(90deg,color-mix(in srgb,${A} 50%,#fff),${A})`);
+    st.setProperty('--k-soft', `color-mix(in srgb,${A} 13%,var(--surface))`); st.setProperty('--k-soft-ink', `color-mix(in srgb,${A} 78%,var(--ink))`);
+  }
 }
 const saveUI = () => lsSet('kt-ui', UI);
 applyUI();
@@ -1435,7 +1587,8 @@ async function renderLibrary() {
   };
   const all = books.map(info), kids = [...libTop(books, pmap)];
   SHELF = []; CARDS.clear();
-  for (const [name, list] of [['Đang đọc', all.filter(x => x.ci >= 0 && !x.done)], ['Mới · chưa đọc', all.filter(x => x.ci < 0)], ['Đã đọc xong', all.filter(x => x.done)]])
+  const pin = x => !!(x.b.ui && x.b.ui.pin);
+  for (const [name, list] of [['Đã ghim', all.filter(pin)], ['Đang đọc', all.filter(x => !pin(x) && x.ci >= 0 && !x.done)], ['Mới · chưa đọc', all.filter(x => !pin(x) && x.ci < 0)], ['Đã đọc xong', all.filter(x => !pin(x) && x.done)]])
     if (list.length) { SHELF.push(...list); kids.push(el('div', { class: 'section-label', text: `${name} (${list.length})` }), el('div', { class: 'xc-ls' }, ...list.map(bookCard))); }
   area.replaceChildren(...kids);
   renderStorage();
@@ -1444,7 +1597,9 @@ const shortTitle = t => t.length > 28 ? t.slice(0, 27) + '…' : t;
 // Nền thẻ truyện: ảnh bìa (phủ tối dần để đọc được chữ) hoặc dải màu
 function paintCover(node, b) {
   node.style.setProperty('--bg', coverBg(b));
-  if (b.hasCover) Store.file(`${b.id}/cover`).then(bl => { if (!bl) return; const u = URL.createObjectURL(bl); libUrls.push(u); node.style.setProperty('--bg', `url("${u}") center 22%/cover`); });
+  const sc = b.ui && b.ui.scene; if (sc && SCN[sc]) { node.style.setProperty('--bg', SCN[sc][2]); return; }
+  const ck = coverKey(b);
+  if (ck) Store.file(ck).then(bl => { if (!bl) return; const u = URL.createObjectURL(bl); libUrls.push(u); node.style.setProperty('--bg', `url("${u}") center 22%/cover`); });
 }
 const kindName = b => b.kind === 'comic' ? 'Truyện tranh' : b.kind === 'mixed' ? 'Tranh + chữ' : 'Truyện chữ';
 function bookCard(x) {
@@ -1453,8 +1608,8 @@ function bookCard(x) {
   const card = el('button', { type: 'button', class: 'xc', 'aria-label': `${b.title}. ${sub}` }, im, el('span', { class: 'xc-tx' }, el('b', { text: b.title }), el('span', { text: sub })),
     x.pct > 0 && !x.done ? el('span', { class: 'xc-pb' }, el('i', { style: `width:${(x.pct * 100).toFixed(1)}%` })) : null);
   paintCover(im, b);
-  card.addEventListener('click', () => openStory(x, card));
-  CARDS.set(b.id, card);
+  card.addEventListener('click', () => { if (card._lp) { card._lp = false; return; } openStory(x, card); });
+  CARDS.set(b.id, card); decorateCard(card, x);
   return card;
 }
 // Thẻ phóng to từ đúng chỗ của nó thành trang chi tiết; đóng thì thu về chỗ cũ
@@ -1495,8 +1650,8 @@ function detailBody(x) {
     el('div', {}, el('div', { class: 'xd-bar' }, el('i', { style: `width:${(x.pct * 100).toFixed(1)}%` })), el('div', { class: 'hero-m', style: 'margin-top:6px', text: `${Math.round(x.pct * 100)}% cả bộ · ${kindName(b)}${b.author ? ' · ' + b.author : ''}` })),
     est,
     el('div', { class: 'xd-acts' },
-      el('button', { type: 'button', class: 'xd-go', text: x.ci < 0 ? 'Bắt đầu đọc' : x.done ? 'Đọc lại' : 'Đọc tiếp', onclick: () => { closeDetail(true); openBook(b.id); } }),
-      el('button', { type: 'button', class: 'xd-opt', text: 'Tuỳ chọn', onclick: () => bookMenu(b) })));
+      glassGo(x.ci < 0 ? 'Bắt đầu đọc' : x.done ? 'Đọc lại' : 'Đọc tiếp', b),
+      el('button', { type: 'button', class: 'xd-opt', text: 'Tuỳ chọn', onclick: () => bookActions(b) })));
 }
 function openDetail(x, card) {
   if (XD.busy || XD.cur) return;
@@ -1513,7 +1668,7 @@ function closeDetail(instant) {
   if (XD.busy) return;
   const card = XD.cur.card, r = card && card.isConnected ? card.getBoundingClientRect() : null;
   if (XD.cur.cu || !r || r.bottom < 0 || r.top > innerHeight || matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    XD.busy = true; curtain(shelfColor(), 'Kệ Truyện', '', done); return;
+    XD.busy = true; curtain(shelfColor(), UI.name || 'Kệ Truyện', '', done); return;
   }
   XD.busy = true; xd.classList.remove('is-in', 'cu');
   setTimeout(() => xdRun(xdFrames(card.getBoundingClientRect()), true, () => { done(); card.focus({ preventScroll: true }); }), 160);
@@ -1526,8 +1681,8 @@ let SHELF = [];                       // các truyện đúng thứ tự đang h
 const CARDS = new Map();              // id truyện → thẻ trên kệ
 function fillDetail(x) {
   const xd = $('#xd'), ttl = $('#xd-ttl'), n = SHELF.length, i = SHELF.indexOf(x), nx = SHELF[i + 1];
-  paintCover($('#xd-hero'), x.b);
-  ttl.querySelector('b').textContent = x.b.title; ttl.querySelector('span').textContent = x.sub;
+  paintCover($('#xd-hero'), x.b); tintDetail(x.b);
+  ttl.querySelector('b').textContent = (x.b.ui && x.b.ui.emoji ? x.b.ui.emoji + ' ' : '') + x.b.title; ttl.querySelector('span').textContent = x.sub;
   const body = detailBody(x);
   if (nx) {
     const th = el('i'); paintCover(th, nx.b);
@@ -1579,7 +1734,7 @@ function curtain(color, label, sub, swap) {
   return new Promise(res => {
     const c = $('#cur');
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) { try { swap(); } catch (e) { console.error(e); } res(); return; }
-    c.style.setProperty('--cu', color); c.querySelector('b').textContent = label; c.querySelector('small').textContent = sub || '';
+    c.style.setProperty('--cu', color); c.style.setProperty('--cu-ink', inkOn(color)); c.querySelector('b').textContent = label; c.querySelector('small').textContent = sub || '';
     c.classList.remove('is-lift'); void c.offsetWidth; c.classList.add('is-cover');
     setTimeout(() => {
       try { swap(); } catch (e) { console.error(e); }
@@ -1600,11 +1755,13 @@ function tuneCol([r, g, b]) {
   return '#' + [f(0), f(8), f(4)].map(v => v.toString(16).padStart(2, '0')).join('');
 }
 async function storyColor(b) {
+  if (b.ui && b.ui.color) return b.ui.color;
   if (COLS.has(b.id)) return COLS.get(b.id);
   let col = null;
+  const scn = b.ui && b.ui.scene && SCN[b.ui.scene];
   try {
-    if (b.hasCover && window.createImageBitmap) {
-      const bl = await Store.file(`${b.id}/cover`);
+    if (!scn && coverKey(b) && window.createImageBitmap) {
+      const bl = await Store.file(coverKey(b));
       if (bl) {
         const bm = await createImageBitmap(bl), cv = document.createElement('canvas'); cv.width = 18; cv.height = 24;
         const cx = cv.getContext('2d'); cx.drawImage(bm, 0, 0, 18, 24); bm.close?.();
@@ -1614,7 +1771,7 @@ async function storyColor(b) {
       }
     }
   } catch {}
-  if (!col) { const m = coverBg(b).match(/#[0-9a-f]{6}/gi); col = m ? tuneCol(hx(m[Math.min(1, m.length - 1)])) : shelfColor(); }
+  if (!col) { const m = (scn ? scn[2] : coverBg(b)).match(/#[0-9a-f]{6}/gi); col = m ? tuneCol(hx(m[Math.min(1, m.length - 1)])) : shelfColor(); }
   COLS.set(b.id, col); return col;
 }
 const colorSoon = b => Promise.race([storyColor(b), new Promise(r => setTimeout(() => r(COLS.get(b.id) || shelfColor()), 260))]);
@@ -1685,7 +1842,9 @@ libMQ.addEventListener?.('change', () => { $('#scene').classList.toggle('night',
 function sceneScroll(y) { if (UI.scene && !matchMedia('(prefers-reduced-motion: reduce)').matches) $('#scene').style.setProperty('--sy', String(Math.round(Math.min(y, 500)))); }
 function greetEl() {
   const d = new Date(), h = d.getHours();
-  const g = h >= 5 && h < 10 ? 'Chào buổi sáng' : h >= 10 && h < 13 ? 'Trưa thong thả, đọc vài chương nhé' : h >= 13 && h < 18 ? 'Chiều nay đọc gì?' : h >= 18 && h < 22 ? 'Buổi tối an yên' : 'Khuya rồi, đọc nhẹ thôi';
+  const n = (UI.me || '').trim();
+  const g = h >= 5 && h < 10 ? (n ? `Chào buổi sáng, ${n}` : 'Chào buổi sáng') : h >= 10 && h < 13 ? (n ? `Trưa thong thả nhé, ${n}` : 'Trưa thong thả, đọc vài chương nhé')
+    : h >= 13 && h < 18 ? (n ? `Chiều nay đọc gì, ${n}?` : 'Chiều nay đọc gì?') : h >= 18 && h < 22 ? (n ? `Buổi tối an yên, ${n}` : 'Buổi tối an yên') : (n ? `Khuya rồi ${n}, đọc nhẹ thôi` : 'Khuya rồi, đọc nhẹ thôi');
   const wd = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'][d.getDay()];
   return el('div', { class: 'greet' }, el('small', { text: `${wd}, ${d.getDate()} tháng ${d.getMonth() + 1}` }), el('h2', { text: g }));
 }
@@ -1738,14 +1897,340 @@ function openUi() {
       el('p', { class: 'ui-note', text: 'Ở trang truyện: vuốt lên để sang truyện tiếp theo, vuốt xuống để về truyện trước.' }),
       el('div', { class: 'ui-h', text: 'Trên kệ' }),
       row('Phong cảnh đầu kệ', 'Bầu trời và đồi núi theo cảnh đã chọn', UI.scene, v => { UI.scene = v; saveUI(); renderScene(); renderLibrary(); }),
-      row('Thẻ “Tuần này”', 'Số phút và số trang bạn đọc trong tuần', UI.stats, v => { UI.stats = v; saveUI(); renderLibrary(); }));
+      row('Thẻ “Tuần này”', 'Số phút và số trang bạn đọc trong tuần', UI.stats, v => { UI.stats = v; saveUI(); renderLibrary(); }),
+      ...personalUi().filter(Boolean));
   }, 'Xong');
 }
 $('#btn-ui').addEventListener('click', openUi);
 renderScene();
+
+/* ---------------- Cá nhân hoá từng truyện ---------------- */
+// Nền cho thẻ truyện: 4 mùa của Lucian UX/UI Prompt #361 · MIT License (c) 2026 Seokwoooo; cực quang / sa mạc / lá thu theo thẻ #328
+const SCN = {
+  xuan: ['Xuân', 'Hoa nở trên đồi', 'radial-gradient(18% 14% at 30% 30%,#FFDEEB,transparent 70%),radial-gradient(22% 16% at 70% 25%,#FCC2D7,transparent 70%),linear-gradient(#FFF0F6,#FFDEEB 50%,#8CE99A 51%,#40C057)'],
+  ha: ['Hạ', 'Một chiều bên sóng', 'radial-gradient(20% 16% at 75% 25%,#FFF3BF,transparent 70%),linear-gradient(#74C0FC,#D0EBFF 45%,#3BC9DB 46%,#0B7285 80%,#FFE8CC 81%)'],
+  thu: ['Thu', 'Con đường lá phong', 'radial-gradient(30% 25% at 30% 60%,#FF922B,transparent 70%),radial-gradient(30% 25% at 70% 50%,#E03131,transparent 70%),linear-gradient(#FFE8CC,#FFC078 50%,#8C5A3C 51%,#5C3D2E)'],
+  dong: ['Đông', 'Ô cửa đêm tuyết', 'radial-gradient(1.5px 1.5px at 20% 20%,#fff,transparent),radial-gradient(1.5px 1.5px at 60% 40%,#fff,transparent),radial-gradient(1.5px 1.5px at 80% 15%,#fff,transparent),radial-gradient(30% 20% at 50% 80%,#FFD43B,transparent 70%),linear-gradient(#1C2A4A,#364FC7 60%,#E7F5FF 61%,#C5D7EE)'],
+  cucquang: ['Cực quang', 'Đêm săn ánh sáng', 'radial-gradient(42% 26% at 62% 28%,rgba(110,240,200,.9),transparent 70%),radial-gradient(30% 18% at 30% 22%,rgba(140,120,255,.5),transparent 70%),linear-gradient(#1E2A55,#2D4B6E 62%,#1C232E)'],
+  samac: ['Sa mạc', 'Ba đêm giữa đồi cát', 'radial-gradient(24% 14% at 70% 30%,#FFE58F,transparent 70%),linear-gradient(#F4A51C,#EF7D2A 50%,#B9562B 51%,#98431F)'],
+  lathu: ['Lá thu', 'Đền cổ mùa lá đỏ', 'radial-gradient(40% 32% at 68% 26%,#E8483F,transparent 70%),radial-gradient(30% 30% at 20% 80%,#F59E42,transparent 70%),linear-gradient(135deg,#F7A35C,#D9443F 58%,#6E4636)'],
+};
+const EMO = ['📖', '⚔️', '🐉', '🌸', '🔥', '👑', '🌙', '💫', '🗡️', '🏯', '🦊', '🍵', '💀', '❤️', '⭐', '🌊', '🍃', '🎭'];
+const COLORS = ['#E11D48', '#F97316', '#F59E0B', '#16A34A', '#0D9488', '#0EA5E9', '#4F46E5', '#7C3AED', '#DB2777', '#57534E'];
+const coverKey = b => b.ui && b.ui.ownCover ? `${b.id}/ucover` : b.hasCover ? `${b.id}/cover` : null;
+const lum = h => { if (!/^#[0-9a-f]{6}$/i.test(h)) return 0; const [r, g, b] = hx(h).map(v => { v /= 255; return v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; }); return .2126 * r + .7152 * g + .0722 * b; };
+const inkOn = h => lum(h) > .42 ? '#1d1b17' : '#ffffff';
+async function saveBookUi(b, patch) { b.ui = Object.assign({}, b.ui, patch); await Store.putBook(b); COLS.delete(b.id); }
+function tintDetail(b) {
+  const xd = $('#xd'), on = !(b.ui && b.ui.tint === false);
+  xd.classList.toggle('tint', on); xd.style.removeProperty('--sc');
+  if (!on) return;
+  const c = (b.ui && b.ui.color) || COLS.get(b.id); if (c) xd.style.setProperty('--sc', c);
+  storyColor(b).then(c => { if (XD.cur && XD.cur.x.b === b) xd.style.setProperty('--sc', c); });
+}
+// Thẻ truyện: biểu tượng nhỏ ở góc + nhấn giữ (#003) để mở bảng tuỳ chọn
+function decorateCard(card, x) {
+  const b = x.b;
+  if (b.ui && b.ui.emoji) card.append(el('span', { class: 'xc-em', text: b.ui.emoji, 'aria-hidden': 'true' }));
+  if (b.ui && b.ui.pin) card.append(el('span', { class: 'xc-pin', 'aria-hidden': 'true', html: '<svg viewBox="0 0 16 16"><path d="M6 1.8h4l-.6 4 2.4 2.4H4.2l2.4-2.4zM8 8.2V14"/></svg>' }));
+  let t = 0, sx = 0, sy = 0;
+  const cancel = () => { clearTimeout(t); t = 0; card.classList.remove('is-press'); };
+  card.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return; card._lp = false; sx = e.clientX; sy = e.clientY; card.classList.add('is-press');
+    t = setTimeout(() => { t = 0; card._lp = true; card.classList.remove('is-press'); card.classList.add('is-pop'); navigator.vibrate?.(12); setTimeout(() => card.classList.remove('is-pop'), 450); bookActions(b); }, 480);
+  });
+  card.addEventListener('pointermove', e => { if (t && Math.hypot(e.clientX - sx, e.clientY - sy) > 9) cancel(); });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) card.addEventListener(ev, cancel);
+  card.addEventListener('contextmenu', e => { e.preventDefault(); if (!card._lp) { cancel(); card._lp = true; bookActions(b); } });
+}
+const ICO = {
+  read: '<svg viewBox="0 0 24 24"><path d="M4 5.5c2.5-1 5-1 8 .8 3-1.8 5.5-1.8 8-.8v13c-2.5-1-5-1-8 .8-3-1.8-5.5-1.8-8-.8z"/><path d="M12 6.3v13"/></svg>',
+  brush: '<svg viewBox="0 0 24 24"><circle cx="7.5" cy="11" r="1.4"/><circle cx="11.5" cy="7.5" r="1.4"/><circle cx="16.5" cy="9" r="1.4"/><path d="M12 21a9 9 0 1 1 9-9c0 2.2-1.6 3-3.2 3H16a2 2 0 0 0-1.4 3.4c.8.9.3 2.6-2.6 2.6z"/></svg>',
+  pin: '<svg viewBox="0 0 24 24"><path d="M9 3h6l-.9 6 3.6 3.6H6.3L9.9 9zM12 12.6V21"/></svg>',
+  add: '<svg viewBox="0 0 24 24"><path d="M7 3.5h7l4 4V20a.5.5 0 0 1-.5.5h-10A.5.5 0 0 1 7 20z"/><path d="M12.5 11v6M9.5 14h6"/></svg>',
+  redo: '<svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.6"/><path d="M4 4v4.6h4.6"/></svg>',
+  rename: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
+};
+function bookActions(b) {
+  if (!$('#sheet').hidden) return;
+  const pinned = !!(b.ui && b.ui.pin);
+  const act = (ic, t, fn) => el('button', { type: 'button', class: 'ba-it', html: `<i>${ic}</i><span>${t}</span>`, onclick: fn });
+  openSheet('Tuỳ chọn truyện', body => {
+    body.classList.add('ba');
+    holdDel(b, body, [el('div', { class: 'ba-grid' },
+      act(ICO.read, 'Đọc tiếp', () => { closeSheet(); closeDetail(true); openBook(b.id); }),
+      act(ICO.brush, 'Tuỳ chỉnh', () => { closeSheet(); storyCustom(b); }),
+      act(ICO.pin, pinned ? 'Bỏ ghim' : 'Ghim lên đầu', async () => { await saveBookUi(b, { pin: !pinned }); closeSheet(); renderLibrary(); toast(pinned ? 'Đã bỏ ghim.' : 'Đã ghim lên đầu kệ.'); }),
+      act(ICO.add, 'Thêm chương', () => { closeSheet(); pickFiles(b); }),
+      act(ICO.redo, 'Đọc lại từ đầu', async () => { await Store.delProgress(b.id); closeSheet(); renderLibrary(); toast('Đã đưa về chương đầu.'); }),
+      act(ICO.rename, 'Đổi tên', () => renameSheet(b, 'Đổi tên truyện'))),
+      el('p', { class: 'ba-hint', text: 'Giữ nút đỏ khoảng 1 giây để xoá truyện khỏi kệ (file gốc không bị ảnh hưởng).' })], []);
+  }, 'Đóng');
+}
+// Ô màu: "tự động" + bảng màu + màu tự chọn
+function swatches(cur, pick, autoLabel) {
+  const box = el('div', { class: 'swx', role: 'radiogroup' });
+  const all = [];
+  const mk = (val, style, label, extra) => { const b = el('button', { type: 'button', class: 'swx-c' + (extra || ''), role: 'radio', 'aria-label': label, style }); if (val !== '*') b.addEventListener('click', () => { set(val); pick(val); }); box.append(b); all.push([val, b]); return b; };
+  mk('', '', autoLabel, ' auto').append(el('span', { text: 'A' }));
+  COLORS.forEach(c => mk(c, `background:${c}`, c));
+  const custom = mk('*', '', 'Màu khác', ' any'), inp = el('input', { type: 'color', value: /^#/.test(cur) && !COLORS.includes(cur) ? cur : '#3b82f6', 'aria-label': 'Chọn màu khác' });
+  custom.append(inp);
+  inp.addEventListener('input', () => { custom.style.setProperty('--c', inp.value); set('*'); pick(inp.value); });
+  custom.addEventListener('click', e => { if (e.target !== inp) inp.click(); });
+  const set = v => all.forEach(([k, b]) => b.setAttribute('aria-checked', String(k === v)));
+  const sync = v => { const isCustom = v && !COLORS.includes(v); if (isCustom) { inp.value = v; custom.style.setProperty('--c', v); } set(isCustom ? '*' : v); };
+  sync(cur);
+  return { el: box, set: sync };
+}
+function emojiPick(cur, pick) {
+  const box = el('div', { class: 'emo-g', role: 'radiogroup' }), all = [];
+  for (const e of ['', ...EMO]) {
+    const b = el('button', { type: 'button', class: 'emo', role: 'radio', text: e || 'Không', 'aria-label': e || 'Không có biểu tượng' });
+    b.addEventListener('click', () => { set(e); pick(e); }); box.append(b); all.push([e, b]);
+  }
+  const set = v => all.forEach(([k, b]) => b.setAttribute('aria-checked', String(k === v)));
+  set(cur); return { el: box, set };
+}
+// Lucian UX/UI Prompt #361 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#361
+// Lật cảnh kiểu rèm sọc: khung tách thành 8 dải dọc lật lần lượt để lộ cảnh mới ở mặt sau, mép dải tối dần khi xoay.
+function blinds(slides, cur, onPick) {
+  const N = 8, rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fr = el('div', { class: 'b361-fr', role: 'img' }), tx = el('div', { class: 'b361-tx' }, el('b'), el('span')), strips = [];
+  for (let i = 0; i < N; i++) { const s = el('div', { class: 'b361-s', html: '<i class="f"></i><i class="b"></i>' }); s.querySelectorAll('i').forEach(f => { f.style.backgroundPosition = `${i / (N - 1) * 100}% 22%`; }); fr.append(s); strips.push(s); }
+  fr.append(tx);
+  const dotsEl = el('div', { class: 'b361-dots', role: 'group', 'aria-label': 'Chọn nền' });
+  const pv = el('button', { type: 'button', class: 'b361-pv', 'aria-label': 'Nền trước', html: '<svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>' });
+  const nx = el('button', { type: 'button', class: 'b361-nx', 'aria-label': 'Nền sau', html: '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>' });
+  let busy = false;
+  const dots = slides.map((sl, k) => { const d = el('button', { type: 'button', class: 'b361-dot', 'aria-label': sl.name, 'aria-pressed': String(k === cur) }); d.addEventListener('click', () => { if (k !== cur) go(k, k > cur ? 1 : -1); }); dotsEl.append(d); return d; });
+  const face = (s, side, k) => { s.querySelector('i.' + side).style.backgroundImage = slides[k].bg(); };
+  function text(k) {
+    tx.classList.add('swap');
+    setTimeout(() => { tx.querySelector('b').textContent = slides[k].name; tx.querySelector('span').textContent = slides[k].desc; tx.classList.remove('swap'); }, rm ? 0 : 320);
+    fr.setAttribute('aria-label', slides[k].name + ', ' + slides[k].desc);
+    dots.forEach((d, j) => d.setAttribute('aria-pressed', String(j === k)));
+  }
+  function go(k, dir) {
+    if (busy) return;
+    k = (k + slides.length) % slides.length; busy = true; text(k); onPick(k);
+    strips.forEach((s, i) => {
+      face(s, 'b', k);
+      const order = dir > 0 ? i : N - 1 - i;
+      if (rm || !s.animate) return;
+      s.animate([{ transform: 'rotateY(0deg)' }, { transform: `rotateY(${dir > 0 ? -90 : 90}deg) scale(.96)`, offset: .5 }, { transform: `rotateY(${dir > 0 ? -180 : 180}deg)` }], { duration: 650, delay: order * 70, easing: 'cubic-bezier(.5,0,.3,1)', fill: 'both' });
+      s.querySelectorAll('i').forEach(f => { try { f.animate([{ '--b361-e': 0 }, { '--b361-e': .5 }, { '--b361-e': 0 }], { duration: 650, delay: order * 70 }); } catch {} });
+    });
+    setTimeout(() => { strips.forEach(s => { face(s, 'f', k); s.getAnimations?.().forEach(a => a.cancel()); }); cur = k; busy = false; }, rm ? 10 : 650 + (N - 1) * 70 + 30);
+  }
+  nx.addEventListener('click', () => go(cur + 1, 1)); pv.addEventListener('click', () => go(cur - 1, -1));
+  strips.forEach(s => face(s, 'f', cur));
+  tx.querySelector('b').textContent = slides[cur].name; tx.querySelector('span').textContent = slides[cur].desc;
+  return { el: el('div', { class: 'b361' }, fr, el('div', { class: 'b361-ft' }, pv, dotsEl, nx)), go: (k, dir = 1) => { if (k === cur) { strips.forEach(s => face(s, 'f', k)); } else go(k, dir); }, refresh: () => strips.forEach(s => face(s, 'f', cur)) };
+}
+async function shrinkImg(blob) {
+  try {
+    const bm = await createImageBitmap(blob), k = Math.min(1, 1000 / Math.max(bm.width, bm.height)), cv = document.createElement('canvas');
+    cv.width = Math.round(bm.width * k); cv.height = Math.round(bm.height * k); cv.getContext('2d').drawImage(bm, 0, 0, cv.width, cv.height); bm.close?.();
+    return await new Promise(r => cv.toBlob(x => r(x || blob), 'image/jpeg', .86));
+  } catch { return blob; }
+}
+// Lucian UX/UI Prompt #250 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#250
+// Thanh "thay đổi chưa lưu": đổi gì là thanh tối thả xuống kèm số thay đổi; định đóng khi chưa lưu thì thanh rung và đỏ lên;
+// Lưu → xoay chờ rồi xanh "Đã lưu" và trượt lên; Huỷ → trả lại giá trị cũ, ô vừa đổi nháy sáng.
+function storyCustom(b) {
+  const u = b.ui || {};
+  const saved = { title: b.title, emoji: u.emoji || '', pin: !!u.pin, color: u.color || '', tint: u.tint !== false, scene: u.scene || '', img: null, drop: false };
+  let now = { ...saved }, ownUrl = null, imgUrl = null;
+  openSheet('Tuỳ chỉnh truyện', body => {
+    const card = body.parentElement; card.classList.add('cz');
+    body.classList.add('cz-body');
+    // thanh lưu
+    const tx = el('span'), cx = el('button', { type: 'button', class: 'czb-cx', text: 'Huỷ', tabindex: '-1' });
+    const sv = el('button', { type: 'button', class: 'czb-sv', tabindex: '-1' }, el('i', { 'aria-hidden': 'true' }), el('b', { text: 'Lưu' }));
+    const bar = el('div', { class: 'czb', role: 'status' }, tx, cx, sv); card.append(bar);
+    // thẻ điều hướng
+    const tabs = ['Chung', 'Màu sắc', 'Nền & bìa'].map((t, i) => el('button', { type: 'button', text: t, 'aria-current': i ? null : 'page' }));
+    const nav = el('div', { class: 'cz-nv' }, ...tabs);
+    // — Chung
+    const name = el('input', { class: 'cz-in', value: b.title, autocomplete: 'off', 'aria-label': 'Tên truyện' });
+    name.addEventListener('input', () => { now.title = name.value; diff(); });
+    const emo = emojiPick(now.emoji, v => { now.emoji = v; diff(); });
+    const pinSw = sw(now.pin, v => { now.pin = v; diff(); });
+    const p1 = el('div', { class: 'cz-p' },
+      el('label', { class: 'cz-lb' }, 'Tên truyện', name),
+      el('span', { class: 'cz-lb' }, 'Biểu tượng (hiện ở góc thẻ và trước tên)'), emo.el,
+      el('div', { class: 'cz-rw' }, el('div', {}, el('b', { text: 'Ghim lên đầu kệ' }), el('small', { text: 'Luôn nằm trong mục “Đã ghim” trên cùng' })), pinSw.el));
+    // — Màu sắc
+    const pvB = el('b'), pvS = el('small'), pv = el('div', { class: 'cz-pv' }, el('div', {}, pvB, pvS));
+    const paintPv = async () => {
+      pvB.textContent = (now.emoji ? now.emoji + ' ' : '') + (now.title.trim() || b.title);
+      pvS.textContent = now.color ? 'Màu bạn chọn' : 'Tự động theo ảnh bìa';
+      const c = now.color || await storyColor(b); pv.style.setProperty('--cu', c); pv.style.setProperty('--cu-ink', inkOn(c));
+    };
+    const sws = swatches(now.color, v => { now.color = v; diff(); paintPv(); }, 'Tự động theo bìa');
+    const tintSw = sw(now.tint, v => { now.tint = v; diff(); });
+    const p2 = el('div', { class: 'cz-p', hidden: '' },
+      el('span', { class: 'cz-lb' }, 'Xem trước rèm khi mở truyện'), pv,
+      el('span', { class: 'cz-lb' }, 'Màu riêng của truyện'), sws.el,
+      el('div', { class: 'cz-rw' }, el('div', {}, el('b', { text: 'Nhuộm nền trang truyện' }), el('small', { text: 'Trang thông tin truyện mang màu này' })), tintSw.el));
+    // — Nền & bìa (#361)
+    const curCover = () => imgUrl ? `url("${imgUrl}")` : (!now.drop && ownUrl) ? `url("${ownUrl}")` : origUrl ? `url("${origUrl}")` : coverBg(b);
+    let origUrl = null;
+    const slides = [{ id: '', name: 'Ảnh bìa', desc: 'Dùng ảnh bìa của truyện', bg: curCover }, ...Object.entries(SCN).map(([id, s]) => ({ id, name: s[0], desc: s[1], bg: () => s[2] }))];
+    const bl = blinds(slides, Math.max(0, slides.findIndex(s => s.id === now.scene)), k => { now.scene = slides[k].id; diff(); });
+    const file = el('input', { type: 'file', accept: 'image/*', hidden: '' });
+    const dropBtn = el('button', { type: 'button', class: 'btn ghost', text: 'Bỏ ảnh riêng' });
+    const syncDrop = () => { dropBtn.hidden = !(now.img || (u.ownCover && !now.drop)); };
+    file.addEventListener('change', () => {
+      const f = file.files && file.files[0]; if (!f) return;
+      if (imgUrl) URL.revokeObjectURL(imgUrl); imgUrl = URL.createObjectURL(f); now.img = f; now.drop = false; syncDrop(); diff();
+      bl.go(0, -1); bl.refresh();
+    });
+    dropBtn.addEventListener('click', () => { if (imgUrl) URL.revokeObjectURL(imgUrl); imgUrl = null; now.img = null; now.drop = !!u.ownCover; syncDrop(); diff(); bl.refresh(); });
+    const p3 = el('div', { class: 'cz-p', hidden: '' },
+      el('span', { class: 'cz-lb' }, 'Nền của thẻ truyện'), bl.el,
+      el('span', { class: 'cz-lb' }, 'Ảnh bìa riêng (logo, ảnh bạn thích…)'),
+      el('div', { class: 'cz-row2' }, el('button', { type: 'button', class: 'btn primary', text: 'Chọn ảnh từ máy', onclick: () => { file.value = ''; file.click(); } }), dropBtn), file);
+    syncDrop();
+    if (u.ownCover) Store.file(`${b.id}/ucover`).then(x => { if (x) { ownUrl = URL.createObjectURL(x); bl.refresh(); } });
+    if (b.hasCover) Store.file(`${b.id}/cover`).then(x => { if (x) { origUrl = URL.createObjectURL(x); bl.refresh(); } });
+    const panes = [p1, p2, p3];
+    tabs.forEach((t, i) => t.addEventListener('click', () => { tabs.forEach((x, j) => { if (j === i) x.setAttribute('aria-current', 'page'); else x.removeAttribute('aria-current'); }); panes.forEach((p, j) => { p.hidden = i !== j; }); }));
+    body.append(nav, ...panes);
+    // đếm thay đổi
+    const KEYS = ['title', 'emoji', 'pin', 'color', 'tint', 'scene', 'img', 'drop'];
+    const changed = () => KEYS.filter(k => k === 'title' ? now.title.trim() !== saved.title : now[k] !== saved[k]);
+    function diff() { const n = changed().length; bar.classList.remove('is-ok', 'is-warn'); tx.textContent = `Thay đổi chưa lưu: ${n}`; card.classList.toggle('is-dirty', n > 0); cx.tabIndex = sv.tabIndex = n ? 0 : -1; }
+    const warn = () => { tx.textContent = 'Lưu hoặc huỷ thay đổi trước đã'; bar.classList.remove('is-warn'); void bar.offsetWidth; bar.classList.add('is-warn'); setTimeout(() => { if (bar.classList.contains('is-warn')) diff(); }, 1600); sv.focus({ preventScroll: true }); };
+    const guard = () => { if (changed().length) warn(); else { [imgUrl, ownUrl, origUrl].forEach(x => x && URL.revokeObjectURL(x)); closeSheet(); } };
+    const head = card.querySelector('.sheet-head button'), nh = head.cloneNode(true); head.replaceWith(nh); nh.addEventListener('click', guard);
+    $('#sheet').onclick = e => { if (e.target === $('#sheet')) guard(); };
+    cx.addEventListener('click', () => {
+      const ch = changed(); if (imgUrl) URL.revokeObjectURL(imgUrl); imgUrl = null; now = { ...saved };
+      name.value = now.title; emo.set(now.emoji); pinSw.set(now.pin); sws.set(now.color); tintSw.set(now.tint); syncDrop();
+      bl.go(Math.max(0, slides.findIndex(s => s.id === now.scene)), -1); bl.refresh(); paintPv();
+      ch.forEach(k => { const t = { title: name, emoji: emo.el, pin: pinSw.el, color: sws.el, tint: tintSw.el, scene: bl.el, img: bl.el, drop: bl.el }[k]; t.classList.remove('is-flash'); void t.offsetWidth; t.classList.add('is-flash'); });
+      diff();
+    });
+    sv.addEventListener('click', async () => {
+      if (sv.classList.contains('is-busy') || !changed().length) return;
+      sv.classList.add('is-busy');
+      try {
+        b.title = now.title.trim() || saved.title;
+        b.ui = Object.assign({}, b.ui, { emoji: now.emoji, pin: now.pin, color: now.color, tint: now.tint, scene: now.scene });
+        if (now.img) { await Store.putFile(`${b.id}/ucover`, await shrinkImg(now.img)); b.ui.ownCover = true; }
+        else if (now.drop) { await Store.delFiles(`${b.id}/ucover`); b.ui.ownCover = false; }
+        await Store.putBook(b); COLS.delete(b.id);
+      } catch (e) { sv.classList.remove('is-busy'); toast('Không lưu được: ' + (e.message || e)); return; }
+      await sleep(450);
+      Object.assign(saved, now, { title: b.title, img: null, drop: false }); now = { ...saved }; u.ownCover = b.ui.ownCover;
+      sv.classList.remove('is-busy'); bar.classList.remove('is-warn'); bar.classList.add('is-ok'); tx.textContent = 'Đã lưu';
+      renderLibrary();
+      setTimeout(() => { card.classList.remove('is-dirty'); cx.tabIndex = sv.tabIndex = -1; }, 900);
+    });
+    paintPv(); diff();
+  }, 'Xong');
+}
+
+/* ---------------- Lucian UX/UI Prompt #001 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#001
+   Nút kính lỏng: viên kính có ánh sáng bên trong; bấm thì co lại như giọt nước, quay vòng chờ, rồi mở truyện ---------------- */
+function glassGo(label, b) {
+  const btn = el('button', { type: 'button', class: 'xd-go g001-btn' }, el('span', { class: 'g001-sheen', 'aria-hidden': 'true' }), el('span', { class: 'g001-txt', text: label }),
+    el('span', { class: 'g001-spin', 'aria-hidden': 'true', html: '<svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="10"/></svg>' }));
+  const mag = el('div', { class: 'g001-mag' }, el('div', { class: 'g001-float' }, btn));
+  const w = el('div', { class: 'g001', 'data-state': 'idle' }, el('div', { class: 'g001-blobs', 'aria-hidden': 'true' }, el('i'), el('i'), el('i')), mag);
+  w.addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse') return;
+    const r = btn.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+    const pull = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : Math.max(0, 1 - Math.hypot(dx, dy) / 190);
+    mag.style.translate = `${(dx * .1 * pull).toFixed(1)}px ${(dy * .18 * pull).toFixed(1)}px`;
+    btn.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%'); btn.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+  });
+  w.addEventListener('pointerleave', () => { mag.style.translate = '0px 0px'; });
+  btn.addEventListener('click', () => {
+    if (w.dataset.state === 'load') return;
+    w.dataset.state = 'load'; btn.setAttribute('aria-busy', 'true');
+    setTimeout(async () => { closeDetail(true); await openBook(b.id); }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 700);
+  });
+  return w;
+}
+
+/* ---------------- Lucian UX/UI Prompt #314 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#314
+   Con trỏ biến hình (chỉ máy tính có chuột): chạy theo như lò xo; ôm lấy nút; thành vạch dọc trên chữ; phình to "Mở" trên bìa truyện ---------------- */
+const finePtr = matchMedia('(hover: hover) and (pointer: fine)');
+(() => {
+  const cur = el('div', { class: 'c314', 'aria-hidden': 'true' }, el('span')), cl = cur.firstChild; document.body.append(cur);
+  const BTN = '.btn,.ui-btn,.xd-x,.xd-nav button,.useg button,.fab-main,.fab-it,.xd-opt,.xd-go,.sheet-head button,.ba-it,.cz-nv button,.b361-pv,.b361-nx,.b361-dot,.sw,.emo,.swx-c,.xd-next,.hd-btn,.hd-undo,.wk button,.note button,.czb button';
+  const pos = { x: -99, y: -99 }, sp = { x: -99, y: -99 }, vel = { x: 0, y: 0 };
+  let mode = '', tgt = null, raf = 0, last = 0, live = false;
+  const enabled = () => UI.cursor !== false && finePtr.matches && !R.book;
+  function kind(t) {
+    let e;
+    if (!t || !t.closest) return ['', null, ''];
+    if ((e = t.closest('.xc'))) return ['img', e, 'Mở'];
+    if ((e = t.closest('.hero'))) return ['img', e, 'Đọc'];
+    if ((e = t.closest('.p389-p'))) return ['img', e, 'Chọn'];
+    if ((e = t.closest(BTN))) return ['btn', e, ''];
+    if ((e = t.closest('input:not([type=color]):not([type=file]),textarea,p,h2,.greet small,.xd-est span,.hero-m'))) return ['text', e, ''];
+    if ((e = t.closest('a'))) return ['link', e, '→'];
+    return ['', null, ''];
+  }
+  function target() {
+    if (mode === 'btn' && tgt && tgt.isConnected) {
+      const r = tgt.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      return { x: cx + (pos.x - cx) * .15, y: cy + (pos.y - cy) * .15, w: r.width + 8, h: r.height + 8, r: getComputedStyle(tgt).borderRadius };
+    }
+    if (mode === 'text') return { x: pos.x, y: pos.y, w: 3, h: 24, r: '2px' };
+    if (mode === 'img') return { x: pos.x, y: pos.y, w: 64, h: 64, r: '999px' };
+    if (mode === 'link') return { x: pos.x, y: pos.y, w: 30, h: 30, r: '999px' };
+    return { x: pos.x, y: pos.y, w: 16, h: 16, r: '999px' };
+  }
+  function frame(now) {
+    raf = 0; const dt = Math.min(.033, Math.max(0, (now - last) / 1000)); last = now; const t = target();
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { sp.x = t.x; sp.y = t.y; }
+    else { vel.x += ((t.x - sp.x) * 420 - vel.x * 30) * dt; vel.y += ((t.y - sp.y) * 420 - vel.y * 30) * dt; sp.x += vel.x * dt; sp.y += vel.y * dt; }
+    cur.style.width = t.w + 'px'; cur.style.height = t.h + 'px'; cur.style.borderRadius = t.r;
+    cur.style.transform = `translate(${(sp.x - t.w / 2).toFixed(1)}px,${(sp.y - t.h / 2).toFixed(1)}px)`;
+    if (Math.abs(t.x - sp.x) + Math.abs(t.y - sp.y) > .2 || Math.abs(vel.x) + Math.abs(vel.y) > 1) raf = requestAnimationFrame(frame);
+  }
+  const kick = () => { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } };
+  const setLive = v => { if (v === live) return; live = v; document.documentElement.classList.toggle('c314-on', v); if (!v) cur.className = 'c314'; };
+  document.addEventListener('pointermove', e => {
+    if (e.pointerType !== 'mouse' || !enabled()) { setLive(false); return; }
+    setLive(true); pos.x = e.clientX; pos.y = e.clientY;
+    const [m, t, label] = kind(document.elementFromPoint(e.clientX, e.clientY));
+    if (m !== mode || t !== tgt) { mode = m; tgt = t; cur.className = 'c314 is-on' + (m ? ' is-' + m : ''); cl.textContent = label; }
+    if (!cur.classList.contains('is-on')) { sp.x = pos.x; sp.y = pos.y; cur.classList.add('is-on'); }
+    kick();
+  }, { passive: true });
+  document.addEventListener('scroll', () => { if (live) kick(); }, { passive: true, capture: true });
+  document.documentElement.addEventListener('mouseleave', () => cur.classList.remove('is-on'));
+  document.addEventListener('pointerdown', e => { if (live) cur.animate?.([{ scale: 1 }, { scale: .85 }, { scale: 1 }], { duration: 260 }); }, { passive: true });
+})();
+
+/* ---------------- Cá nhân hoá app: tên kệ, logo, lời chào, màu nhấn ---------------- */
+function renderBrand() { $('.brand h1').textContent = (UI.logo ? UI.logo + ' ' : '') + (UI.name || 'Kệ Truyện'); }
+function personalUi() {
+  const nameIn = el('input', { class: 'cz-in', value: UI.name || '', placeholder: 'Kệ Truyện', autocomplete: 'off', 'aria-label': 'Tên kệ' });
+  nameIn.addEventListener('input', () => { UI.name = nameIn.value.trim(); saveUI(); renderBrand(); });
+  const meIn = el('input', { class: 'cz-in', value: UI.me || '', placeholder: 'Ví dụ: Phúc', autocomplete: 'off', 'aria-label': 'Tên của bạn' });
+  meIn.addEventListener('change', () => { UI.me = meIn.value.trim(); saveUI(); renderLibrary(); });
+  const logo = emojiPick(UI.logo || '', v => { UI.logo = v; saveUI(); renderBrand(); });
+  const acc = swatches(UI.accent || '', v => { UI.accent = v; saveUI(); applyUI(); }, 'Theo cảnh');
+  return [el('div', { class: 'ui-h', text: 'Cá nhân' }),
+    el('label', { class: 'cz-lb' }, 'Tên kệ sách', nameIn),
+    el('span', { class: 'cz-lb' }, 'Logo cạnh tên kệ'), logo.el,
+    el('label', { class: 'cz-lb' }, 'Tên của bạn (để app chào)', meIn),
+    el('span', { class: 'cz-lb' }, 'Màu nhấn (nút, thanh tiến độ, rèm khi về kệ)'), acc.el,
+    finePtr.matches ? el('div', { class: 'ui-row' }, el('div', {}, el('b', { text: 'Con trỏ biến hình' }), el('small', { text: 'Trên máy tính: con trỏ ôm lấy nút, phình to trên bìa truyện' })), sw(UI.cursor !== false, v => { UI.cursor = v; saveUI(); }).el) : null,
+    el('p', { class: 'ui-note', text: 'Mẹo: nhấn giữ một truyện trên kệ để mở nhanh Tuỳ chỉnh, Ghim, Đổi tên hoặc Xoá.' })];
+}
+renderBrand();
 function coverEl(b) {
-  const cover = el('div', { class: 'cover' + (b.hasCover ? '' : ' gen'), style: b.hasCover ? null : `background:${coverBg(b)}` });
-  if (b.hasCover) { const img = el('img', { alt: '' }); cover.append(img); Store.file(`${b.id}/cover`).then(bl => { if (bl) { const u = URL.createObjectURL(bl); libUrls.push(u); img.src = u; } }); }
+  const ck = coverKey(b);
+  const cover = el('div', { class: 'cover' + (ck ? '' : ' gen'), style: ck ? null : `background:${coverBg(b)}` });
+  if (ck) { const img = el('img', { alt: '' }); cover.append(img); Store.file(ck).then(bl => { if (bl) { const u = URL.createObjectURL(bl); libUrls.push(u); img.src = u; } }); }
   else cover.append(el('small', { text: b.kind === 'comic' ? 'Truyện tranh' : 'Truyện chữ' }), el('b', { text: b.title }));
   return cover;
 }
@@ -1830,6 +2315,12 @@ function renameSheet(b, heading) {
 }
 function confirmDelete(b) {
   openSheet('Xoá truyện này?', body => {
+    const h = holdDel(b, body, [el('p', { text: 'Giữ nút bên dưới khoảng 1 giây để xoá. Truyện và chỗ đang đọc sẽ bị xoá khỏi máy này; file gốc không bị ảnh hưởng.' })],
+      [el('div', { class: 'sheet-actions' }, el('button', { class: 'btn ghost', type: 'button', text: 'Giữ lại', onclick: () => { h.cancel(); closeSheet(); } }))]);
+  });
+}
+function holdDel(b, body, mid, tail) {
+  {
     const HOLD = 1200, rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const size = b.files.reduce((n, f) => n + (f.size || 0), 0);
     const file = el('div', { class: 'hd-file' }, coverEl(b), el('span', {}, el('b', { text: b.title }), el('small', { text: `${b.chapters.length} chương · ${fmtBytes(size)}` })));
@@ -1874,11 +2365,9 @@ function confirmDelete(b) {
       file.classList.remove('is-gone'); btn.classList.remove('is-gone'); btn.removeAttribute('tabindex'); done.classList.remove('is-on');
       btn.focus({ preventScroll: true });
     });
-    body.append(file,
-      el('p', { text: 'Giữ nút bên dưới khoảng 1 giây để xoá. Truyện và chỗ đang đọc sẽ bị xoá khỏi máy này; file gốc không bị ảnh hưởng.' }),
-      el('div', { class: 'hd-row' }, btn, done),
-      el('div', { class: 'sheet-actions' }, el('button', { class: 'btn ghost', type: 'button', text: 'Giữ lại', onclick: () => { clearTimeout(delT); sheetOnClose = null; closeSheet(); } })));
-  });
+    body.append(file, ...mid, el('div', { class: 'hd-row' }, btn, done), ...tail);
+    return { cancel: () => { clearTimeout(delT); sheetOnClose = null; } };
+  }
 }
 function showErrors(errors, heading) {
   openSheet(heading, body => {
