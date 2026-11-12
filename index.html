@@ -1516,6 +1516,16 @@ html.c314-on,html.c314-on *{cursor:none!important}
 .st.hold .st-bars-top,.st.hold .st-hd{opacity:0;transition:opacity .25s}
 .rc-note .bk-note-ic{font-size:20px}
 @media (prefers-reduced-motion:reduce){.st-cube{transition:none}.st-in>*,.sk-dt.on,.rp-it{animation:none}}
+/* nhận truyện từ công cụ tải */
+.sheet-body.rv{grid-auto-rows:max-content}
+.rv-card{display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;background:color-mix(in srgb,var(--accent) 9%,var(--surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 22%,transparent)}
+.rv-card>div{flex:1;min-width:0}
+.rv-card b{display:block;font-size:15.5px;font-weight:800;line-height:1.3}
+.rv-card small{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.rv-ic{width:44px;height:44px;flex:none;border-radius:14px;display:grid;place-items:center;background:var(--accent);color:#fff;animation:rvDrop .9s cubic-bezier(.3,1.5,.5,1) both}
+.rv-ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+@keyframes rvDrop{0%{transform:translateY(-14px);opacity:0}60%{transform:translateY(3px)}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.rv-ic{animation:none}}
 </style>
 </head>
 <body>
@@ -1961,6 +1971,7 @@ async function importFiles(fileList, target, opts = {}) {
     } catch (e) { errors.push(`${f.name}: ${e.message || e}`); }
   }
   updateOverlay(1, 'Đang lưu…');
+  if (opts.meta && added) Object.assign(book, opts.meta);
   if (!added) { hideOverlay(); if (!opts.batch) showErrors(errors, 'Không thêm được file nào'); return { added, errors }; }
   book.chapters.sort((a, b) => ncmp(a.src, b.src) || a.sub - b.sub);
   const types = new Set(book.chapters.map(c => c.type));
@@ -2376,7 +2387,8 @@ function bookActions(b) {
       act(ICO.add, 'Thêm chương', () => { closeSheet(); pickFiles(b); }),
       act(ICO.redo, 'Đọc lại từ đầu', async () => { await Store.delProgress(b.id); closeSheet(); renderLibrary(); toast('Đã đưa về chương đầu.'); }),
       act(ICO.rename, 'Đổi tên', () => renameSheet(b, 'Đổi tên truyện')),
-      b.kind === 'comic' ? null : act('<svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>', 'Lọc chữ', () => { closeSheet(); openFilter(b); })),
+      b.kind === 'comic' ? null : act('<svg viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg>', 'Lọc chữ', () => { closeSheet(); openFilter(b); }),
+      b.srcLast ? act('<svg viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>', 'Tải tiếp', () => { closeSheet(); fetchMore(b); }) : null),
       el('p', { class: 'ba-hint', text: 'Giữ nút đỏ khoảng 1 giây để xoá truyện khỏi kệ (file gốc không bị ảnh hưởng).' })], []);
   }, 'Đóng');
 }
@@ -2795,7 +2807,7 @@ async function buildBackup() {
   const pm = new Map(prog.map(p => [p.id, p])), out = [];
   for (const b of books) {
     const p = pm.get(b.id);
-    const e = { fp: fpOf(b), title: b.title, kind: b.kind, chapters: b.chapters.length, ui: b.ui || null, look: b.look || null, filter: b.filter || null, created: b.created, lastRead: b.lastRead,
+    const e = { fp: fpOf(b), title: b.title, kind: b.kind, chapters: b.chapters.length, ui: b.ui || null, look: b.look || null, filter: b.filter || null, srcKey: b.srcKey || null, srcLast: b.srcLast || null, created: b.created, lastRead: b.lastRead,
       marks: (b.marks || []).map(m => { const { chId, ...r } = m; return { ...r, ch: chRef(b, chId) }; }).filter(m => m.ch),
       prog: p ? { ch: chRef(b, p.chId), frac: p.frac || 0, at: p.at || 0 } : null };
     if (b.ui && b.ui.ownCover) { const bl = await Store.file(`${b.id}/ucover`).catch(() => null); if (bl) e.cover = await toDataUrl(bl); }
@@ -2819,6 +2831,7 @@ async function applyEntry(b, e) {
   if (e.ui) b.ui = Object.assign({}, e.ui, { ownCover: false });
   if (e.look) b.look = e.look;
   if (e.filter) b.filter = e.filter;
+  if (e.srcKey && !b.srcKey) { b.srcKey = e.srcKey; b.srcLast = e.srcLast; }
   if (e.cover) { try { const bl = await (await fetch(e.cover)).blob(); await Store.putFile(`${b.id}/ucover`, bl); b.ui = Object.assign({}, b.ui, { ownCover: true }); } catch {} }
   if (e.marks && e.marks.length) {
     const key = m => m.chId + ':' + (+m.frac || 0).toFixed(3), have = new Set((b.marks || []).map(key));
@@ -3079,6 +3092,7 @@ function bookMenu(b) {
     const acts = el('div', { class: 'sheet-actions' },
       el('button', { class: 'btn primary', type: 'button', text: 'Đọc tiếp', onclick: () => { closeSheet(); openBook(b.id); } }),
       el('button', { class: 'btn ghost', type: 'button', text: 'Thêm chương / file vào bộ này', onclick: () => { closeSheet(); pickFiles(b); } }),
+      b.srcLast ? el('button', { class: 'btn ghost', type: 'button', text: `Tải chương mới từ ${srcHost(b)}`, onclick: () => { closeSheet(); fetchMore(b); } }) : null,
       el('button', { class: 'btn ghost', type: 'button', text: 'Đổi tên', onclick: () => renameSheet(b, 'Đổi tên truyện') }),
       el('button', { class: 'btn ghost', type: 'button', text: 'Đọc lại từ đầu', onclick: async () => { await Store.delProgress(b.id); closeSheet(); renderLibrary(); toast('Đã đưa về chương đầu.'); } }),
       el('button', { class: 'btn ghost', type: 'button', style: 'color:var(--danger)', text: 'Xoá khỏi kệ', onclick: () => confirmDelete(b) }));
@@ -3956,6 +3970,62 @@ document.addEventListener('keydown', e => {
   else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); turn(-1); }
 });
 function followLink(a) { const t = a.dataset.target; const idx = R.book.chapters.findIndex(c => c.entries?.includes(t)); if (idx >= 0) jumpTo(idx, 0); }
+
+/* ================= Nhận truyện từ công cụ "Kệ Truyện · Tải truyện" =================
+   Công cụ mở Kệ Truyện ở #nhan rồi gửi file EPUB qua postMessage. Kệ Truyện hỏi bạn trước khi thêm,
+   rồi thêm thành truyện mới hoặc nối vào truyện cùng nguồn (để lần sau "Tải tiếp" đúng chỗ). */
+const srcHost = b => { try { return new URL(b.srcKey).hostname.replace(/^www\./, ''); } catch { return ''; } };
+function fetchMore(b) {                                  // mở lại trang nguồn ở chương cuối đã tải, công cụ tự tải các chương sau đó
+  if (!b.srcLast) return;
+  const w = window.open(b.srcLast + '#kt-tai-tiep', '_blank');
+  if (!w) toast('Trình duyệt chặn mở tab mới. Hãy cho phép cửa sổ bật lên.');
+}
+(() => {
+  let armed = false;
+  async function arm() {
+    if (armed || location.hash !== '#nhan') return;
+    history.replaceState(null, '', location.pathname + location.search);
+    if (!window.opener) { toast('Không thấy công cụ tải. Hãy bấm lại "Mở trong Kệ Truyện" từ trang truyện.'); return; }
+    armed = true;
+    const op = window.opener;
+    const ping = setInterval(() => { try { op.postMessage({ type: 'kt-ready' }, '*'); } catch { clearInterval(ping); } }, 400);
+    setTimeout(() => clearInterval(ping), 60000);
+    const reply = (ok, msg) => { try { op.postMessage({ type: 'kt-done', ok, msg }, '*'); } catch {} };
+    addEventListener('message', async function on(e) {
+      const d = e.data;
+      if (e.source !== op || !d || d.type !== 'kt-import') return;
+      removeEventListener('message', on); clearInterval(ping);
+      if (!(d.buf instanceof ArrayBuffer) || d.buf.byteLength < 100 || d.buf.byteLength > 400e6 || !/\.epub$/i.test(String(d.name || ''))) { reply(false, 'Dữ liệu không hợp lệ'); return; }
+      let from = ''; try { from = new URL(e.origin).hostname.replace(/^www\./, ''); } catch {}
+      let books = []; try { books = await Store.books(); } catch {}
+      const same = books.find(b => b.srcKey && b.srcKey === d.key);
+      const meta = { srcKey: String(d.key || '').slice(0, 500), srcLast: String(d.last || '').slice(0, 1000), srcAt: Date.now() };
+      const file = new File([d.buf], String(d.name).slice(0, 180), { type: 'application/epub+zip' });
+      const go = async target => {
+        closeSheet();
+        try { await importFiles([file], target, { title: target ? undefined : String(d.title || '').slice(0, 200), meta, label: target ? 'Đang nối chương mới…' : 'Đang thêm truyện…' }); reply(true); }
+        catch (err) { reply(false, err.message || String(err)); }
+      };
+      let decided = false;
+      sheetOnClose = () => { if (!decided) reply(false, 'Bạn đã huỷ trong Kệ Truyện'); };
+      openSheet('Nhận truyện', body => {
+        body.classList.add('rv');
+        body.append(...[
+          el('div', { class: 'rv-card' },
+            el('span', { class: 'rv-ic', 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>' }),
+            el('div', {}, el('b', { text: d.title || 'Truyện' }), el('small', { text: `${d.count || '?'} chương · ${fmtBytes(d.buf.byteLength)} · từ ${from || 'trang khác'}` }))),
+          same ? el('button', { type: 'button', class: 'rp-it', style: '--k:0', onclick: () => { decided = true; go(same); } },
+            el('span', { class: 'rp-ic', 'aria-hidden': 'true', text: '➕' }),
+            el('span', {}, el('b', { text: `Nối vào “${same.title}”` }), el('small', { text: `Đang có ${same.chapters.length} chương trên kệ` })), el('em', { 'aria-hidden': 'true', text: '›' })) : null,
+          el('button', { type: 'button', class: 'rp-it', style: `--k:${same ? 1 : 0}`, onclick: () => { decided = true; go(null); } },
+            el('span', { class: 'rp-ic', 'aria-hidden': 'true', text: '📚' }),
+            el('span', {}, el('b', { text: same ? 'Thêm thành truyện riêng' : 'Thêm vào kệ' }), el('small', { text: same ? 'Giữ truyện cũ, tạo thêm một truyện mới' : 'Truyện sẽ nằm trên kệ, đọc được khi không có mạng' })), el('em', { 'aria-hidden': 'true', text: '›' })),
+          el('p', { class: 'ui-note', text: 'Lần sau muốn tải chương mới: nhấn giữ truyện trên kệ › Tải tiếp.' })].filter(Boolean));
+      }, 'Huỷ');
+    });
+  }
+  arm(); addEventListener('hashchange', arm);
+})();
 
 /* ================= Chuỗi ngày đọc & Tổng kết tháng/năm =================
    Dữ liệu: ST.days (giây đọc/ngày), ST.ch (chương đọc xong/ngày), ST.pages, cộng thêm (từ bản này)
