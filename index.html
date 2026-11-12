@@ -1100,6 +1100,49 @@ html.c314-on,html.c314-on *{cursor:none!important}
 @media (prefers-reduced-motion: reduce){.c314{transition:opacity .2s}.g001-blobs i,.g001-float,.g001-sheen{animation:none}.xc.is-pop{animation:none}.czb,.b361-tx{transition:none}}
 .brand{min-width:0;flex:1}
 .brand h1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+
+/* ----- Trang truyện: không tràn ngang, kéo theo tay ----- */
+.xd-body{overflow-x:hidden;overscroll-behavior:none}
+.xd-in{grid-template-columns:minmax(0,1fr);width:100%}
+.xd-in > *{min-width:0}
+.xd-acts{grid-template-columns:minmax(0,1fr) auto}
+.xd-ttl{right:20px;max-width:none}
+.xd-ttl b{overflow-wrap:anywhere}
+.xd-pull{position:absolute;left:50%;z-index:5;max-width:calc(100% - 40px);padding:9px 16px;border-radius:999px;background:color-mix(in srgb,var(--ink) 80%,transparent);color:var(--bg);font-size:13.5px;font-weight:750;white-space:nowrap;pointer-events:none;
+  opacity:var(--pull,0);transform:translateX(-50%) scale(calc(.85 + var(--pull,0) * .15));transition:background .2s}
+.xd[data-pull="up"] .xd-pull{bottom:calc(env(safe-area-inset-bottom,0px) + 22px)}
+.xd[data-pull="down"] .xd-pull{top:266px}
+.xd:not([data-pull="up"]):not([data-pull="down"]) .xd-pull{opacity:0}
+.xd-pull.ready{background:var(--sc,var(--accent));color:#fff}
+.xd-cz{position:absolute;left:62px;top:calc(env(safe-area-inset-top,0px) + 14px);z-index:4;height:38px;padding:0 14px 0 11px;border-radius:999px;display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.38);color:#fff;font-size:13.5px;font-weight:750;
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;transform:scale(.6);transform-origin:0 50%;transition:opacity .25s,transform .45s var(--ux-spring);pointer-events:none}
+.xd.is-in .xd-cz{opacity:1;transform:none;pointer-events:auto;transition-delay:.05s}
+.xd-cz:active{transform:scale(.94)}
+.xd-cz svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+
+/* ----- Lucian UX/UI Prompt #292 · MIT License (c) 2026 Seokwoooo · lọc & sắp xếp kệ ----- */
+.f292{margin:20px 0 2px}
+.f292-fs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * var(--gutter-r)) 0 calc(-1 * var(--gutter-l));padding:3px var(--gutter-r) 3px var(--gutter-l);-webkit-overflow-scrolling:touch}
+.f292-fs::-webkit-scrollbar{display:none}
+.f292-f{flex:none;display:flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:999px;background:var(--surface);box-shadow:0 0 0 1px var(--line);font-size:13.5px;font-weight:750;color:var(--muted);transition:background-color .25s,color .25s,box-shadow .25s,transform .3s var(--ux-spring)}
+.f292-f small{font-size:11.5px;font-weight:800;opacity:.65;font-variant-numeric:tabular-nums}
+.f292-f[aria-pressed="true"]{background:var(--ink);color:var(--bg);box-shadow:0 6px 14px -8px rgba(0,0,0,.5)}
+.f292-f:active{transform:scale(.93)}
+.f292-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+.f292-n{margin:0 2px;font-size:12.5px;font-weight:750;color:var(--muted);font-variant-numeric:tabular-nums}
+.f292-sort{display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:999px;font-size:13px;font-weight:750;color:var(--ink);background:color-mix(in srgb,var(--ink) 6%,transparent)}
+.f292-sort svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.f292 + #shelf > .section-label:first-child{margin-top:14px}
+#shelf > .xc-ls:first-child{margin-top:12px}
+.shelf-empty{margin:0;padding:36px 0;text-align:center;color:var(--muted);font-size:14px}
+.srt{position:fixed;z-index:60;min-width:190px;padding:6px;border-radius:18px;background:var(--surface);box-shadow:0 0 0 1px var(--line),0 22px 44px -16px rgba(0,0,0,.4);transform:scale(.5);opacity:0;transform-origin:100% 0;transition:transform .35s cubic-bezier(.3,1.4,.5,1),opacity .2s}
+.srt.on{transform:none;opacity:1}
+.srt small{display:block;padding:6px 12px 4px;font-size:11.5px;font-weight:800;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.srt button{display:flex;align-items:center;justify-content:space-between;width:100%;height:42px;padding:0 12px;border-radius:11px;font-size:14.5px;font-weight:650;color:var(--ink)}
+.srt button[aria-checked="true"]{font-weight:800}
+.srt button[aria-checked="true"]::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.srt button:active{background:color-mix(in srgb,var(--ink) 7%,transparent)}
+@media (prefers-reduced-motion: reduce){.srt,.f292-f,.xd-cz{transition:none}}
 </style>
 </head>
 <body>
@@ -1128,6 +1171,8 @@ html.c314-on,html.c314-on *{cursor:none!important}
     <div class="xd-ttl" id="xd-ttl"><b></b><span></span></div>
     <div class="xd-body" id="xd-body"></div>
     <div class="xd-nav" id="xd-nav"><button type="button" id="xd-up" aria-label="Truyện trước"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 10l4-4 4 4"/></svg></button><span id="xd-n"></span><button type="button" id="xd-dn" aria-label="Truyện sau"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button></div>
+    <button class="xd-cz" id="xd-cz" type="button" aria-label="Tuỳ chỉnh truyện này"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.5" cy="11" r="1.4"/><circle cx="11.5" cy="7.5" r="1.4"/><circle cx="16.5" cy="9" r="1.4"/><path d="M12 21a9 9 0 1 1 9-9c0 2.2-1.6 3-3.2 3H16a2 2 0 0 0-1.4 3.4c.8.9.3 2.6-2.6 2.6z"/></svg>Tuỳ chỉnh</button>
+    <div class="xd-pull" id="xd-pull" aria-live="polite"></div>
     <button class="xd-x" id="xd-x" type="button" aria-label="Đóng"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
   </div>
   <div class="fab" id="fab">
@@ -1579,18 +1624,16 @@ async function renderLibrary() {
   books.sort((a, b) => (pmap.get(b.id)?.at || b.lastRead || 0) - (pmap.get(a.id)?.at || a.lastRead || 0));
   $('#lib-count').textContent = books.length ? `${books.length} truyện` : '';
   const area = $('#shelf-area');
-  if (!books.length) { SHELF = []; area.replaceChildren(...(UI.scene ? [greetEl()] : []), emptyState()); renderStorage(); return; }
-  closeDetail(true);
+  if (!books.length) { SHELF = []; closeDetail(true); area.replaceChildren(...(UI.scene ? [greetEl()] : []), emptyState()); renderStorage(); return; }
   const info = b => {
     const p = pmap.get(b.id), total = b.chapters.length, ci = p ? Math.max(0, b.chapters.findIndex(c => c.id === p.chId)) : -1, pos = ci < 0 ? 0 : ci + (p.frac || 0);
     return { b, total, ci, pos, pct: clamp(pos / total, 0, 1), done: ci >= total - 1 && ci >= 0 && (p.frac || 0) >= 0.6 };
   };
   const all = books.map(info), kids = [...libTop(books, pmap)];
-  SHELF = []; CARDS.clear();
-  const pin = x => !!(x.b.ui && x.b.ui.pin);
-  for (const [name, list] of [['Đã ghim', all.filter(pin)], ['Đang đọc', all.filter(x => !pin(x) && x.ci >= 0 && !x.done)], ['Mới · chưa đọc', all.filter(x => !pin(x) && x.ci < 0)], ['Đã đọc xong', all.filter(x => !pin(x) && x.done)]])
-    if (list.length) { SHELF.push(...list); kids.push(el('div', { class: 'section-label', text: `${name} (${list.length})` }), el('div', { class: 'xc-ls' }, ...list.map(bookCard))); }
+  LIB.all = all;
+  kids.push(shelfBar(), el('div', { id: 'shelf' }));
   area.replaceChildren(...kids);
+  buildShelf(false);
   renderStorage();
 }
 const shortTitle = t => t.length > 28 ? t.slice(0, 27) + '…' : t;
@@ -1778,13 +1821,7 @@ const colorSoon = b => Promise.race([storyColor(b), new Promise(r => setTimeout(
 (() => {                                                                 // vuốt / cuộn chuột / phím ↑↓ để đổi truyện
   const xd = $('#xd'), bd = () => $('#xd-body');
   const edge = () => { const b = bd(); return { top: b.scrollTop <= 1, bot: b.scrollTop + b.clientHeight >= b.scrollHeight - 2 }; };
-  let t0 = null, acc = 0, accT;
-  xd.addEventListener('touchstart', e => { if (!XD.cur || XD.busy || e.touches.length > 1) { t0 = null; return; } const p = e.touches[0]; t0 = { x: p.clientX, y: p.clientY, ...edge() }; }, { passive: true });
-  xd.addEventListener('touchend', e => {
-    if (!t0) return; const p = e.changedTouches[0], dx = p.clientX - t0.x, dy = p.clientY - t0.y, s = t0, now = edge(); t0 = null;
-    if (Math.abs(dy) < 70 || Math.abs(dy) < Math.abs(dx) * 1.4) return;
-    if (dy < 0 && s.bot && now.bot) storyStep(1); else if (dy > 0 && s.top && now.top) storyStep(-1);
-  }, { passive: true });
+  let acc = 0, accT;
   xd.addEventListener('wheel', e => {
     if (!XD.cur || XD.busy || Date.now() < (XD.cool || 0)) { acc = 0; return; }
     const g = edge(); if ((e.deltaY > 0 && !g.bot) || (e.deltaY < 0 && !g.top)) { acc = 0; return; }
@@ -2161,7 +2198,7 @@ function glassGo(label, b) {
 const finePtr = matchMedia('(hover: hover) and (pointer: fine)');
 (() => {
   const cur = el('div', { class: 'c314', 'aria-hidden': 'true' }, el('span')), cl = cur.firstChild; document.body.append(cur);
-  const BTN = '.btn,.ui-btn,.xd-x,.xd-nav button,.useg button,.fab-main,.fab-it,.xd-opt,.xd-go,.sheet-head button,.ba-it,.cz-nv button,.b361-pv,.b361-nx,.b361-dot,.sw,.emo,.swx-c,.xd-next,.hd-btn,.hd-undo,.wk button,.note button,.czb button';
+  const BTN = '.btn,.ui-btn,.xd-x,.xd-nav button,.useg button,.fab-main,.fab-it,.xd-opt,.xd-go,.sheet-head button,.ba-it,.cz-nv button,.b361-pv,.b361-nx,.b361-dot,.sw,.emo,.swx-c,.xd-next,.hd-btn,.hd-undo,.wk button,.note button,.czb button,.f292-f,.f292-sort,.srt button,.xd-cz';
   const pos = { x: -99, y: -99 }, sp = { x: -99, y: -99 }, vel = { x: 0, y: 0 };
   let mode = '', tgt = null, raf = 0, last = 0, live = false;
   const enabled = () => UI.cursor !== false && finePtr.matches && !R.book;
@@ -2227,6 +2264,142 @@ function personalUi() {
     el('p', { class: 'ui-note', text: 'Mẹo: nhấn giữ một truyện trên kệ để mở nhanh Tuỳ chỉnh, Ghim, Đổi tên hoặc Xoá.' })];
 }
 renderBrand();
+
+/* ---------------- Lucian UX/UI Prompt #292 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#292
+   Lọc & sắp xếp kệ: chọn bộ lọc thì thẻ không khớp co lại biến mất, thẻ còn lại trượt lên lấp chỗ trống,
+   thẻ quay lại thì bật lên tại chỗ của nó; số truyện bên cạnh lăn tới con số mới ---------------- */
+const LIB = { all: [] };
+const isPin = x => !!(x.b.ui && x.b.ui.pin);
+const FILTERS = [['all', 'Tất cả', () => true], ['pin', 'Đã ghim', isPin], ['reading', 'Đang đọc', x => x.ci >= 0 && !x.done], ['new', 'Chưa đọc', x => x.ci < 0],
+  ['done', 'Đã xong', x => x.done], ['text', 'Truyện chữ', x => x.b.kind !== 'comic'], ['comic', 'Truyện tranh', x => x.b.kind === 'comic']];
+const SORTS = [['recent', 'Đọc gần đây'], ['az', 'Tên A–Z'], ['added', 'Mới thêm'], ['prog', 'Tiến độ']];
+const addedAt = b => b.added || b.addedAt || parseInt(String(b.id).slice(0, 8), 36) || 0;
+function sorted(list) {
+  const s = UI.sort || 'recent', a = list.slice();
+  if (s === 'az') a.sort((p, q) => p.b.title.localeCompare(q.b.title, 'vi', { numeric: true }));
+  else if (s === 'added') a.sort((p, q) => addedAt(q.b) - addedAt(p.b));
+  else if (s === 'prog') a.sort((p, q) => q.pct - p.pct);
+  return a;
+}
+function shelfBar() {
+  const chips = el('div', { class: 'f292-fs', role: 'group', 'aria-label': 'Lọc truyện' }), shown = [];
+  for (const [id, name, fn] of FILTERS) {
+    const n = LIB.all.filter(fn).length;
+    if (id !== 'all' && (!n || ((id === 'text' || id === 'comic') && n === LIB.all.length))) continue;
+    shown.push(id);
+    const b = el('button', { type: 'button', class: 'f292-f', 'data-f': id, 'aria-pressed': 'false' }, name, el('small', { text: String(n) }));
+    b.addEventListener('click', () => { setFilter(id); b.scrollIntoView?.({ inline: 'nearest', block: 'nearest', behavior: 'smooth' }); });
+    chips.append(b);
+  }
+  if (!shown.includes(UI.filter)) UI.filter = 'all';
+  const sortBtn = el('button', { type: 'button', class: 'f292-sort', 'aria-haspopup': 'menu', html: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 3v10M1.8 10.8L4 13l2.2-2.2M11 13V3M8.8 5.2L11 3l2.2 2.2"/></svg><span></span>' });
+  sortBtn.addEventListener('click', () => sortMenu(sortBtn));
+  return el('div', { class: 'f292', id: 'shelf-bar' }, chips, el('div', { class: 'f292-row' }, el('p', { class: 'f292-n', 'aria-live': 'polite' }), sortBtn));
+}
+function updateBar() {
+  const bar = $('#shelf-bar'); if (!bar) return;
+  bar.querySelectorAll('.f292-f').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.f === (UI.filter || 'all'))));
+  const cnt = bar.querySelector('.f292-n'), t = `${SHELF.length} truyện`;
+  if (cnt.textContent !== t) { const first = !cnt.textContent; cnt.textContent = t; if (!first) cnt.animate?.([{ transform: 'translateY(8px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 320, easing: 'cubic-bezier(.3,1.3,.5,1)' }); }
+  bar.querySelector('.f292-sort span').textContent = (SORTS.find(s => s[0] === (UI.sort || 'recent')) || SORTS[0])[1];
+}
+function buildShelf(anim) {
+  const box = $('#shelf'); if (!box) return;
+  const f = FILTERS.find(x => x[0] === UI.filter) || FILTERS[0], A = LIB.all;
+  const groups = f[0] === 'all'
+    ? [['Đã ghim', A.filter(isPin)], ['Đang đọc', A.filter(x => !isPin(x) && x.ci >= 0 && !x.done)], ['Mới · chưa đọc', A.filter(x => !isPin(x) && x.ci < 0)], ['Đã đọc xong', A.filter(x => !isPin(x) && x.done)]]
+    : [[null, A.filter(f[2])]];
+  const old = new Map(); if (anim) CARDS.forEach((c, id) => old.set(id, c.getBoundingClientRect()));
+  SHELF = []; CARDS.clear(); const kids = [];
+  for (const [name, l] of groups) {
+    const list = sorted(l); if (!list.length) continue;
+    SHELF.push(...list);
+    if (name) kids.push(el('div', { class: 'section-label', text: `${name} (${list.length})` }));
+    kids.push(el('div', { class: 'xc-ls' }, ...list.map(bookCard)));
+  }
+  if (!SHELF.length) kids.push(el('p', { class: 'shelf-empty', text: 'Không có truyện nào trong mục này.' }));
+  box.replaceChildren(...kids);
+  updateBar();
+  if (anim && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let n = 0;
+    for (const x of SHELF) {
+      const c = CARDS.get(x.b.id), r0 = old.get(x.b.id), r1 = c.getBoundingClientRect(), delay = Math.min(n++ * 35, 420);
+      if (r0 && r1.top < innerHeight + 200) c.animate([{ transform: `translate(${r0.left - r1.left}px,${r0.top - r1.top}px)` }, { transform: 'none' }], { duration: 600, delay, easing: 'cubic-bezier(.3,1.25,.4,1)', fill: 'backwards' });
+      else if (!r0) c.animate([{ transform: 'scale(0)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 520, delay, easing: 'cubic-bezier(.3,1.25,.4,1)', fill: 'backwards' });
+    }
+  }
+  // trang truyện đang mở: giữ nguyên, cập nhật theo dữ liệu mới
+  if (XD.cur) {
+    const id = XD.cur.x.b.id, nx = SHELF.find(x => x.b.id === id);
+    if (!nx) closeDetail(true);
+    else { XD.cur.x = nx; const c = CARDS.get(id); if (!XD.cur.cu && c) c.classList.add('hide'); XD.cur.card = c; fillDetail(nx); }
+  }
+}
+function setFilter(id) {
+  if ((UI.filter || 'all') === id) return;
+  UI.filter = id; saveUI();
+  const f = FILTERS.find(x => x[0] === id) || FILTERS[0], keep = new Set(LIB.all.filter(f[2]).map(x => x.b.id));
+  let out = 0;
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) CARDS.forEach((c, k) => { if (!keep.has(k)) { out++; c.animate?.([{ transform: 'none', opacity: 1 }, { transform: 'scale(.2)', opacity: 0 }], { duration: 260, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }); } });
+  updateBar();
+  setTimeout(() => buildShelf(true), out ? 220 : 0);
+}
+function sortMenu(btn) {
+  const was = $('.srt'); if (was) { was.remove(); return; }
+  const r = btn.getBoundingClientRect(), cur = UI.sort || 'recent';
+  const m = el('div', { class: 'srt', role: 'menu', style: `top:${Math.round(r.bottom + 8)}px;right:${Math.round(Math.max(12, innerWidth - r.right))}px` },
+    el('small', { text: 'Sắp xếp kệ theo' }),
+    ...SORTS.map(([id, name]) => el('button', { type: 'button', role: 'menuitemradio', 'aria-checked': String(cur === id), text: name, onclick: () => { m.classList.remove('on'); setTimeout(() => m.remove(), 150); if (cur === id) return; UI.sort = id; saveUI(); buildShelf(true); } })));
+  document.body.append(m); requestAnimationFrame(() => m.classList.add('on'));
+  const off = e => { if (!m.contains(e.target) && e.target !== btn && !btn.contains(e.target)) m.remove(); document.removeEventListener('pointerdown', off, true); };
+  setTimeout(() => document.addEventListener('pointerdown', off, true));
+  window.addEventListener('scroll', () => m.remove(), { once: true, passive: true });
+}
+
+/* ---------------- Trang truyện: kéo theo tay để sang truyện khác ----------------
+   Cuộn nội dung bình thường; khi chạm mép (cuối/đầu) mà vẫn kéo tiếp thì trang dịch theo tay kèm gợi ý
+   "Thả tay để sang truyện tiếp"; thả quá ngưỡng (hoặc vuốt nhanh) là chuyển. Vuốt trên ảnh bìa thì đổi truyện ngay. */
+(() => {
+  const xd = $('#xd'), bd = () => $('#xd-body'), hint = $('#xd-pull');
+  const edge = () => { const b = bd(); return { top: b.scrollTop <= 2, bot: b.scrollTop + b.clientHeight >= b.scrollHeight - 4 }; };
+  const TH = 64;
+  let g = null;
+  const setPull = v => {
+    const n = $('#xd-body .xd-in'); if (n) n.style.transform = v ? `translateY(${v.toFixed(1)}px)` : '';
+    const k = Math.min(1, Math.abs(v) / (TH * .5));
+    xd.style.setProperty('--pull', k.toFixed(3)); xd.dataset.pull = v < 0 ? 'up' : v > 0 ? 'down' : '';
+    const i = SHELF.indexOf(XD.cur && XD.cur.x), nx = SHELF[i + (v < 0 ? 1 : -1)];
+    hint.classList.toggle('ready', k >= 1 && !!nx);
+    hint.textContent = !v ? '' : !nx ? (v < 0 ? 'Đây là truyện cuối cùng' : 'Đây là truyện đầu tiên') : k >= 1 ? (v < 0 ? '↑ Thả tay để sang truyện tiếp' : '↓ Thả tay để về truyện trước') : (v < 0 ? '↑ Kéo tiếp để sang truyện sau' : '↓ Kéo tiếp để về truyện trước');
+  };
+  const reset = smooth => { const n = $('#xd-body .xd-in'); if (n && smooth) { n.style.transition = 'transform .45s cubic-bezier(.3,1.3,.5,1)'; setTimeout(() => { n.style.transition = ''; }, 460); } setPull(0); };
+  xd.addEventListener('touchstart', e => {
+    if (!XD.cur || XD.busy || e.touches.length > 1 || e.target.closest('input')) { g = null; return; }
+    const p = e.touches[0]; g = { x0: p.clientX, y0: p.clientY, base: null, dir: 0, hero: !bd().contains(e.target), pull: 0, t: [] };
+  }, { passive: true });
+  xd.addEventListener('touchmove', e => {
+    if (!g) return;
+    const p = e.touches[0], dy = p.clientY - g.y0, dx = p.clientX - g.x0;
+    if (!g.dir) { if (Math.abs(dy) < 6 && Math.abs(dx) < 6) return; if (Math.abs(dx) > Math.abs(dy)) { g = null; return; } g.dir = 1; }
+    const ed = g.hero ? { top: true, bot: true } : edge();
+    if (g.base == null) { if ((p.clientY < (g.ly ?? g.y0) && ed.bot) || (p.clientY > (g.ly ?? g.y0) && ed.top)) g.base = p.clientY; else { g.ly = p.clientY; return; } }
+    const pull = p.clientY - g.base;
+    if ((pull < 0 && !ed.bot) || (pull > 0 && !ed.top)) { g.base = null; g.ly = p.clientY; setPull(0); return; }
+    if (e.cancelable) e.preventDefault();
+    g.pull = pull; g.t.push([e.timeStamp, p.clientY]); if (g.t.length > 6) g.t.shift();
+    setPull(pull * .5);
+  }, { passive: false });
+  const end = () => {
+    if (!g) return; const s = g; g = null;
+    let v = 0; if (s.t.length > 1) { const a = s.t[0], b = s.t[s.t.length - 1]; v = (b[1] - a[1]) / Math.max(1, b[0] - a[0]); }
+    const go = s.pull && (Math.abs(s.pull) * .5 >= TH * .5 || (Math.abs(s.pull) > 24 && Math.abs(v) > .4));
+    reset(true);
+    if (go) storyStep(s.pull < 0 ? 1 : -1);
+  };
+  xd.addEventListener('touchend', end, { passive: true });
+  xd.addEventListener('touchcancel', () => { g = null; reset(true); }, { passive: true });
+})();
+$('#xd-cz').addEventListener('click', () => { if (XD.cur && !XD.busy) storyCustom(XD.cur.x.b); });
 function coverEl(b) {
   const ck = coverKey(b);
   const cover = el('div', { class: 'cover' + (ck ? '' : ' gen'), style: ck ? null : `background:${coverBg(b)}` });
