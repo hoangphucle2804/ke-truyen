@@ -1221,6 +1221,27 @@ html.c314-on,html.c314-on *{cursor:none!important}
 .ps-row b{display:block;font-size:14.5px;font-weight:760}
 .ps-row small{display:block;margin-top:2px;font-size:12.5px;line-height:1.4;color:var(--muted)}
 .ps-go{flex:none;height:36px;padding:0 12px;font-size:13px}
+/* ----- Vuốt ngang đổi chương (#324 + #390) ----- */
+.chx{position:fixed;inset:0;z-index:25;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:0 28px;background:var(--rbg);color:var(--rink);pointer-events:none;will-change:transform;box-shadow:0 0 50px rgba(0,0,0,.28)}
+.chx[hidden]{display:none}
+.chx-lb{font:800 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.22em;opacity:.5}
+.chx-num{position:relative;height:100px;overflow:hidden;-webkit-mask-image:linear-gradient(transparent,#000 20%,#000 80%,transparent);mask-image:linear-gradient(transparent,#000 20%,#000 80%,transparent)}
+.chx-strip{will-change:transform}
+.chx-strip span{display:block;height:100px;font:900 84px/100px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-.05em;text-align:center;font-variant-numeric:tabular-nums}
+.chx-tt{max-width:min(82vw,440px);text-align:center;font-size:18px;font-weight:700;line-height:1.4;text-wrap:balance}
+.chx-g{width:40px;height:40px;margin-top:4px}
+.chx-g svg{width:100%;height:100%;display:block}
+.chx-g circle{fill:none;stroke-width:4}
+.chx-g .t{stroke:currentColor;opacity:.14}
+.chx-g .v{stroke:var(--rs-acc,var(--accent,#3D8BFF));stroke-linecap:round;transform:rotate(-90deg);transform-origin:20px 20px}
+.chx-hint{min-height:18px;font-size:13px;font-weight:700;opacity:.55;transition:opacity .2s,color .2s}
+.chx.ready .chx-hint{opacity:1;color:var(--rs-acc,var(--accent,#3D8BFF))}
+.chx.ready .chx-g{animation:chx-pop .35s cubic-bezier(.3,1.6,.5,1)}
+@keyframes chx-pop{50%{transform:scale(1.18)}}
+.chx.edge .chx-num,.chx.edge .chx-g{display:none}
+.chx.edge .chx-tt{opacity:.7}
+.flow.chx-on{will-change:transform,opacity}
+@media (prefers-reduced-motion: reduce){.chx.ready .chx-g{animation:none}}
 </style>
 </head>
 <body>
@@ -1296,7 +1317,7 @@ html.c314-on,html.c314-on *{cursor:none!important}
     <span class="rc-pg" aria-hidden="true"><i></i></span>
   </div>
   <div class="rc-bot">
-    <button class="rbtn aa" id="r-look" type="button" aria-label="Giao diện và cài đặt">Aa</button>
+    <button class="rbtn" id="r-tocb" type="button" aria-label="Mục lục (phím T)" title="Mục lục" data-icon="list"></button>
     <div class="scrub"><input class="rg" type="range" id="r-scrub" min="0" max="0" step="1" value="0" aria-label="Kéo để tới chương"><div class="scrub-txt" id="r-pos"></div></div>
     <button class="rbtn" id="r-more" type="button" aria-label="Thêm tuỳ chọn" data-icon="more"></button>
   </div>
@@ -3623,9 +3644,10 @@ async function goChapter(i, dir = 0) {
   const n = R.book.chapters.length;
   if (i < 0 || i >= n) { flashText(i < 0 ? 'Đây là chương đầu tiên' : 'Đây là chương cuối cùng', ''); return; }
   const now = Date.now(); if (now - chgT < 90) return; chgT = now;     // giữ phím: không dồn quá nhanh
-  autoStop(); pushHist();
-  flashText(R.book.chapters[i].title, `${i + 1} / ${n}`);
-  await jumpTo(i, 0);
+  autoStop(); pushHist(); const from = readPos(); chRemember();
+  const fr = from && Math.abs(i - from.i) === 1 ? chRecall(i) : 0;
+  flashText(R.book.chapters[i].title, fr ? 'Tiếp tục chỗ đang đọc' : `${i + 1} / ${n}`);
+  await jumpTo(i, fr);
   const box = R.mode === 'page' ? pgView : flow, cls = dir > 0 ? 'chg-next' : dir < 0 ? 'chg-prev' : 'chg-jump';
   box.classList.remove('chg-next', 'chg-prev', 'chg-jump'); void box.offsetWidth; box.classList.add(cls);
   setTimeout(() => box.classList.remove(cls), 300);
@@ -3657,6 +3679,118 @@ document.addEventListener('keydown', e => {
   else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); turn(-1); }
 });
 function followLink(a) { const t = a.dataset.target; const idx = R.book.chapters.findIndex(c => c.entries?.includes(t)); if (idx >= 0) jumpTo(idx, 0); }
+
+/* ---------------- Nhớ chỗ đọc của từng chương ----------------
+   Sang chương bên cạnh (vuốt ngang, nút/phím chương trước–sau) rồi quay lại thì về đúng chỗ đang đọc dở của chương đó,
+   không phải đầu chương. Nhớ tối đa 40 chương gần nhất cho mỗi truyện, kể cả sau khi tắt app. */
+const CHPOS = { id: null, m: new Map(), t: 0 };
+function chMem() {
+  if (!R.book) return null;
+  if (CHPOS.id !== R.book.id) { CHPOS.id = R.book.id; CHPOS.m = new Map(Object.entries(lsGet('kt-chpos-' + R.book.id, {})).map(([k, v]) => [+k, v])); }
+  return CHPOS.m;
+}
+function chRemember() {
+  const p = readPos(), m = chMem(); if (!p || !m) return;
+  m.delete(p.i); m.set(p.i, Math.round(clamp(p.frac, 0, 1) * 1000) / 1000);
+  while (m.size > 40) m.delete(m.keys().next().value);
+  const id = CHPOS.id; clearTimeout(CHPOS.t); CHPOS.t = setTimeout(() => { try { lsSet('kt-chpos-' + id, Object.fromEntries(CHPOS.id === id ? CHPOS.m : [])); } catch {} }, 800);
+}
+const chRecall = i => { const f = chMem()?.get(i) || 0; return f > .015 ? Math.min(f, .985) : 0; };
+let chScrollT = 0;
+window.addEventListener('scroll', () => { if (!R.book || reader.hidden || chScrollT) return; chScrollT = setTimeout(() => { chScrollT = 0; if (R.book && !R.busy) chRemember(); }, 500); }, { passive: true });
+
+/* ---------------- Vuốt ngang để đổi chương (chế độ cuộn dọc) ----------------
+   Lucian UX/UI Prompt #324 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#324
+   Màn mới trượt vào theo đúng ngón tay, màn đang đọc lùi nhẹ về sau và tối đi; thả quá ~1/3 bề ngang (hoặc vuốt nhanh) là sang, không thì bật lại.
+   Lucian UX/UI Prompt #390 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#390
+   Số chương cỡ lớn lăn như dải số từ chương hiện tại sang chương đích; vòng nhỏ bên dưới đầy dần tới ngưỡng thả tay.
+   Kéo sang trái → chương sau, kéo sang phải → chương trước. */
+(() => {
+  const C = 2 * Math.PI * 16;
+  const strip = el('div', { class: 'chx-strip' }), tt = el('b', { class: 'chx-tt' }), hint = el('span', { class: 'chx-hint' });
+  const ring = el('span', { class: 'chx-g', html: `<svg viewBox="0 0 40 40"><circle class="t" cx="20" cy="20" r="16"/><circle class="v" cx="20" cy="20" r="16" style="stroke-dasharray:${C.toFixed(1)};stroke-dashoffset:${C.toFixed(1)}"/></svg>` });
+  const pan = el('div', { class: 'chx', 'aria-hidden': 'true', hidden: '' }, el('small', { class: 'chx-lb', text: 'CHƯƠNG' }), el('div', { class: 'chx-num' }, strip), tt, ring, hint);
+  reader.append(pan);
+  const gv = ring.querySelector('.v');
+  let g = null, busy = false;
+  const rm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const blocked = () => !R.book || R.mode !== 'scroll' || reader.hidden || busy || !rs.hidden || !$('#sheet').hidden || !$('#r-menu').hidden;
+  function setup() {
+    const n = R.book.chapters.length, ok = g.to >= 0 && g.to < n;
+    g.ok = ok;
+    strip.replaceChildren(el('span', { text: String(g.cur + 1) }), el('span', { text: ok ? String(g.to + 1) : String(g.cur + 1) }));
+    tt.textContent = ok ? R.book.chapters[g.to].title : (g.dir > 0 ? 'Đây là chương cuối cùng' : 'Đây là chương đầu tiên');
+    pan.classList.toggle('edge', !ok); pan.classList.remove('ready'); g.ready = false;
+    pan.dataset.dir = g.dir > 0 ? 'next' : 'prev';
+    hint.textContent = ok ? (g.dir > 0 ? '← Kéo tiếp để sang chương sau' : 'Kéo tiếp để về chương trước →') : '';
+  }
+  function paint() {
+    const w = g.w, d = g.dx, p = Math.min(1, Math.abs(d) / (w * .34));
+    const x = (g.dir > 0 ? w : -w) + d;                                   // màn mới bám theo ngón tay
+    pan.style.transform = `translate3d(${x.toFixed(1)}px,0,0)`;
+    flow.style.transform = `translate3d(${(d * .3).toFixed(1)}px,0,0)`;   // màn cũ lùi chậm hơn
+    flow.style.opacity = String(1 - p * .45);
+    strip.style.transform = `translateY(${(-p * 100).toFixed(1)}px)`;
+    gv.style.strokeDashoffset = (C * (1 - p)).toFixed(1);
+    const ready = g.ok && p >= 1;
+    if (ready !== g.ready) { g.ready = ready; pan.classList.toggle('ready', ready); if (ready) navigator.vibrate?.(10); hint.textContent = ready ? 'Thả tay để chuyển chương' : (g.dir > 0 ? '← Kéo tiếp để sang chương sau' : 'Kéo tiếp để về chương trước →'); }
+  }
+  function settle(ms) { const e = `transform ${ms}ms cubic-bezier(.3,.9,.3,1)`; pan.style.transition = e; flow.style.transition = `${e},opacity ${ms}ms ease`; }
+  function clear() { pan.style.transition = flow.style.transition = ''; flow.style.transform = flow.style.opacity = ''; pan.hidden = true; pan.style.transform = ''; pan.style.opacity = ''; flow.classList.remove('chx-on'); }
+  window.addEventListener('touchstart', e => {
+    g = null;
+    if (blocked() || e.touches.length > 1 || e.target.closest?.('.rc-top,.rc-bot,.rmenu,input,textarea,a,button')) return;
+    const t = e.touches[0]; g = { x0: t.clientX, y0: t.clientY, claim: false, dx: 0, s: [] };
+  }, { passive: true });
+  window.addEventListener('touchmove', e => {
+    if (!g) return;
+    if (e.touches.length > 1) { cancel(); return; }
+    const t = e.touches[0];
+    if (!g.claim) {
+      const dx = t.clientX - g.x0, dy = t.clientY - g.y0;
+      if (Math.abs(dx) < 14 && Math.abs(dy) < 14) return;
+      if (Math.abs(dx) < Math.abs(dy) * 1.4 || String(getSelection?.() || '')) { g = null; return; }   // đang cuộn dọc / bôi chữ
+      const pos = readPos(); if (!pos) { g = null; return; }
+      Object.assign(g, { claim: true, cur: pos.i, dir: dx < 0 ? 1 : -1, w: innerWidth, x0: t.clientX });
+      g.to = g.cur + g.dir; autoStop(); chRemember(); setup();
+      flow.classList.add('chx-on'); pan.style.transition = flow.style.transition = ''; pan.hidden = false;
+    }
+    if (e.cancelable) e.preventDefault();
+    let d = t.clientX - g.x0;
+    const nd = d < 0 ? 1 : d > 0 ? -1 : g.dir;
+    if (nd !== g.dir) { g.dir = nd; g.to = g.cur + nd; setup(); }
+    if (!g.ok) d /= 3;
+    g.dx = d; g.s.push([e.timeStamp, t.clientX]); if (g.s.length > 6) g.s.shift();
+    paint();
+  }, { passive: false });
+  function cancel() {
+    if (!g || !g.claim) { g = null; return; }
+    g = null; settle(rm() ? 0 : 420);
+    pan.style.transform = `translate3d(${pan.dataset.dir === 'next' ? innerWidth : -innerWidth}px,0,0)`; flow.style.transform = 'translate3d(0,0,0)'; flow.style.opacity = '1';
+    setTimeout(clear, rm() ? 0 : 430);
+  }
+  window.addEventListener('touchend', async () => {
+    if (!g || !g.claim) { g = null; return; }
+    const s = g; let v = 0;
+    if (s.s.length > 1) { const a = s.s[0], b = s.s[s.s.length - 1]; v = (b[1] - a[1]) / Math.max(1, b[0] - a[0]); }
+    const p = Math.abs(s.dx) / (s.w * .34);
+    const go = s.ok && (p >= 1 || (Math.abs(s.dx) > 40 && Math.abs(v) > .45 && Math.sign(v) === Math.sign(s.dx)));
+    if (!go) { if (!s.ok && Math.abs(s.dx) > 12) flashText(s.dir > 0 ? 'Đây là chương cuối cùng' : 'Đây là chương đầu tiên', ''); cancel(); return; }
+    g = null; busy = true;
+    const ms = rm() ? 0 : 360;
+    settle(ms); pan.style.transform = 'translate3d(0,0,0)'; flow.style.transform = `translate3d(${s.dir > 0 ? -30 : 30}%,0,0)`; flow.style.opacity = '.4';
+    strip.style.transition = `transform ${ms}ms ease`; strip.style.transform = 'translateY(-100px)'; gv.style.strokeDashoffset = '0';
+    await sleep(ms + 40);
+    const fr = chRecall(s.to);
+    try { pushHist(); await jumpTo(s.to, fr); } catch (e) { console.error(e); }
+    if (fr) flashText(R.book.chapters[s.to].title, 'Tiếp tục chỗ đang đọc');
+    flow.style.transition = 'none'; flow.style.transform = ''; flow.style.opacity = ''; strip.style.transition = '';
+    await sleep(rm() ? 0 : 160);
+    pan.style.transition = rm() ? '' : 'opacity .32s ease,transform .45s cubic-bezier(.3,.9,.3,1)'; pan.style.opacity = '0'; pan.style.transform = `translate3d(${s.dir > 0 ? -40 : 40}px,0,0)`;
+    setTimeout(() => { clear(); busy = false; }, rm() ? 0 : 460);
+  }, { passive: true });
+  window.addEventListener('touchcancel', cancel, { passive: true });
+})();
 
 /* ----- Vị trí đọc, thanh tiến độ ----- */
 function readPos() {
@@ -4016,7 +4150,7 @@ function openFind() {
   rs.replaceChildren(pn);
   setTimeout(() => inp.focus(), 80);
 }
-$('#r-look').addEventListener('click', openLook);
+$('#r-tocb').addEventListener('click', openToc);
 $('#r-more').addEventListener('click', openMenu);
 $('#r-toc').addEventListener('click', openToc);
 $('#r-pos').addEventListener('click', () => { if (!scrubbing) openToc(); });
@@ -4161,7 +4295,7 @@ function keepPlace(fn) {
 let draft = null;
 const MODES = [['scroll', 'Cuộn dọc'], ['curl', 'Lật trang – như sách'], ['slide', 'Lật trang – trượt'], ['fade', 'Lật trang – mờ dần'], ['none', 'Lật trang – tức thì']];
 const LOOKS = [['auto', 'Tự động theo máy'], ['light', 'Luôn sáng'], ['dark', 'Luôn tối']];
-document.addEventListener('click', e => { const t = e.target.closest?.('#r-toc,#r-pos,#r-more,#r-look,#r-find'); if (t) R.trig = t; }, true);
+document.addEventListener('click', e => { const t = e.target.closest?.('#r-toc,#r-tocb,#r-pos,#r-more,#r-look,#r-find'); if (t) R.trig = t; }, true);
 /* Lucian UX/UI Prompt #289 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#289
    Bảng bung ra từ đúng nút vừa bấm: điểm gốc phóng to nằm ở tâm nút, phóng từ 50% lên đủ cỡ trong .35s
    theo đường cong nảy cubic-bezier(.3,1.4,.5,1), mờ hiện trong .2s; đóng thì thu ngược về nút. */
@@ -4220,7 +4354,7 @@ function bubbled(inp, fmt) {
   inp.addEventListener('input', place); place();
   return w;
 }
-function openLook() { if (!R.book) return; closeMenu(); R.popAnchor = R.trig && R.trig.id === 'r-more' ? R.trig : $('#r-look'); rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(true); }; lookAny(); }
+function openLook() { if (!R.book) return; closeMenu(); R.popAnchor = R.trig && R.trig.id === 'r-more' ? R.trig : $('#r-more'); rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(true); }; lookAny(); }
 const lookAny = () => (R.book.kind === 'comic' ? lookComic : lookMain)();
 // closeLook(true): thu bảng ngược về nút rồi mới ẩn; closeLook(): ẩn ngay (để mở bảng khác liền sau)
 function closeLook(anim) {
