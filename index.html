@@ -1799,6 +1799,15 @@ html.c314-on,html.c314-on *{cursor:none!important}
 .sp-snack button{flex:none;height:32px;padding:0 12px;border-radius:9px;color:#ffd08a;font-weight:800}
 @keyframes spSn{from{opacity:0;transform:translate(-50%,16px)}}
 @media (prefers-reduced-motion:reduce){.sp-stack,.sp-grp,.sp-ghost,.sp-menu,.sp-it,.sp-l,.sp-caret svg{transition:none!important}.sp-spin{animation:none}}
+/* chọn nhiều truyện cùng lúc */
+.gp-list{display:grid;border-radius:18px;overflow:hidden;box-shadow:var(--k-sh,0 0 0 1px var(--line))}
+.gp-it{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);animation:skUp .45s cubic-bezier(.3,1.3,.5,1) both;animation-delay:calc(var(--k) * 60ms)}
+.gp-it+.gp-it{border-top:1px solid var(--line)}
+.gp-it>span:last-child{min-width:0}
+.gp-it b{display:block;font-size:14.5px;font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gp-it small{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.gp-n{width:30px;height:30px;flex:none;border-radius:10px;display:grid;place-items:center;font-size:13px;font-weight:850;background:color-mix(in srgb,var(--accent) 14%,var(--surface));color:color-mix(in srgb,var(--accent) 80%,var(--ink))}
+.gp-go{width:100%}
 </style>
 </head>
 <body>
@@ -2186,7 +2195,7 @@ function splitText(text, fname) {
 }
 
 /* ---------------- Thêm truyện ---------------- */
-const SUPPORTED = /\.(epub|cbz|zip|txt)$/i;
+const SUPPORTED = /\.(epub|cbz|zip|txt|pdf)$/i;
 async function makeThumb(blob) {
   let src;
   try { src = await createImageBitmap(blob); }
@@ -2210,7 +2219,7 @@ function guessTitle(files, firstMeta) {
 async function importFiles(fileList, target, opts = {}) {
   const files = [...fileList].filter(f => SUPPORTED.test(f.name)).sort((a, b) => ncmp(a.name, b.name));
   const skipped = fileList.length - files.length;
-  if (!files.length) { if (!opts.batch) toast('Chưa hỗ trợ loại file này. Hãy chọn file EPUB, CBZ hoặc TXT.'); return { added: 0, errors: [] }; }
+  if (!files.length) { if (!opts.batch) toast('Chưa hỗ trợ loại file này. Hãy chọn file EPUB, PDF, CBZ hoặc TXT.'); return { added: 0, errors: [] }; }
   try { await navigator.storage?.persist?.(); } catch {}
   const isNew = !target;
   const book = target || { id: uid(), title: '', created: Date.now(), lastRead: Date.now(), chapters: [], files: [], hasCover: false };
@@ -2224,7 +2233,15 @@ async function importFiles(fileList, target, opts = {}) {
       const ext = extOf(f.name);
       let meta;
       const key = `${book.id}/f${n}`;
-      if (ext === 'txt') {
+      if (ext === 'pdf') {
+        meta = await parsePdf(f, key, (fr, t) => updateOverlay((idx + fr * .98) / files.length, `${idx + 1}/${files.length} · ${t}`));
+        if (meta.pdf === 'text') for (let j = 0; j < meta.chapters.length; j++) {
+          const c = meta.chapters[j]; c.type = 'text'; c.textKey = `${key}_t${j}`;
+          await Store.putFile(c.textKey, new Blob([c.body], { type: 'text/plain' })); delete c.body;
+        } else { await Store.putFile(key, meta.zip); delete meta.zip; }
+        if (!coverSource && meta.cover) { const cb = meta.cover; coverSource = async () => cb; }
+        delete meta.cover;
+      } else if (ext === 'txt') {
         meta = splitText(decodeText(await f.arrayBuffer()), f.name);
         for (let j = 0; j < meta.chapters.length; j++) {
           const c = meta.chapters[j]; c.type = 'text'; c.textKey = `${key}_t${j}`;
@@ -3428,9 +3445,9 @@ function emptyState() {
       el('li', {}, el('div', { html: 'Bấm vào bìa để đọc. Phím <b>← →</b> để đổi chương, bấm giữa trang để hiện mục lục và cài đặt.' })))
     : el('ol', { class: 'steps' },
       el('li', {}, el('div', { html: 'Bấm <b>Thêm truyện</b>, mở thư mục chứa truyện trong ứng dụng Tệp.' })),
-      el('li', {}, el('div', { html: 'Bấm <b>Chọn</b> ở góc trên, chọn tất cả các chương (ví dụ 209 file EPUB). Các file chọn cùng lúc được gộp thành <b>một bộ truyện</b>, xếp đúng thứ tự chương.' })),
+      el('li', {}, el('div', { html: 'Bấm <b>Chọn</b> ở góc trên, chọn tất cả các chương (ví dụ 209 file EPUB). Các phần của cùng một truyện được gộp thành <b>một bộ</b>, xếp đúng thứ tự chương; chọn nhiều truyện khác nhau thì mỗi truyện thành một bộ riêng.' })),
       el('li', {}, el('div', { html: 'Chạm vào bìa để đọc. Truyện tranh cuộn dọc liền mạch qua các chương, chạm giữa màn hình để hiện mục lục.' }))),
-    el('div', { class: 'formats' }, ...['EPUB truyện tranh', 'EPUB truyện chữ', 'CBZ / ZIP ảnh', 'TXT'].map(t => el('span', { class: 'chip', text: t }))),
+    el('div', { class: 'formats' }, ...['EPUB truyện chữ', 'EPUB truyện tranh', 'PDF', 'CBZ / ZIP ảnh', 'TXT'].map(t => el('span', { class: 'chip', text: t }))),
     el('div', { class: 'row' },
       el('button', { class: 'btn primary', type: 'button', text: 'Thêm truyện', onclick: () => pickFiles(null) }),
       canFolder ? el('button', { class: 'btn ghost', type: 'button', text: 'Thêm cả thư mục', onclick: () => $('#btn-folder').click() }) : null,
@@ -3532,7 +3549,7 @@ function showErrors(errors, heading) {
 }
 let pickTarget = null;
 function pickFiles(target) { pickTarget = target; const inp = $('#file-pick'); inp.value = ''; inp.click(); }
-$('#file-pick').addEventListener('change', e => { const fl = e.target.files; if (fl && fl.length) importFiles(fl, pickTarget); });
+$('#file-pick').addEventListener('change', e => { const fl = e.target.files; if (fl && fl.length) importPicked(fl, pickTarget); });
 $('#btn-import').addEventListener('click', () => pickFiles(null));
 
 /* ----- Nút tròn thêm truyện: bấm để bung ra các nguồn ----- */
@@ -3589,7 +3606,7 @@ function groupEntries(entries) {
 }
 async function importEntries(entries) {
   const { groups, skipped } = groupEntries(entries);
-  if (!groups.length) { toast('Không có file EPUB, CBZ hoặc TXT nào trong đó.'); return; }
+  if (!groups.length) { toast('Không có file EPUB, PDF, CBZ hoặc TXT nào trong đó.'); return; }
   const books = await Store.books().catch(() => []);
   const have = new Set(books.flatMap(b => b.files.map(f => f.name + '|' + f.size)));
   const todo = groups.filter(g => !g.files.every(f => have.has(f.name + '|' + f.size)));
@@ -4328,6 +4345,240 @@ document.addEventListener('keydown', e => {
   else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); turn(-1); }
 });
 function followLink(a) { const t = a.dataset.target; const idx = R.book.chapters.findIndex(c => c.entries?.includes(t)); if (idx >= 0) jumpTo(idx, 0); }
+
+/* ================= PDF =================
+   Dùng pdf.js (Mozilla, Apache-2.0) để trong thư mục ./pdfjs/ cạnh index.html; chỉ tải khi bạn thêm file PDF.
+   · PDF chữ  → tách thành chữ, ghép lại thành đoạn văn và chương (theo mục lục của PDF, hoặc dòng "Chương N"),
+                bỏ tiêu đề lặp ở đầu/cuối trang và số trang → đọc như EPUB (đổi cỡ chữ, nền, Lọc chữ, Chuẩn hoá…).
+   · PDF ảnh (truyện tranh, sách scan) → vẽ từng trang thành ảnh JPEG, gói lại như CBZ → đọc như truyện tranh.
+   Sau khi thêm, đọc không cần pdf.js nữa (chạy offline bình thường). */
+let PDFJS = null;
+async function pdfLib() {
+  if (PDFJS) return PDFJS;
+  const base = new URL('./pdfjs/', location.href).href;
+  let m;
+  try { m = await import(base + 'pdf.min.mjs'); }
+  catch { throw new Error('chưa tải được bộ đọc PDF. Hãy chắc là thư mục pdfjs đã được tải lên cùng index.html, và máy đang có mạng ở lần đầu thêm PDF'); }
+  m.GlobalWorkerOptions.workerSrc = base + 'pdf.worker.min.mjs';
+  return (PDFJS = { m, base });
+}
+const PDF_PAGE_NO = /^\s*(?:[-–—]\s*)?(?:trang|page|tr\.)?\s*\d{1,4}\s*(?:\/\s*\d{1,4}|of\s*\d+)?\s*(?:[-–—])?\s*$/i;
+const PDF_HEAD = /^\s*(?:(?:chương|chuong|chapter|hồi|quyển|phần|tiết)\s+[0-9ivxlcdm]+\b.{0,80}|(?:mở đầu|lời mở đầu|lời tựa|phần kết|vĩ thanh|ngoại truyện)\b.{0,60})$/i;
+// gom các mẩu chữ của một trang thành dòng (theo đường chân chữ), giữ toạ độ để biết thụt lề, khoảng cách dòng
+async function pdfLines(page) {
+  const tc = await page.getTextContent({ disableNormalization: false }), vp = page.getViewport({ scale: 1 });
+  const its = tc.items.filter(it => it.str != null && it.str !== '').map(it => {
+    const t = it.transform, h = Math.hypot(t[2], t[3]) || it.height || 10;
+    return { s: it.str, x: t[4], y: t[5], w: it.width || 0, h, eol: it.hasEOL };
+  }).sort((a, b) => b.y - a.y || a.x - b.x);
+  const lines = [];
+  for (const it of its) {
+    let L = lines.find(l => Math.abs(l.y - it.y) < Math.min(l.h, it.h) * .5);
+    if (!L) { L = { y: it.y, h: it.h, parts: [] }; lines.push(L); }
+    L.parts.push(it); L.h = Math.max(L.h, it.h);
+  }
+  return { H: vp.height, W: vp.width, lines: lines.sort((a, b) => b.y - a.y).map(L => {
+    L.parts.sort((a, b) => a.x - b.x);
+    let s = '', end = null;
+    for (const p of L.parts) { if (end != null && p.x - end > p.h * .22 && !/\s$/.test(s) && !/^\s/.test(p.s)) s += ' '; s += p.s; end = p.x + p.w; }
+    const x = L.parts[0].x;
+    return { t: s.replace(/\s+/g, ' ').trim().normalize('NFC'), x, r: end, y: L.y, h: L.h };
+  }).filter(l => l.t) };
+}
+// chữ lấy ra có đọc được không (PDF dùng phông không có bảng mã → ra ký tự lạ)
+const pdfReadable = s => { const t = s.replace(/\s+/g, ''); if (t.length < 40) return false; const ok = (t.match(/[\p{L}\p{N}\p{P}]/gu) || []).length, pua = (t.match(/[-�]/g) || []).length; return ok / t.length > .85 && pua / t.length < .02; };
+const pdfNorm = t => foldVi(t).replace(/\d+/g, '#').replace(/\s+/g, ' ').trim();
+function pdfLayout(pages) {         // tính trên cả file: dòng đầu/cuối trang lặp lại, lề trái, bề rộng dòng, khoảng cách dòng
+  const edge = new Map();
+  for (const p of pages) for (const l of [...p.lines.slice(0, 2), ...p.lines.slice(-2)]) { if (PDF_HEAD.test(l.t)) continue; const k = pdfNorm(l.t); edge.set(k, (edge.get(k) || 0) + 1); }
+  const rep = new Set([...edge].filter(([k, n]) => pages.length >= 4 && n >= pages.length * .4 && k.length < 120).map(([k]) => k));
+  const body = pages.flatMap(p => p.lines.filter(l => !PDF_PAGE_NO.test(l.t) && !rep.has(pdfNorm(l.t))));
+  if (!body.length) return { rep, left: 0, right: 1, gap: 14 };
+  const cnt = new Map(); body.forEach(l => { const v = Math.round(l.x); cnt.set(v, (cnt.get(v) || 0) + 1); });
+  const left = [...cnt].sort((a, b) => b[1] - a[1])[0][0], rights = body.map(l => l.r).sort((a, b) => a - b), right = rights[Math.floor(rights.length * .9)];
+  const gaps = []; for (const p of pages) for (let i = 1; i < p.lines.length; i++) { const g = p.lines[i - 1].y - p.lines[i].y; if (g > 0) gaps.push(g); }
+  gaps.sort((a, b) => a - b);
+  return { rep, left, right, gap: gaps[Math.floor(gaps.length / 2)] || 14 };
+}
+function pdfParas(pages, L = pdfLayout(pages)) {   // → mảng đoạn văn (đã bỏ đầu/cuối trang lặp lại và số trang)
+  const rep = L.rep, norm = pdfNorm;
+  const all = [];
+  for (const p of pages) {
+    const ls = p.lines.filter((l, i) => !PDF_PAGE_NO.test(l.t) && !((i < 2 || i >= p.lines.length - 2) && rep.has(norm(l.t))));
+    ls.forEach((l, i) => all.push({ ...l, gap: i ? ls[i - 1].y - l.y : null, W: p.W, first: i === 0 }));
+  }
+  if (!all.length) return [];
+  const { left, right, gap } = L;
+  const full = right - left, paras = []; let cur = '', prev = null;
+  const push = () => { if (cur.trim()) paras.push(cur.trim()); cur = ''; };
+  for (const l of all) {
+    const head = PDF_HEAD.test(l.t) && l.t.length < 100, centered = l.r - l.x < full * .7 && Math.abs((l.x + l.r) / 2 - (left + right) / 2) < full * .08 && l.x > left + l.h;
+    let brk = !prev || head || centered;
+    if (!brk) {
+      if (l.gap != null && l.gap > gap * 1.55) brk = true;                                      // khoảng trống giữa hai đoạn
+      else if (l.x > left + l.h * .8) brk = true;                                                 // dòng thụt lề
+      else if (/[.!?…:”"»)\]]$/.test(prev.t) && prev.r < left + full * .82) brk = true;           // dòng trước kết câu và ngắn
+      else if (prev.head || prev.centered) brk = true;
+    }
+    if (brk) push();
+    if (cur && /[\p{L}]-$/u.test(cur) && /^\p{Ll}/u.test(l.t)) cur = cur.slice(0, -1) + l.t; else cur += (cur ? ' ' : '') + l.t;
+    if (head || centered) push();
+    prev = { ...l, head, centered };
+  }
+  push();
+  return paras;
+}
+// gói ảnh thành file zip (không nén, như CBZ)
+function zipStore(entries) {          // [{name, data:Uint8Array}]
+  const T = zipStore.T || (zipStore.T = (() => { const t = new Uint32Array(256); for (let i = 0; i < 256; i++) { let c = i; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[i] = c >>> 0; } return t; })());
+  const crc = b => { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = T[(c ^ b[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+  const enc = new TextEncoder(), parts = [], cen = []; let off = 0;
+  for (const e of entries) {
+    const nb = enc.encode(e.name), cr = crc(e.data), lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint32(14, cr, true); lh.setUint32(18, e.data.length, true); lh.setUint32(22, e.data.length, true); lh.setUint16(26, nb.length, true);
+    parts.push(lh, nb, e.data);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, cr, true); ch.setUint32(20, e.data.length, true); ch.setUint32(24, e.data.length, true); ch.setUint16(28, nb.length, true); ch.setUint32(42, off, true);
+    cen.push(ch, nb); off += 30 + nb.length + e.data.length;
+  }
+  const cd = cen.reduce((s, p) => s + p.byteLength, 0), end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, entries.length, true); end.setUint16(10, entries.length, true); end.setUint32(12, cd, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...cen, end], { type: 'application/zip' });
+}
+const canvasJpeg = (c, q = .82) => new Promise(r => c.toBlob(b => r(b), 'image/jpeg', q));
+async function renderPdfPage(page, width) {
+  const vp0 = page.getViewport({ scale: 1 }), scale = Math.min(3, width / vp0.width), vp = page.getViewport({ scale });
+  const c = document.createElement('canvas'); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+  if (c.width * c.height > 16e6) { const k = Math.sqrt(16e6 / (c.width * c.height)); c.width = Math.floor(c.width * k); c.height = Math.floor(c.height * k); }
+  const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+  await page.render({ canvasContext: ctx, canvas: c, viewport: page.getViewport({ scale: c.width / vp0.width }) }).promise;
+  const b = await canvasJpeg(c); c.width = c.height = 0; page.cleanup();
+  return b;
+}
+async function pdfOutline(doc) {      // mục lục của PDF → [{title, page}] (chỉ cấp ngoài cùng, đúng thứ tự trang)
+  try {
+    const ol = await doc.getOutline(); if (!ol || ol.length < 2) return null;
+    const out = [];
+    for (const it of ol) {
+      let d = it.dest; if (typeof d === 'string') d = await doc.getDestination(d);
+      if (!Array.isArray(d) || !d[0]) continue;
+      const page = typeof d[0] === 'number' ? d[0] : await doc.getPageIndex(d[0]);
+      out.push({ title: String(it.title || '').replace(/\s+/g, ' ').trim(), page });
+    }
+    for (let i = 1; i < out.length; i++) if (out[i].page < out[i - 1].page) return null;
+    return out.length >= 2 ? out : null;
+  } catch { return null; }
+}
+async function parsePdf(f, key, step) {
+  const { m, base } = await pdfLib();
+  const task = m.getDocument({ data: new Uint8Array(await f.arrayBuffer()), wasmUrl: base + 'wasm/', isEvalSupported: false, useSystemFonts: true, stopAtErrors: false });
+  let doc; try { doc = await task.promise; } catch (e) { throw new Error(/password/i.test(e?.name + e?.message) ? 'file PDF có mật khẩu' : 'file PDF bị hỏng hoặc không đọc được'); }
+  try {
+    const n = doc.numPages, info = (await doc.getMetadata().catch(() => null))?.info || {};
+    let title = String(info.Title || '').trim(); if (/^(microsoft (word|powerpoint)|untitled|document)\b|\.(docx?|pptx?|indd|pdf)$/i.test(title)) title = '';
+    const creator = String(info.Author || '').trim();
+    // thử vài trang đầu xem là PDF chữ hay PDF ảnh
+    const sample = [], probe = Math.min(n, 8);
+    for (let i = 1; i <= probe; i++) sample.push(await pdfLines(await doc.getPage(i)));
+    const txt = sample.map(p => p.lines.map(l => l.t).join(' ')).join(' ');
+    const isText = txt.replace(/\s/g, '').length / probe > 120 && pdfReadable(txt);
+    const outline = await pdfOutline(doc);
+    if (isText) {
+      const pages = sample.slice();
+      for (let i = probe + 1; i <= n; i++) { pages.push(await pdfLines(await doc.getPage(i))); if (i % 4 === 0) { step(i / n, `Đang đọc chữ trang ${i}/${n}`); await sleep(0); } }
+      let chapters; const L = pdfLayout(pages);
+      if (outline) {
+        chapters = outline.map((o, j) => {
+          const ps = pdfParas(pages.slice(o.page, j + 1 < outline.length ? outline[j + 1].page : n), L);
+          if (ps.length && foldVi(ps[0]).replace(/\W+/g, '') === foldVi(o.title).replace(/\W+/g, '')) ps.shift();
+          return { title: o.title || `Phần ${j + 1}`, body: ps.join('\n') };
+        });
+        const pre = pdfParas(pages.slice(0, outline[0].page), L); if (pre.join('').length > 200) chapters.unshift({ title: 'Mở đầu', body: pre.join('\n') });
+        chapters = chapters.filter(c => c.body.trim());
+      } else chapters = splitText(pdfParas(pages, L).join('\n'), f.name).chapters;
+      if (!chapters.length) throw new Error('không tách được chữ trong file PDF này');
+      // ảnh bìa: trang đầu thu nhỏ
+      let cover = null; try { cover = await renderPdfPage(await doc.getPage(1), 600); } catch {}
+      return { kind: 'novel', pdf: 'text', title, creator, chapters, cover };
+    }
+    // PDF ảnh: vẽ từng trang
+    const ents = [], marks = outline ? new Map(outline.map(o => [o.page, o.title])) : null;
+    for (let i = 1; i <= n; i++) {
+      const b = await renderPdfPage(await doc.getPage(i), 1400);
+      ents.push({ name: `p${String(i).padStart(4, '0')}.jpg`, data: new Uint8Array(await b.arrayBuffer()) });
+      step(i / n, `Đang chuyển trang ${i}/${n} thành ảnh`);
+    }
+    const blob = zipStore(ents), names = ents.map(e => e.name);
+    let chapters;
+    if (marks && outline.length >= 2) {
+      chapters = outline.map((o, j) => ({ type: 'images', title: o.title || `Phần ${j + 1}`, pages: names.slice(o.page, j + 1 < outline.length ? outline[j + 1].page : n) })).filter(c => c.pages.length);
+      if (outline[0].page > 0) chapters.unshift({ type: 'images', title: 'Mở đầu', pages: names.slice(0, outline[0].page) });
+    } else if (n > 60) {
+      chapters = []; for (let i = 0; i < n; i += 40) chapters.push({ type: 'images', title: `Trang ${i + 1}–${Math.min(n, i + 40)}`, pages: names.slice(i, i + 40) });
+    } else chapters = [{ type: 'images', title: title || prettyName(f.name), pages: names }];
+    return { kind: 'comic', pdf: 'image', title, creator, chapters, zip: blob, cover: new Blob([ents[0].data], { type: 'image/jpeg' }) };
+  } finally { try { await task.destroy(); } catch {} }
+}
+
+/* ================= Chọn nhiều file cùng lúc: tự nhận ra file nào thuộc truyện nào =================
+   Trước đây mọi file chọn cùng lúc đều gộp thành MỘT truyện. Giờ: xem tên file + tên truyện ghi trong EPUB,
+   các phần của cùng một truyện (Ch.001-100, Ch.101-200, Chương 1, Chương 2…) gộp lại; truyện khác nhau tách riêng. */
+const SER_RE = /[(\[{]?\s*\b(?:chuong|chapter|chap|ch|c|tap|quyen|q|vol(?:ume)?|phan|part|hoi|ep(?:isode)?)\.?\s*\d+(?:\s*[-~–]\s*\d+)?\s*[)\]}]?/g;
+const seriesKey = s => foldVi(String(s || '').replace(/\.(epub|cbz|zip|txt|pdf)$/i, '')).replace(SER_RE, ' ').replace(/\(\s*\d+\s*\)/g, ' ').replace(/\b\d+\b/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+async function peekTitle(f) {
+  if (!/\.epub$/i.test(f.name)) return '';
+  try {
+    const zip = await openZip(f), c = await zip.text('META-INF/container.xml'), p = (c.match(/full-path\s*=\s*"([^"]+)"/) || [])[1];
+    if (!p) return '';
+    return decodeEnt(((await zip.text(p)).match(/<dc:title[^>]*>([\s\S]*?)<\/dc:title>/i) || [])[1] || '').replace(/\s+/g, ' ').trim();
+  } catch { return ''; }
+}
+async function groupPicked(files) {
+  const groups = new Map();
+  for (const f of files) {
+    const t = await peekTitle(f), chapterTitle = /^(chuong|chapter|chap|hoi|tap)\s*\d+/i.test(foldVi(t));
+    const fk = seriesKey(f.name), tk = chapterTitle ? '' : seriesKey(t);
+    const k = fk || tk ? fk + '|' + tk : '#';            // tên chỉ toàn số (001.epub, Chương 12.epub…): coi là chương của cùng một truyện
+    if (!groups.has(k)) groups.set(k, { files: [], title: null, size: 0 });
+    const g = groups.get(k); g.files.push(f); g.size += f.size;
+    if (!g.title && t && !chapterTitle) g.title = t;
+  }
+  for (const g of groups.values()) if (!g.title) g.title = g.files.length === 1 ? prettyName(g.files[0].name) : guessTitle(g.files, null);
+  return [...groups.values()];
+}
+async function importPicked(fileList, target) {
+  const files = [...fileList].filter(f => SUPPORTED.test(f.name));
+  if (target || files.length < 2) return importFiles(fileList, target);
+  showOverlay('Đang xem các file…');
+  let groups;
+  try { groups = await groupPicked(files.sort((a, b) => ncmp(a.name, b.name))); } finally { hideOverlay(); }
+  if (groups.length < 2) return importFiles(fileList, null);
+  const skipped = fileList.length - files.length;
+  const run = async merge => {
+    closeSheet();
+    if (merge) return importFiles(files, null);
+    const books = await Store.books().catch(() => []), have = new Set(books.flatMap(b => b.files.map(f => f.name + '|' + f.size)));
+    const todo = groups.filter(g => !g.files.every(f => have.has(f.name + '|' + f.size))), dup = groups.length - todo.length;
+    let ok = 0; const errors = [];
+    for (let i = 0; i < todo.length; i++) {
+      const g = todo[i], r = await importFiles(g.files, null, { batch: true, title: g.files.length > 1 ? g.title : null, label: `Đang thêm truyện ${i + 1}/${todo.length}…` });
+      if (r && r.added) ok++; if (r) errors.push(...r.errors);
+    }
+    await renderLibrary();
+    const msg = `Đã thêm ${ok} truyện` + (dup ? `, bỏ qua ${dup} truyện đã có trên kệ` : '') + (skipped ? `, bỏ qua ${skipped} file không hỗ trợ` : '') + '.';
+    if (errors.length) showErrors(errors, msg); else toast(msg);
+  };
+  openSheet(`Nhận ra ${groups.length} truyện`, body => {
+    body.classList.add('rv');
+    body.append(
+      el('p', { class: 'ui-note', text: `Bạn chọn ${files.length} file. Các phần của cùng một truyện đã được gộp lại; truyện khác nhau sẽ thành các truyện riêng trên kệ.` }),
+      el('div', { class: 'gp-list' }, ...groups.map((g, i) => el('div', { class: 'gp-it', style: `--k:${i}` },
+        el('span', { class: 'gp-n', 'aria-hidden': 'true', text: String(i + 1) }),
+        el('span', {}, el('b', { text: g.title }), el('small', { text: `${g.files.length} file · ${fmtBytes(g.size)}${g.files.length > 1 ? ' · gộp thành 1 truyện' : ''}` }))))),
+      el('button', { type: 'button', class: 'btn primary gp-go', text: `Thêm thành ${groups.length} truyện`, onclick: () => run(false) }),
+      el('button', { type: 'button', class: 'btn ghost gp-go', text: 'Gộp tất cả thành 1 truyện', onclick: () => run(true) }));
+  }, 'Huỷ');
+}
 
 /* =====================================================================================
    Ô MÃ 6 SỐ — Lucian UX/UI Prompt #026 · MIT License (c) 2026 Seokwoooo
