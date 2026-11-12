@@ -35,6 +35,9 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0}
+/* Tắt "tự giữ vị trí cuộn" của trình duyệt ở chính khung cuộn (Safari iOS mới có tính năng này):
+   app tự bù vị trí khi chèn/gỡ chương, nếu trình duyệt bù thêm lần nữa sẽ bị đẩy đi đúng một chương */
+html{overflow-anchor:none}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%;overflow-anchor:none}
 [hidden]{display:none!important}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -93,6 +96,10 @@ html.paged,html.paged body{overflow:hidden;height:100%;overscroll-behavior:none}
 .flow{max-width:var(--flow-w,820px);margin:0 auto;min-height:100vh;overflow-anchor:none}
 .chap-label{color:var(--rmuted);font-family:var(--f-ui);font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 68px) 16px 14px}
 .chap.comic img{display:block;width:100%;max-width:100%;height:auto;background:#15161a;margin-bottom:var(--cgap,0px)}
+.chap.comic .cimg{position:relative;width:100%;height:0;margin-bottom:var(--cgap,0px);background:#15161a;overflow:hidden}
+.chap.comic .cimg img{position:absolute;left:0;top:0;width:100%;height:100%;margin:0;background:none}
+.pager .chap.comic .cimg{height:auto;padding-bottom:0!important;margin:0 auto .8em;background:none;break-inside:avoid}
+.pager .chap.comic .cimg img{position:static;width:auto;height:auto;max-width:100%;max-height:var(--pgh,80vh);margin:0 auto}
 .flow{touch-action:manipulation}
 .flow.zoom{max-width:1640px;width:200%}
 #reader.zoomed{overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain}
@@ -491,6 +498,34 @@ main.lib{padding-bottom:140px}
 @keyframes pop-kid{from{opacity:0;transform:translateY(10px)}}
 /* #383 sóng màu khi đổi nền đọc */
 .wave{position:fixed;left:0;top:0;width:100%;height:100%;z-index:40;pointer-events:none}
+/* #383 trình chọn màu nền: mỗi nền một trang, màu kế dâng lên như sóng */
+.tw-open{display:flex;align-items:center;gap:12px;min-height:56px;padding:0 16px;border-radius:18px;background:var(--rs-card);box-shadow:0 0 0 1px var(--rs-line);font-size:15.5px;font-weight:650;text-align:left;transition:transform .35s var(--ux-spring)}
+.tw-open:active{transform:scale(.97)}
+.tw-sw{display:flex;flex:none;padding-left:7px}
+.tw-sw i{width:22px;height:22px;border-radius:50%;margin-left:-7px;box-shadow:0 0 0 2px var(--rs-card),0 0 0 3px var(--rs-line)}
+.tw-sw i.on{box-shadow:0 0 0 2px var(--rs-card),0 0 0 4px var(--rs-acc);z-index:1;position:relative}
+.tw-open .chev svg{width:15px;height:15px;color:var(--rs-muted)}
+.tw{position:relative;width:min(100%,340px);height:min(520px,calc(100% - env(safe-area-inset-top,0px) - 24px));border-radius:36px;background:var(--bg,#fff);color:var(--fg,#111);box-shadow:0 0 0 1px var(--rs-line),0 30px 60px -30px rgba(0,0,0,.55);overflow:hidden;font-family:var(--f-ui);letter-spacing:-.01em;animation:rs-in .5s var(--ux-spring)}
+.tw-wv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.tw-ct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding:70px 26px 30px;text-align:center}
+.tw-ill{position:relative;width:170px;height:170px;flex:none}
+.tw-ill i{position:absolute;background:var(--fg,#111)}
+.tw-ill b{position:absolute;inset:0;display:grid;place-items:center;font-size:78px;line-height:1}
+.tw-ct>*{transition:opacity .45s,transform .7s var(--ux-spring)}
+.tw.is-out .tw-ct>*{opacity:0;transform:translateY(-20px)}
+.tw.is-in .tw-ct>*{opacity:0;transform:translateY(30px);transition:none}
+.tw-ct h3{margin:30px 0 0;font-size:24px;font-weight:880;letter-spacing:-.04em}
+.tw-ct p{margin:10px 0 0;font-size:14.5px;line-height:1.6;opacity:.85}
+.tw-ct>:nth-child(2){transition-delay:.06s}
+.tw-ct>:nth-child(3){transition-delay:.12s}
+.tw-sk{position:absolute;right:18px;top:18px;z-index:2;color:var(--fg,#111);opacity:.8;font-size:13px;font-weight:700;padding:6px 8px}
+.tw-ft{position:absolute;left:24px;right:24px;bottom:26px;z-index:2;display:flex;align-items:center;justify-content:space-between}
+.tw-dots{display:flex;gap:6px}
+.tw-dots button{width:8px;height:8px;border-radius:4px;background:color-mix(in srgb,var(--fg,#111) 40%,transparent);transition:width .45s var(--ux-spring),background-color .3s}
+.tw-dots button.on{width:24px;background:var(--fg,#111)}
+.tw-nx{height:46px;padding:0 22px;border-radius:999px;background:var(--fg,#111);color:var(--bg,#fff);font-size:14px;font-weight:850;transition:transform .35s var(--ux-spring)}
+.tw-nx:active{transform:scale(.94)}
+.tw :focus-visible{outline:2px solid var(--fg,#111);outline-offset:3px}
 /* #328 kệ sách: thẻ lớn + trang chi tiết */
 .xc-ls{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
 .xc{position:relative;height:118px;border-radius:20px;overflow:hidden;text-align:left;color:#fff;transition:transform .3s cubic-bezier(.34,1.45,.64,1),opacity .2s;display:block;width:100%}
@@ -653,6 +688,125 @@ main.lib{padding-bottom:140px}
 .mt.on{color:var(--rs-ink2)}
 .mt.on .mt-i{background:var(--rs-acc);color:var(--rs-acci)}
 @media (prefers-reduced-motion: reduce){.rs-panel{animation:none}.lx-pill,.tl-i,.sw::after,.rg-bub{transition:none}}
+
+/* ===== Lucian đợt 3: làm lại cho đúng thẻ gốc ===== */
+/* Lucian UX/UI Prompt #212 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#212
+   Ở đầu trang: thanh rộng rãi, trong suốt. Cuộn xuống: trượt lên khuất. Cuộn lên một chút: trở lại dạng mảnh
+   có nền mờ + bóng, vạch mảnh dưới thanh chạy theo tiến độ đọc. Về tới đầu trang: trong suốt lại. */
+#reader:not(.paged-ui) .rc-top{height:calc(env(safe-area-inset-top,0px) + 58px);padding:env(safe-area-inset-top,0px) var(--gutter-r) 0 var(--gutter-l);gap:4px;
+  background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;
+  transition:transform .38s cubic-bezier(.2,.8,.2,1),height .3s,background-color .3s,box-shadow .3s,-webkit-backdrop-filter .3s,backdrop-filter .3s}
+#reader:not(.paged-ui) .rc-top .rbtn{width:40px;height:40px;background:transparent;border:0;box-shadow:none;transition:width .3s,height .3s,background-color .2s,transform .5s var(--ux-spring)}
+#reader:not(.paged-ui) .rc-top .rbtn:active{background:var(--rline)}
+#reader:not(.paged-ui) .rc-label{text-align:left;font-size:13px;font-weight:800;color:var(--rink);letter-spacing:-.01em;padding-left:2px}
+#reader.solid:not(.paged-ui) .rc-top{height:calc(env(safe-area-inset-top,0px) + 46px);padding-top:env(safe-area-inset-top,0px);padding-bottom:0;
+  background:color-mix(in srgb,var(--rbg) 78%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--rline),0 8px 20px -14px rgba(0,0,0,.45)}
+#reader.solid:not(.paged-ui) .rc-top .rbtn{width:34px;height:34px}
+#reader.solid:not(.paged-ui) .rc-top .rbtn svg{width:19px;height:19px}
+#reader.chrome-off .rc-top{transform:translateY(-110%)}
+.rc-top>.rc-pg{position:absolute;left:0;bottom:-1px;width:100%;height:2px;opacity:0;transition:opacity .3s;pointer-events:none}
+.rc-pg i{display:block;height:100%;width:0;background:var(--rs-acc,#6A57F2)}
+#reader.solid:not(.paged-ui) .rc-pg{opacity:1}
+#reader:not(.paged-ui) .chap-prog{display:none}
+/* Kệ sách: cùng kiểu thanh ẩn/hiện */
+.lib-head{background:transparent;transition:transform .38s cubic-bezier(.2,.8,.2,1),background-color .3s,box-shadow .3s,-webkit-backdrop-filter .3s,backdrop-filter .3s}
+.lib-head .wrap{transition:padding .3s}
+.lib-head .brand h1{transition:font-size .3s}
+.lib-head.scrolled .wrap{padding-block:8px}
+.lib-head.scrolled .brand h1{font-size:20px}
+
+/* Lucian UX/UI Prompt #289 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#289
+   Bảng nổi gọn, bung ra từ nút vừa bấm (scale .5 → 1, .35s cubic-bezier(.3,1.4,.5,1); opacity .2s). */
+.rs-wrap{display:block;padding:0;background:transparent}
+.rs-panel.p289{position:absolute;max-width:none;margin:0;border-radius:22px;padding:16px 14px;box-shadow:0 0 0 1px var(--rs-line),0 22px 44px -16px rgba(0,0,0,.4);
+  transform:scale(.5);opacity:0;animation:none;transition:transform .35s cubic-bezier(.3,1.4,.5,1),opacity .2s}
+.rs-panel.p289.on{transform:none;opacity:1}
+.rs-panel.p289.tocp{height:auto}
+.rs-panel.p289 .rs-top{margin:-16px -14px 0;padding:16px 0 20px;border-radius:22px 22px 0 0}
+.rs-grab{display:none}
+.rs-panel.p289 .rs-x{width:38px;height:38px}
+.rs-panel.p289 .rs-x svg{width:17px;height:17px}
+.rs-wrap:has(> .tw){display:flex;align-items:center;justify-content:center;padding:0 20px;background:rgba(0,0,0,.28)}
+/* Các dòng cài đặt trong menu ⋯ (theo #289) */
+.m-set{display:grid;gap:6px;padding:8px;border-radius:16px;background:var(--rs-card);box-shadow:0 0 0 1px var(--rs-line)}
+.m-fs{display:flex;align-items:center;gap:6px;padding:4px 4px 4px 8px;border-radius:12px;background:var(--rs-bg)}
+.m-fs span{flex:1;font-size:14.5px;font-weight:700}
+.m-fs em{font-style:normal;font-size:13px;font-weight:800;color:var(--rs-muted);font-variant-numeric:tabular-nums;min-width:48px;text-align:center}
+.m-fs button{width:36px;height:34px;border-radius:10px;background:var(--rs-card);box-shadow:inset 0 0 0 1px var(--rs-line);color:var(--rs-ink);font-weight:900}
+.m-fs button:disabled{opacity:.35}
+.m-dn{font-size:12px}.m-up{font-size:18px}
+.m-rw{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 4px 4px 8px;font-size:14.5px;font-weight:650}
+.rs-panel.p289 .mgrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.rs-panel.p289 .mt{padding:11px 2px 9px;font-size:12px}
+.rs-panel.p289 .mnav button{height:46px;border-radius:14px;font-size:14.5px}
+
+/* Lucian UX/UI Prompt #012 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#012
+   Ruy băng lưu trang (thu nhỏ từ 104px xuống 60px; giữ nguyên đường cong và thời lượng). */
+.m12{position:relative;display:flex;align-items:center;gap:14px;padding:10px 12px;border-radius:18px;background:var(--rs-card);box-shadow:0 0 0 1px var(--rs-line)}
+.m12-btn{position:relative;width:60px;height:60px;flex:none;border-radius:19px;background:var(--rs-bg);color:var(--rs-ink);
+  box-shadow:0 0 0 1px var(--rs-line),0 14px 24px -16px var(--rs-shadow);transition:transform .5s var(--ux-spring),box-shadow .5s var(--ux-ease)}
+.m12-btn:active{transform:scale(.9)}
+.m12-icon{position:absolute;left:18px;top:14.5px;width:24px;height:31px}
+.m12-icon svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.m12-out{fill:none;stroke:currentColor;stroke-width:4.6;stroke-linejoin:round}
+.m12-in{fill:url(#m12-g);clip-path:inset(0 0 100% 0);transition:clip-path .55s cubic-bezier(.6,0,.3,1)}
+.m12.is-on .m12-in{clip-path:inset(0 0 0 0)}
+.m12.is-on .m12-out{stroke:transparent;transition:stroke .2s .4s}
+.m12.is-on:not(.calm) .m12-icon{animation:m12-drop .7s var(--ux-ease)}
+@keyframes m12-drop{0%{transform:translateY(0)}30%{transform:translateY(4px) scaleY(.9)}60%{transform:translateY(-3px)}100%{transform:none}}
+.m12-p{position:absolute;left:50%;top:50%;width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:2px;background:var(--c);opacity:0;pointer-events:none;z-index:2}
+.m12.is-burst .m12-p{animation:m12-burst .8s var(--ux-ease) forwards}
+@keyframes m12-burst{0%{opacity:1;transform:rotate(var(--a)) translateY(-18px) scale(.6)}100%{opacity:0;transform:rotate(var(--a)) translateY(-54px) scale(1.1) rotate(160deg)}}
+.m12-ring{position:absolute;inset:-2px;border-radius:21px;box-shadow:0 0 0 2px #FF9F5A;opacity:0;pointer-events:none}
+.m12.is-burst .m12-ring{animation:m12-ring .6s var(--ux-ease)}
+@keyframes m12-ring{from{opacity:1;transform:scale(.9)}to{opacity:0;transform:scale(1.35)}}
+.m12-meta{margin:0;display:flex;align-items:center;gap:10px;min-width:0;font-size:15px;font-weight:680;color:var(--rs-ink2)}
+.m12-roll{position:relative;height:22px;overflow:hidden;flex:none;transition:width .45s var(--ux-spring)}
+.m12-roll span{display:block;width:max-content;line-height:22px;white-space:nowrap;transition:transform .5s var(--ux-spring),opacity .3s var(--ux-ease)}
+.m12-roll span+span{position:absolute;left:0;top:0;transform:translateY(100%);opacity:0}
+.m12.is-on .m12-roll span:first-child{transform:translateY(-100%);opacity:0}
+.m12.is-on .m12-roll span+span{transform:none;opacity:1}
+.m12.is-on .m12-lab{color:var(--rs-ink)}
+.m12-dot{width:4px;height:4px;flex:none;border-radius:50%;background:var(--rs-muted)}
+.m12-num{font-variant-numeric:tabular-nums;color:var(--rs-muted);font-weight:600;white-space:nowrap}
+
+/* Lucian UX/UI Prompt #383 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#383 */
+.tw{width:min(300px,100%);height:min(500px,calc(100% - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 40px));border-radius:36px;animation:tw-in .5s var(--ux-spring)}
+@keyframes tw-in{from{transform:scale(.92);opacity:0}}
+.tw-wv path:first-child{filter:drop-shadow(0 -6px 14px rgba(0,0,0,.22))}
+.tw-crest{fill:none;stroke-width:2.5;stroke-linecap:round;opacity:.28;vector-effect:non-scaling-stroke}
+.tw-ill{width:170px;height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.tw-ill .tw-aa{position:static;display:block;inset:auto;font-size:76px;line-height:1;letter-spacing:-.02em}
+.tw-ill .tw-lines{display:grid;gap:9px;width:150px}
+.tw-ill .tw-lines i{position:static;display:block;height:7px;border-radius:4px;background:var(--fg,#111);opacity:.22}
+.tw-ct{padding-top:64px}
+
+/* Lucian UX/UI Prompt #276 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#276
+   Bảng phông chữ: nền tối, tên phông cỡ lớn; dòng khác mờ đi, dòng đang chọn dịch phải lộ mũi tên. */
+.rs-panel.p289.flp{background:#111;color:#F2EFEA;border-radius:32px;padding:22px 18px;box-shadow:0 0 0 1px rgba(255,255,255,.06),0 30px 60px -30px rgba(0,0,0,.7)}
+.flp .rs-head h3{color:#F2EFEA}
+.flp .rs-x{background:#1C1B19;color:#F2EFEA;box-shadow:0 0 0 1px #2A2826}
+.flp .fl-hd{font-size:10.5px;font-weight:750;letter-spacing:.12em;color:#8D8880;margin-bottom:-4px}
+.flp .fl-ls{border-top-color:#2A2826}
+.flp .fl-ls li{border-bottom-color:#2A2826}
+.rs-panel.p289.flp{display:flex;flex-direction:column;gap:12px}
+.flp .fl-ls{flex:1;min-height:0;overflow:hidden}
+.flp .fl-ls.scrolly{overflow-y:auto;touch-action:pan-y;overscroll-behavior:contain;scrollbar-width:none}
+.flp .fl-a{padding:11px 2px 10px;color:#F2EFEA}
+.flp .fl-a b{font-size:21px;font-weight:800;letter-spacing:-.03em}
+.flp .fl-a span{font-size:10.5px;font-weight:650;color:#8D8880}
+.flp .fl-a.sel b{color:#F2EFEA}
+.flp .fl-a.sel span{color:#FFD43B}
+.flp .fl-ls.is-hov .fl-a{color:#5C5852}
+.flp .fl-ls.is-hov .fl-a span{color:#5C5852}
+.flp .fl-ls.is-hov .fl-a.is-on{color:#F2EFEA;transform:translateX(10px)}
+.flp .fl-a:focus-visible{outline:2px solid #F2EFEA;outline-offset:2px}
+.flp .fl-pv{width:132px;height:150px;border-radius:6px;box-shadow:0 20px 40px -16px rgba(0,0,0,.8)}
+.flp .fl-st i{width:132px;height:150px;padding:12px 12px}
+.flp .fl-st i b{font-size:40px;line-height:1.05}
+.flp .fl-st i span{margin-top:8px;font-size:11.5px;line-height:1.45;-webkit-line-clamp:5}
+body.in-lib .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 186px)}
+@media (prefers-reduced-motion: reduce){#reader .rc-top,.lib-head,.rs-panel.p289,.m12-in,.m12-roll,.m12-roll span{transition:none}.m12-p,.m12-ring,.m12-icon{animation:none!important}}
 </style>
 </head>
 <body>
@@ -720,6 +874,7 @@ main.lib{padding-bottom:140px}
     </button>
     <button class="rbtn" id="r-find" type="button" aria-label="Tìm trong truyện" data-icon="search"></button>
     <button class="rbtn wide-only" id="r-toc" type="button" aria-label="Mục lục (phím T)" title="Mục lục (T)" data-icon="list"></button>
+    <span class="rc-pg" aria-hidden="true"><i></i></span>
   </div>
   <div class="rc-bot">
     <button class="rbtn aa" id="r-look" type="button" aria-label="Giao diện và cài đặt">Aa</button>
@@ -1651,8 +1806,9 @@ async function buildSection(i) {
       let blob; try { blob = await zip.blob(p); } catch { continue; }
       const url = URL.createObjectURL(blob); urls.push(url);
       const sz = (await imgSize(blob)) || (await sizeByLoad(url));
-      const img = el('img', { alt: '', decoding: 'async', width: sz.w, height: sz.h, style: `aspect-ratio:${sz.w}/${sz.h}` });
-      img.dataset.src = url; sec.append(img);
+      const img = el('img', { alt: '', decoding: 'async', width: sz.w, height: sz.h });
+      img.dataset.src = url;
+      sec.append(el('div', { class: 'cimg', style: `padding-bottom:${(sz.h / sz.w * 100).toFixed(4)}%` }, img));
     }
   } else if (ch.type === 'text') {
     const blob = await Store.file(ch.textKey);
@@ -1738,9 +1894,29 @@ async function scrollJump(i, frac) {
     flow.append(s.el); R.secs = [s]; attach(s);
     window.scrollTo(0, absTop(s.el) + frac * s.el.getBoundingClientRect().height);
     R.lastY = window.scrollY;
+    pinTo(s, frac);
   } catch (e) { toast('Không mở được chương: ' + (e.message || e)); }
   finally { if (gen === R.gen) R.busy = false; }
   updateBars(); ensure();
+}
+// Sau khi nhảy tới một chương: giữ đúng chỗ đó thêm ~1,2 giây. Nếu trình duyệt tự dời vị trí cuộn
+// (Safari iOS) hoặc việc chèn chương phía trên làm lệch, kéo về lại ngay. Chạm / cuộn tay là thôi giữ.
+function pinTo(s, frac) {
+  const tok = R.pinTok = (R.pinTok || 0) + 1, t0 = performance.now();
+  const step = now => {
+    if (tok !== R.pinTok || !s.el.isConnected || R.touching || R.mode !== 'scroll') return;
+    const r = s.el.getBoundingClientRect(), d = r.top + frac * r.height;
+    if (Math.abs(d) > 1) window.scrollBy(0, d);
+    if (now - t0 < 1200) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+const unpin = () => { R.pinTok = (R.pinTok || 0) + 1; };
+for (const t of ['touchstart', 'wheel']) window.addEventListener(t, unpin, { passive: true });
+window.addEventListener('keydown', e => { if (/^(Arrow|Page|Home|End| )/.test(e.key)) unpin(); });
+// Bù vị trí khi chèn/gỡ chương phía trên: đo lại ở khung hình kế tiếp, lệch thì sửa (không bao giờ bù hai lần)
+function holdMark(mark, t0) {
+  requestAnimationFrame(() => { if (R.touching || !mark.isConnected) return; const d = mark.getBoundingClientRect().top - t0; if (Math.abs(d) > 1) window.scrollBy(0, d); });
 }
 // Trang "đứng yên": không chạm tay và đã ngừng cuộn một lúc (tự cuộn bằng máy thì không có đà nên vẫn tính)
 const calm = () => !R.touching && (auto.on || Date.now() - (R.scrollT || 0) > 250);
@@ -1761,6 +1937,7 @@ async function ensure() {
       else {
         const mark = first.el.lastElementChild || first.el, t0 = mark.getBoundingClientRect().top; flow.prepend(s.el);
         window.scrollBy(0, mark.getBoundingClientRect().top - t0);         // giữ nguyên chỗ đang nhìn
+        holdMark(mark, t0);
         R.secs.unshift(s); attach(s); changed = true;
       }
     }
@@ -1773,6 +1950,7 @@ async function ensure() {
         const mark = R.secs[1].el.lastElementChild || R.secs[1].el, t0 = mark.getBoundingClientRect().top;
         dispose(a); R.secs.shift();
         window.scrollBy(0, mark.getBoundingClientRect().top - t0);          // đo lại theo nội dung còn lại, không lệch dù lề đầu chương thay đổi
+        holdMark(mark, t0);
       }
       else { dispose(b); R.secs.pop(); }
     }
@@ -2072,7 +2250,7 @@ async function goChapter(i, dir = 0) {
 }
 document.addEventListener('keydown', e => {
   if (!R.book || reader.hidden) return;
-  if (e.key === 'Escape') { if (!rs.hidden) closeLook(); else if (!$('#r-menu').hidden) closeMenu(); else if (!$('#sheet').hidden) closeSheet(); return; }
+  if (e.key === 'Escape') { if (!rs.hidden) closeLook(true); else if (!$('#r-menu').hidden) closeMenu(); else if (!$('#sheet').hidden) closeSheet(); return; }
   if (!rs.hidden || !$('#sheet').hidden || e.target.closest?.('input,textarea') || e.altKey || e.ctrlKey || e.metaKey) return;
   const k = e.key.toLowerCase();                   // phím tắt
   if (k === 't' || k === 'g') { e.preventDefault(); openToc(); return; }
@@ -2119,9 +2297,10 @@ function updateBars() {
   } else $('#r-label').textContent = m != null && ch.type !== 'images' ? `Còn ${fmtMin(m)} trong chương` : ch.title;
   const tl = todayLine();
   for (const e of reader.querySelectorAll('.ec-meta')) if (e.textContent !== tl) e.textContent = tl;
-  updateMark();
+  updateMark(); R.pos = p;
   $('#nav-prev').disabled = p.i === 0; $('#nav-next').disabled = p.i >= n - 1;
-  $('#chap-prog').firstElementChild.style.width = (clamp(R.mode === 'page' && P.cur ? P.page / Math.max(1, P.cur.pages - 2) : p.frac, 0, 1) * 100).toFixed(1) + '%';
+  const cw = (clamp(R.mode === 'page' && P.cur ? P.page / Math.max(1, P.cur.pages - 2) : p.frac, 0, 1) * 100).toFixed(1) + '%';
+  $('#chap-prog').firstElementChild.style.width = cw; $('.rc-pg i').style.width = cw;
   if (scrubbing) return;
   scrub.max = Math.max(0, n - 1); scrub.value = p.i; fill(scrub);
   $('#r-pos').textContent = `Chương ${p.i + 1} / ${n} · ${Math.round((p.i + p.frac) / n * 100)}%`;
@@ -2162,8 +2341,9 @@ window.addEventListener('scroll', () => {
     R.sacc = Math.abs(sd) > innerHeight * 0.9 ? 0 : (sd > 0) === (R.sacc > 0) ? (R.sacc || 0) + sd : sd;   // nhảy chương / bù vị trí: không tính
     reader.classList.toggle('solid', y > 20);
     if (!auto.on && rs.hidden && !flow.classList.contains('zoom')) {
-      if (R.sacc > 8 && R.chrome && y > 60) setChrome(false);       // cuộn xuống: nhường chỗ cho nội dung
-      else if (R.sacc < -6 && !R.chrome) setChrome(true);           // cuộn lên một chút: hiện lại
+      if (y < 60) { if (!R.chrome && R.sacc < 0) setChrome(true); }  // về sát đầu trang: thanh hiện lại, trong suốt
+      else if (R.sacc > 8 && R.chrome) setChrome(false);            // cuộn xuống: nhường chỗ cho nội dung
+      else if (R.sacc < -6 && !R.chrome) setChrome(true);           // cuộn lên một chút: hiện lại dạng mảnh có nền mờ
     }
     R.lastY = y;
     updateBars(); scheduleSave(); ensure();
@@ -2256,7 +2436,7 @@ function openToc() {
   closeMenu(); draft = null; R.popAnchor = R.trig && R.trig.id !== 'r-look' && R.trig.id !== 'r-find' ? R.trig : $('#r-more');
   const b = R.book, total = b.chapters.length, cur = readPos()?.i ?? 0, folded = b.chapters.map(c => foldVi(c.title));
   let tab = 'ch';
-  rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(); };
+  rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(true); };
   const list = el('div', { class: 'tl' });
   const info = el('small', { text: `${cur + 1} / ${total}` });
   const err = el('p', { class: 'tl-err', hidden: '' });
@@ -2347,7 +2527,7 @@ const SRC_COL = ['#6366F1', '#F59E0B', '#10B981', '#EF4444', '#0EA5E9', '#8B5CF6
 function openFind() {
   if (!R.book || R.book.kind === 'comic') return;
   closeMenu(); draft = null; R.popAnchor = $('#r-find');
-  rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(); };
+  rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(true); };
   const book = R.book, n = book.chapters.length;
   const inp = el('input', { class: 'field', type: 'search', enterkeyhint: 'search', autocomplete: 'off', placeholder: 'Tên nhân vật, câu thoại…', value: R.lastFind || '', 'aria-label': 'Từ khoá' });
   const info = el('small', { text: '' }), q = el('div', { class: 'sx-q', hidden: '' });
@@ -2485,31 +2665,76 @@ function winSheet() {
 /* ----- Menu “…” ----- */
 function openMenu() {
   if (!R.book) return;
-  if (!rs.hidden && rs.querySelector('.mgrid')) { closeLook(); return; }
+  if (!rs.hidden && rs.querySelector('.mgrid')) { closeLook(true); return; }
   closeMenu(); draft = null; R.popAnchor = $('#r-more');
   const b = R.book, n = b.chapters.length, p = readPos(), comic = b.kind === 'comic';
-  rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(); };
+  rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(true); };
   const run = fn => () => { closeLook(); fn(); };
   const tile = (label, icon, fn, o = {}) => el('button', { type: 'button', class: 'mt' + (o.on ? ' on' : ''), disabled: o.off ? '' : null, onclick: run(fn) },
     el('span', { class: 'mt-i', html: icon }), el('span', { text: label }));
-  const marked = curMark() >= 0;
+  // Cỡ chữ: chữ phía sau đổi ngay khi bấm (thẻ #289)
+  const fv = el('em', { class: 'm-fv' }), dn = el('button', { type: 'button', class: 'm-dn', text: 'A', 'aria-label': 'Chữ nhỏ hơn' }), up = el('button', { type: 'button', class: 'm-up', text: 'A', 'aria-label': 'Chữ lớn hơn' });
+  const syncFs = () => { fv.textContent = S.fs + ' px'; dn.disabled = S.fs <= 12; up.disabled = S.fs >= 36; };
+  const stepFs = d => { keepPlace(() => { S.fs = clamp(S.fs + d, 12, 36); applySettings(); }); syncFs(); };
+  dn.onclick = () => stepFs(-1); up.onclick = () => stepFs(1); syncFs();
+  const swRow = (label, on, change) => { const s = sw(on, change); return el('div', { class: 'm-rw' }, el('span', { text: label }), s.el); };
   rs.replaceChildren(panel(
     el('div', { class: 'rs-head' },
       el('button', { type: 'button', class: 'rs-x', 'aria-label': 'Đóng', html: ICON.x, onclick: closeLook }),
       el('div', { class: 'mh' }, el('b', { text: b.title }), el('small', { text: p ? `${b.chapters[p.i].title} · ${p.i + 1}/${n}` : '' }))),
     el('div', { class: 'mprog' }, el('i', { style: `width:${p ? ((p.i + p.frac) / n * 100).toFixed(1) : 0}%` })),
+    saveRow(),
+    comic ? null : el('div', { class: 'm-set' },
+      el('div', { class: 'm-fs' }, el('span', { text: 'Cỡ chữ' }), dn, fv, up),
+      swRow('Tự chuyển tối theo giờ', S.night.on, on => { S.night.on = on; keepPlace(applySettings); }),
+      swRow('Giữ màn hình sáng', S.wake, on => { S.wake = on; saveSettings(); wake(on); })),
     el('div', { class: 'mnav' },
       el('button', { type: 'button', disabled: !p || p.i === 0 ? '' : null, onclick: run(() => goChapter(p.i - 1, -1)) }, el('span', { html: ICON.back }), el('span', { text: 'Chương trước' })),
       el('button', { type: 'button', disabled: !p || p.i >= n - 1 ? '' : null, onclick: run(() => goChapter(p.i + 1, 1)) }, el('span', { text: 'Chương sau' }), el('span', { html: ICON.chev }))),
     el('div', { class: 'mgrid' },
       tile('Mục lục', ICON.list, openToc),
       comic ? null : tile('Tìm kiếm', ICON.search, openFind),
-      tile(marked ? 'Bỏ đánh dấu' : 'Đánh dấu', ICON.mark, toggleMark, { on: marked }),
-      tile(comic ? 'Cài đặt' : 'Giao diện', 'Aa', openLook),
+      comic ? null : tile('Màu nền', ICON.sun, openThemes),
+      comic ? null : tile('Phông chữ', 'Aa', openFonts),
+      tile(comic ? 'Cài đặt' : 'Giao diện', ICON.gear, openLook),
       tile('Đầu chương', ICON.top, toChapStart),
       tile('Quay lại', ICON.undo, goBack, { off: !(R.hist && R.hist.length) }),
       canFolder ? tile('Cỡ cửa sổ', ICON.win, winSheet) : null,
       canFolder ? tile('Toàn màn hình', ICON.page, () => setWin(document.fullscreenElement ? 'exit' : 'full')) : null)));
+}
+/* Lucian UX/UI Prompt #012 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#012
+   Hàng "Lưu trang": bấm thì màu đổ xuống ruy băng từ trên, biểu tượng hụt xuống rồi bật lên, hoa giấy văng ra;
+   nhãn và số dấu trang cùng cuộn đổi. */
+function saveRow() {
+  const b = R.book, on0 = curMark() >= 0, rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const P8 = [['0deg', '#FFC14D'], ['45deg', '#FF6B6B'], ['90deg', '#8B6CFF'], ['135deg', '#22C3A6'], ['180deg', '#FFC14D'], ['225deg', '#FF6B6B'], ['270deg', '#3D8BFF'], ['315deg', '#FF9F5A']];
+  const box = el('div', { class: 'm12 calm' + (on0 ? ' is-on' : '') });
+  const btn = el('button', { type: 'button', class: 'm12-btn', 'aria-pressed': String(on0), 'aria-label': on0 ? 'Bỏ lưu trang này' : 'Lưu trang này',
+    html: '<span class="m12-ring" aria-hidden="true"></span><span class="m12-icon" aria-hidden="true"><svg viewBox="0 0 44 56"><defs><linearGradient id="m12-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC14D"/><stop offset="1" stop-color="#FF6B6B"/></linearGradient></defs>'
+      + '<path class="m12-in" d="M6 4h32a2 2 0 0 1 2 2v46l-18-12L4 52V6a2 2 0 0 1 2-2z"/><path class="m12-out" d="M6 4h32a2 2 0 0 1 2 2v46l-18-12L4 52V6a2 2 0 0 1 2-2z"/></svg></span>'
+      + P8.map(([a, c]) => `<span class="m12-p" style="--a:${a};--c:${c}" aria-hidden="true"></span>`).join('') });
+  const roll = el('span', { class: 'm12-roll m12-lab' }, el('span', { text: 'Lưu trang này' }), el('span', { text: 'Đã lưu' }));
+  const num = el('span', { class: 'm12-num', text: `${(b.marks || []).length} dấu trang` });
+  box.append(btn, el('p', { class: 'm12-meta', 'aria-live': 'polite' }, roll, el('span', { class: 'm12-dot', 'aria-hidden': 'true' }), num));
+  const fit = on => { roll.style.width = roll.children[on ? 1 : 0].offsetWidth + 'px'; };
+  requestAnimationFrame(() => fit(on0));
+  let t = 0;
+  btn.addEventListener('click', async () => {
+    box.classList.remove('calm');
+    await toggleMark();
+    const on = curMark() >= 0;
+    box.classList.toggle('is-on', on); btn.setAttribute('aria-pressed', String(on)); btn.setAttribute('aria-label', on ? 'Bỏ lưu trang này' : 'Lưu trang này');
+    num.textContent = `${(b.marks || []).length} dấu trang`; fit(on);
+    box.classList.remove('is-burst'); clearTimeout(t);
+    if (on && !rm) { void box.offsetWidth; box.classList.add('is-burst'); t = setTimeout(() => box.classList.remove('is-burst'), 900); }
+  });
+  return box;
+}
+function openThemes() { if (!R.book) return; rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(true); }; lookThemes(true); }
+function openFonts() {
+  if (!R.book) return;
+  draft = JSON.parse(JSON.stringify(S.over[S.theme] || {})); R.popAnchor = $('#r-more');
+  rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(true); }; lookFonts(true);
 }
 function menuAway(e) { if (!$('#r-menu').contains(e.target) && !$('#r-more').contains(e.target)) closeMenu(); }
 function closeMenu() { $('#r-menu').hidden = true; document.removeEventListener('pointerdown', menuAway, true); }
@@ -2524,31 +2749,45 @@ let draft = null;
 const MODES = [['scroll', 'Cuộn dọc'], ['curl', 'Lật trang – như sách'], ['slide', 'Lật trang – trượt'], ['fade', 'Lật trang – mờ dần'], ['none', 'Lật trang – tức thì']];
 const LOOKS = [['auto', 'Tự động theo máy'], ['light', 'Luôn sáng'], ['dark', 'Luôn tối']];
 document.addEventListener('click', e => { const t = e.target.closest?.('#r-toc,#r-pos,#r-more,#r-look,#r-find'); if (t) R.trig = t; }, true);
+/* Lucian UX/UI Prompt #289 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#289
+   Bảng bung ra từ đúng nút vừa bấm: điểm gốc phóng to nằm ở tâm nút, phóng từ 50% lên đủ cỡ trong .35s
+   theo đường cong nảy cubic-bezier(.3,1.4,.5,1), mờ hiện trong .2s; đóng thì thu ngược về nút. */
+let SAFE = null;
+function safeInsets() {
+  if (!SAFE) {
+    const p = el('div', { style: 'position:fixed;left:0;top:0;width:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);visibility:hidden;pointer-events:none' });
+    document.body.append(p); const cs = getComputedStyle(p);
+    SAFE = { t: parseFloat(cs.paddingTop) || 0, b: parseFloat(cs.paddingBottom) || 0 }; p.remove();
+  }
+  return SAFE;
+}
+window.addEventListener('resize', () => { SAFE = null; const pn = rs.querySelector('.rs-panel.p289'); if (pn && R.lastAnchor) placePanel(pn, R.lastAnchor); });
+function placePanel(pn, a) {
+  const W = innerWidth, H = innerHeight, s = safeInsets(), m = 10, top0 = s.t + m, bot0 = H - s.b - m;
+  const tall = pn.classList.contains('tocp') || pn.classList.contains('flp');
+  const w = Math.min(tall ? 440 : 400, W - 2 * m);
+  if (!a) a = { left: W - m - 46, right: W - m, top: bot0 - 50, bottom: bot0 - 4, width: 46, height: 46 };
+  const cx = a.left + a.width / 2, cy = a.top + a.height / 2, below = cy < H / 2;
+  const left = clamp(cx > W / 2 ? a.right + 4 - w : a.left - 4, m, W - m - w);
+  const room = Math.max(160, below ? bot0 - (a.bottom + 10) : (a.top - 10) - top0);
+  Object.assign(pn.style, { left: left + 'px', width: w + 'px', maxHeight: room + 'px', height: tall ? room + 'px' : '',
+    top: below ? a.bottom + 10 + 'px' : 'auto', bottom: below ? 'auto' : (H - a.top + 10) + 'px' });
+  const h = pn.offsetHeight, y0 = below ? a.bottom + 10 : a.top - 10 - h;       // kích thước thật, không tính phần đang thu nhỏ
+  pn.style.transformOrigin = `${(cx - left).toFixed(1)}px ${(cy - y0).toFixed(1)}px`;
+}
 function panel(...kids) {
-  const grab = el('div', { class: 'rs-grab', 'aria-hidden': 'true' });
-  const pn = el('div', { class: 'rs-panel', role: 'dialog', 'aria-modal': 'true' }, grab, ...kids);
-  const anchor = R.popAnchor; R.popAnchor = null;
-  if (!anchor) pn.style.animation = 'none';       // vẽ lại bên trong bảng đang mở: không chạy lại hiệu ứng mở
-  if (anchor) queueMicrotask(() => {               // bung ra từ đúng vị trí nút vừa bấm, các dòng hiện lần lượt
+  const pn = el('div', { class: 'rs-panel p289', role: 'dialog', 'aria-modal': 'true' }, ...kids);
+  const anchor = R.popAnchor; R.popAnchor = null; R.lookTok = (R.lookTok || 0) + 1;
+  requestAnimationFrame(() => {
     if (!pn.isConnected) return;
-    const a = anchor.getBoundingClientRect(), r = pn.getBoundingClientRect();
-    if (!a.width || !r.width) return;
-    pn.style.transformOrigin = `${(a.left + a.width / 2 - r.left).toFixed(0)}px ${(a.top + a.height / 2 - r.top).toFixed(0)}px`;
-    [...pn.children].forEach((c, k) => c.style.setProperty('--k', Math.min(k, 7)));
-    pn.classList.add('pop');
-    setTimeout(() => { pn.style.animation = 'none'; pn.classList.remove('pop'); }, 1100);   // xong thì tắt hẳn, không để hiệu ứng trồi lên chạy lại
+    const r = anchor && anchor.isConnected ? anchor.getBoundingClientRect() : null;
+    const a = r && r.width ? { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height } : R.lastAnchor;
+    placePanel(pn, a); R.lastAnchor = a;
+    if (!r || !r.width || matchMedia('(prefers-reduced-motion: reduce)').matches) {   // vẽ lại bên trong bảng đang mở: hiện luôn, không bung lại
+      pn.style.transition = 'none'; pn.classList.add('on'); void pn.offsetWidth; pn.style.transition = ''; return;
+    }
+    void pn.offsetWidth; pn.classList.add('on');
   });
-  // Kéo tay nắm: bảng đi theo ngón tay; thả khi đã kéo xuống đủ xa hoặc vuốt nhanh thì đóng, không thì bật lại
-  let d = null;
-  grab.addEventListener('pointerdown', e => { d = { y: e.clientY, t: performance.now(), dy: 0 }; try { grab.setPointerCapture(e.pointerId); } catch {} pn.style.animation = 'none'; pn.style.transition = 'none'; });
-  grab.addEventListener('pointermove', e => { if (!d) return; d.dy = e.clientY - d.y; pn.style.transform = `translateY(${d.dy > 0 ? d.dy : d.dy / 5}px)`; });
-  const end = () => {
-    if (!d) return; const g = d; d = null;
-    const fast = g.dy / Math.max(1, performance.now() - g.t) > 0.5;
-    if (g.dy > 90 || (fast && g.dy > 24)) { pn.style.transition = 'transform .25s var(--ux-ease)'; pn.style.transform = 'translateY(110%)'; setTimeout(closeLook, 220); }
-    else { pn.style.transition = 'transform .5s var(--ux-spring)'; pn.style.transform = ''; }
-  };
-  grab.addEventListener('pointerup', end); grab.addEventListener('pointercancel', end);
   return pn;
 }
 // Thanh trượt có bong bóng giá trị nghiêng theo tốc độ kéo
@@ -2568,9 +2807,16 @@ function bubbled(inp, fmt) {
   inp.addEventListener('input', place); place();
   return w;
 }
-function openLook() { if (!R.book) return; closeMenu(); R.popAnchor = R.trig && R.trig.id === 'r-more' ? R.trig : $('#r-look'); rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(); }; lookAny(); }
+function openLook() { if (!R.book) return; closeMenu(); R.popAnchor = R.trig && R.trig.id === 'r-more' ? R.trig : $('#r-look'); rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(true); }; lookAny(); }
 const lookAny = () => (R.book.kind === 'comic' ? lookComic : lookMain)();
-function closeLook() { rs.hidden = true; rs.replaceChildren(); draft = null; endLive(); }
+// closeLook(true): thu bảng ngược về nút rồi mới ẩn; closeLook(): ẩn ngay (để mở bảng khác liền sau)
+function closeLook(anim) {
+  const pn = rs.querySelector('.rs-panel.p289.on'), tok = R.lookTok = (R.lookTok || 0) + 1;
+  draft = null; endLive();
+  const fin = () => { if (tok !== R.lookTok) return; rs.hidden = true; rs.replaceChildren(); };
+  if (anim && pn && !matchMedia('(prefers-reduced-motion: reduce)').matches) { pn.classList.remove('on'); rs.style.pointerEvents = 'none'; setTimeout(() => { rs.style.pointerEvents = ''; fin(); }, 210); }
+  else fin();
+}
 let liveT;
 function livePreview() { clearTimeout(liveT); liveT = setTimeout(() => keepPlace(applySettings), 120); }
 function endLive() { clearTimeout(liveT); if (LIVE) { LIVE = null; if (R.book) keepPlace(applySettings); } }
@@ -2659,20 +2905,74 @@ function themeWave(color, apply) {
     if (k < 1) requestAnimationFrame(f); else finish();
   })(t0);
 }
+const TW_DESC = { original: 'Nền trắng, chữ đen rõ nét.', quiet: 'Nền xám tối, chữ dịu, hợp đọc khuya.', paper: 'Nền xám nhạt như giấy in.', bold: 'Chữ đậm, tương phản cao.', calm: 'Nền vàng ấm, đỡ mỏi mắt.', focus: 'Nền kem sáng, tập trung vào chữ.' };
+const TW_ILL = [
+  [[60, 60, 50, 50], [20, 30, 24, 24], [118, 110, 30, 30]],
+  [[20, 100, 26, 50], [56, 70, 26, 80], [92, 40, 26, 110], [128, 86, 26, 64]],
+  [[30, 50, 60, 60], [80, 50, 60, 60], [62, 112, 46, 46]],
+];
+const waveD = (y, t, amp) => { const pts = []; for (let x = 0; x <= 300; x += 10) pts.push(x + ' ' + (y + Math.sin(x / 38 + t * 9) * amp + Math.sin(x / 17 - t * 6) * amp * 0.35).toFixed(1)); return 'M0 520 L' + pts.join(' L') + ' L300 520 Z'; };
+// Ngọn sóng (chỉ đường viền phía trên) để thấy rõ sóng dâng cả khi hai màu nền gần giống nhau
+const waveCrest = (y, t, amp) => { const pts = []; for (let x = 0; x <= 300; x += 10) pts.push(x + ' ' + (y + Math.sin(x / 38 + t * 9) * amp + Math.sin(x / 17 - t * 6) * amp * 0.35).toFixed(1)); return 'M' + pts.join(' L'); };
+/* Lucian UX/UI Prompt #383 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#383
+   Mỗi màu nền là một trang. Bấm Tiếp: màu của nền kế dâng lên từ đáy thành làn sóng phủ kín thẻ (1,1 giây),
+   ngọn sóng lắc qua lại khi dâng; sóng qua rồi hình và chữ mới nổi lên; chấm dưới kéo dài đánh dấu trang hiện tại. */
+function lookThemes(fromMenu) {
+  R.lookTok = (R.lookTok || 0) + 1;
+  const rm = matchMedia('(prefers-reduced-motion: reduce)').matches, N = THEMES.length, NS = 'http://www.w3.org/2000/svg';
+  let cur = Math.max(0, THEMES.findIndex(t => t.id === S.theme)), busy = false;
+  const svg = document.createElementNS(NS, 'svg'), path = document.createElementNS(NS, 'path'), crest = document.createElementNS(NS, 'path');
+  svg.setAttribute('class', 'tw-wv'); svg.setAttribute('viewBox', '0 0 300 500'); svg.setAttribute('preserveAspectRatio', 'none'); svg.setAttribute('aria-hidden', 'true');
+  crest.setAttribute('class', 'tw-crest'); svg.append(path, crest);
+  const aa = el('b', { class: 'tw-aa' }), lines = el('span', { class: 'tw-lines' }, ...[100, 92, 97, 58].map(w => el('i', { style: `width:${w}%` })));
+  const ill = el('div', { class: 'tw-ill', 'aria-hidden': 'true' }, aa, lines), h = el('h3'), d = el('p');
+  const dots = THEMES.map((t, k) => el('button', { type: 'button', 'aria-label': `Nền ${t.name}`, onclick: () => go(k) }));
+  const nx = el('button', { class: 'tw-nx', type: 'button', text: 'Tiếp', onclick: () => go((cur + 1) % N) });
+  const done = () => fromMenu ? closeLook() : lookMain();
+  const card = el('div', { class: 'tw', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Màu nền đọc' }, svg,
+    el('button', { class: 'tw-sk', type: 'button', text: 'Xong', onclick: done }),
+    el('div', { class: 'tw-ct', 'aria-live': 'polite' }, ill, h, d),
+    el('div', { class: 'tw-ft' }, el('div', { class: 'tw-dots' }, ...dots), nx));
+  const fillPage = i => {
+    const t = THEMES[i], pal = palette(t.id), c = themeCfg(t.id);
+    card.style.setProperty('--bg', pal.bg); card.style.setProperty('--fg', pal.ink);
+    h.textContent = t.name; d.textContent = TW_DESC[t.id] || '';
+    aa.textContent = 'Aa'; aa.style.fontFamily = fontStack(c.font); aa.style.fontWeight = c.bold ? 700 : 500;
+    dots.forEach((x, k) => { x.classList.toggle('on', k === i); x.setAttribute('aria-current', String(k === i)); });
+    nx.textContent = i === N - 1 ? 'Về đầu' : 'Tiếp';
+  };
+  function go(n) {
+    if (busy || n === cur) return;
+    const np = palette(THEMES[n].id);
+    busy = true; card.classList.add('is-out'); path.setAttribute('fill', np.bg); crest.setAttribute('stroke', np.ink);
+    const t0 = performance.now(), D = rm ? 1 : 1100;
+    const end = () => {
+      if (!busy) return; clearTimeout(guard);
+      cur = n; card.classList.remove('is-out'); card.classList.add('is-in'); fillPage(n); path.setAttribute('d', ''); crest.setAttribute('d', '');
+      void card.offsetWidth; card.classList.remove('is-in'); busy = false;
+      keepPlace(() => { S.theme = THEMES[n].id; applySettings(); });       // trang đọc phía sau đổi theo luôn
+    };
+    const guard = setTimeout(end, D + 700);
+    (function f(now) {
+      if (!busy || !card.isConnected) return;
+      const k = clamp((now - t0) / D, 0, 1), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2, y = 520 - e * 600, amp = 26 * Math.sin(k * Math.PI);
+      path.setAttribute('d', waveD(y, k, amp)); crest.setAttribute('d', waveCrest(y, k, amp));
+      if (k < 1) requestAnimationFrame(f); else end();
+    })(t0);
+  }
+  fillPage(cur);
+  rs.replaceChildren(card);
+  nx.focus({ preventScroll: true });
+}
 function lookMain() {
   const fsBtn = (cls, d, label) => el('button', { type: 'button', class: cls, text: 'A', 'aria-label': label, onclick: () => keepPlace(() => { S.fs = clamp(S.fs + d, 12, 36); applySettings(); }) });
   const modeBtn = el('button', { type: 'button', 'aria-label': 'Kiểu đọc: cuộn dọc hoặc lật trang', html: S.mode === 'scroll' ? ICON.scroll : ICON.page });
   modeBtn.onclick = () => popover(modeBtn, MODES, S.mode, v => { setReadMode(v); lookMain(); });
   const lookBtn = el('button', { type: 'button', 'aria-label': 'Sáng hoặc tối', html: ICON.sunset });
   lookBtn.onclick = () => popover(lookBtn, LOOKS, S.appearance, v => { S.appearance = v; keepPlace(applySettings); lookMain(); });
-  const grid = el('div', { class: 'tgrid' });
-  for (const t of THEMES) {
-    const c = themeCfg(t.id), p = palette(t.id);
-    grid.append(el('button', { type: 'button', class: 'tcard' + (t.id === S.theme ? ' on' : ''), 'aria-pressed': String(t.id === S.theme),
-      style: `--tbg:${p.bg};--tink:${p.ink};font-family:${fontStack(c.font)};font-weight:${c.bold ? 700 : 400}`,
-      onclick: () => { if (t.id === S.theme) return; themeWave(p.bg, () => { keepPlace(() => { S.theme = t.id; applySettings(); }); if (!rs.hidden) lookMain(); }); } },
-      el('b', { text: 'Aa' }), el('span', { text: t.name }), Object.keys(S.over[t.id] || {}).length ? el('sup', { text: '*' }) : null));
-  }
+  const themeBtn = el('button', { type: 'button', class: 'tw-open', onclick: lookThemes },
+    el('span', { class: 'tw-sw', 'aria-hidden': 'true' }, ...THEMES.map(t => el('i', { class: t.id === S.theme ? 'on' : '', style: `background:${palette(t.id).bg}` }))),
+    el('span', { class: 'grow', text: `Màu nền đọc · ${themeOf(S.theme).name}` }), el('span', { class: 'chev', html: ICON.chev }));
   const presets = el('div', { class: 'rs-presets' }, ...PRESETS.map(pr => {
     const pal = themeOf(pr.theme)[pr.appearance], on = S.theme === pr.theme && S.appearance === pr.appearance && S.fs === pr.fs;
     return el('button', { type: 'button', class: 'preset' + (on ? ' on' : ''), style: `--tbg:${pal.bg};--tink:${pal.ink}`,
@@ -2690,7 +2990,7 @@ function lookMain() {
       el('div', { class: 'pill' }, fsBtn('a-sm', -1, 'Chữ nhỏ hơn'), fsBtn('a-lg', 1, 'Chữ lớn hơn')),
       el('div', { class: 'pill' }, modeBtn, lookBtn)),
     presets,
-    grid,
+    themeBtn,
     el('div', { class: 'rs-group' },
       el('div', { class: 'rs-item' }, el('span', { class: 'grow', text: 'Tự chuyển tối theo giờ' }), night.el),
       el('div', { class: 'rs-item' }, el('span', { class: 'grow', text: 'Khung giờ tối' }), times),
@@ -2751,22 +3051,27 @@ function lookCustom(fresh) {
     el('div', { class: 'rs-sec' }, el('h4', { text: 'Bố cục & dễ đọc' }), layout),
     el('button', { type: 'button', class: 'rs-link', text: 'Khôi phục mặc định của chủ đề này', onclick: () => { draft = {}; lookCustom(false); } })));
 }
-function saveDraft() {
+function saveDraft(next = lookMain) {
   const t = themeOf(S.theme), d = draft || {};
   if (!d.custom) { delete d.custom; LAYOUT.forEach(k => delete d[k]); }
   if (!d.font || d.font === t.font) delete d.font;
   if (d.bold == null || d.bold === t.bold) delete d.bold;
   if (Object.keys(d).length) S.over[S.theme] = d; else delete S.over[S.theme];
-  draft = null; LIVE = null; clearTimeout(liveT); keepPlace(applySettings); lookMain();
+  draft = null; LIVE = null; clearTimeout(liveT); keepPlace(applySettings); if (next) next();
 }
-function lookFonts() {
+/* Lucian UX/UI Prompt #276 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#276
+   Danh sách phông chữ cỡ lớn trên nền tối. Rê chuột (hoặc miết ngón tay) qua một dòng: thẻ xem trước của phông đó
+   nổi lên cạnh con trỏ, theo sau chậm một nhịp và nghiêng theo hướng đi; đổi dòng thì dải thẻ trượt lên/xuống,
+   dòng đang chọn dịch sang phải để lộ mũi tên. direct = mở thẳng từ menu ⋯: chọn là áp dụng luôn. */
+function lookFonts(direct) {
   const t = themeOf(S.theme), cur = draft.font || t.font, rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const sample = sampleText().slice(0, 96);
+  const sample = sampleText().slice(0, 90);
   const ls = el('ul', { class: 'fl-ls', 'aria-label': 'Phông chữ' }), st = el('div', { class: 'fl-st' }), pv = el('div', { class: 'fl-pv', 'aria-hidden': 'true' }, st);
   for (const f of FONTS) st.append(el('i', { style: `font-family:${f[2]}` }, el('b', { text: 'Aa' }), el('span', { text: sample })));
+  const back = () => direct ? closeLook(true) : lookCustom(false);
   const pn = panel(
-    el('div', { class: 'rs-head' }, el('button', { type: 'button', class: 'rs-x', 'aria-label': 'Quay lại', html: ICON.back, onclick: () => lookCustom(false) }), el('h3', { text: 'Phông chữ' })),
-    el('div', { class: 'fl-hd', 'aria-hidden': 'true' }, el('span', { text: 'Rê hoặc miết để xem trước' }), el('span', { text: FONTS.length + ' kiểu' })),
+    el('div', { class: 'rs-head' }, el('button', { type: 'button', class: 'rs-x', 'aria-label': direct ? 'Đóng' : 'Quay lại', html: direct ? ICON.x : ICON.back, onclick: back }), el('h3', { text: 'Phông chữ' })),
+    el('div', { class: 'fl-hd', 'aria-hidden': 'true' }, el('span', { text: 'Miết để xem trước' }), el('span', { text: FONTS.length + ' kiểu' })),
     ls, pv);
   pn.classList.add('flp');
   let now = -1, raf = 0, last = 0, vx = 0; const pos = { x: 0, y: 0 }, sp = { x: 0, y: 0 };
@@ -2774,12 +3079,12 @@ function lookFonts() {
     if (i === now) return; now = i;
     B.forEach((b, j) => b.classList.toggle('is-on', j === i));
     ls.classList.toggle('is-hov', i >= 0); pv.classList.toggle('is-on', i >= 0);
-    if (i >= 0) st.style.transform = `translateY(${-i * 120}px)`;
+    if (i >= 0) st.style.transform = `translateY(${-i * 150}px)`;
   };
   const frame = t2 => {                            // thẻ xem trước bám theo con trỏ chậm một nhịp và nghiêng theo hướng đi
     raf = 0; if (!pn.isConnected) return;
     const dt = Math.min(0.033, Math.max(0, (t2 - last) / 1000)); last = t2;
-    const tx = pos.x + 18, ty = pos.y - 60, k = rm ? 1 : Math.min(1, dt * 9), nx = sp.x + (tx - sp.x) * k;
+    const tx = pos.x + 18, ty = pos.y - 75, k = rm ? 1 : Math.min(1, dt * 9), nx = sp.x + (tx - sp.x) * k;
     vx = (nx - sp.x) / Math.max(dt, 0.001); sp.x = nx; sp.y += (ty - sp.y) * k;
     const tilt = clamp(vx * 0.02, -12, 12);
     pv.style.left = sp.x.toFixed(1) + 'px'; pv.style.top = sp.y.toFixed(1) + 'px'; pv.style.rotate = (rm ? 0 : tilt).toFixed(2) + 'deg';
@@ -2789,23 +3094,28 @@ function lookFonts() {
   const B = FONTS.map(([id, name, stack], i) => {
     const b = el('button', { type: 'button', class: 'fl-a' + (id === cur ? ' sel' : ''), style: `font-family:${stack}` },
       el('b', { text: name }), el('span', { text: id === cur ? 'đang dùng' : id === t.font ? 'mặc định' : '' }), el('i', { 'aria-hidden': 'true', text: '→' }));
-    b.addEventListener('click', () => { draft.font = id; lookCustom(false); });
-    b.addEventListener('focus', () => { pick(i); const r = b.getBoundingClientRect(), pr = pn.getBoundingClientRect(); pos.x = pr.width - 212; pos.y = r.top - pr.top + r.height / 2; if (!pv.dataset.seen) { sp.x = pos.x + 18; sp.y = pos.y - 60; } kick(); });
+    b.addEventListener('click', () => {
+      draft.font = id;
+      if (direct) { saveDraft(null); closeLook(true); toast('Đã đổi phông chữ: ' + name); } else lookCustom(false);
+    });
+    b.addEventListener('focus', () => { pick(i); const r = b.getBoundingClientRect(), pr = pn.getBoundingClientRect(); pos.x = pr.width - 170; pos.y = r.top - pr.top + r.height / 2; if (!pv.dataset.seen) { sp.x = pos.x + 18; sp.y = pos.y - 75; } kick(); });
     b.addEventListener('blur', () => { if (!pv.dataset.seen) pick(-1); });
     ls.append(el('li', {}, b)); return b;
   });
   const move = e => {
     const r = pn.getBoundingClientRect();
-    pos.x = clamp(e.clientX - r.left, 0, r.width - 212); pos.y = e.clientY - r.top;
+    pos.x = clamp(e.clientX - r.left, 0, r.width - 170); pos.y = e.clientY - r.top;
     const hit = document.elementFromPoint(e.clientX, e.clientY), b = hit && hit.closest && hit.closest('.fl-a');
     pick(b ? B.indexOf(b) : -1);
-    if (now >= 0 && !pv.dataset.seen) { pv.dataset.seen = 1; sp.x = pos.x + 18; sp.y = pos.y - 60; }
+    if (now >= 0 && !pv.dataset.seen) { pv.dataset.seen = 1; sp.x = pos.x + 18; sp.y = pos.y - 75; }
     kick();
   };
   pn.addEventListener('pointermove', move); pn.addEventListener('pointerdown', move);
   const leave = () => { pick(-1); delete pv.dataset.seen; };
   pn.addEventListener('pointerleave', leave); pn.addEventListener('pointerup', e => { if (e.pointerType !== 'mouse') setTimeout(leave, 0); });
   rs.replaceChildren(pn);
+  // Màn hình thấp không đủ chỗ cho cả danh sách: cho cuộn (khi đó miết ngón tay sẽ cuộn thay vì xem trước)
+  requestAnimationFrame(() => requestAnimationFrame(() => ls.classList.toggle('scrolly', ls.scrollHeight > ls.clientHeight + 2)));
 }
 
 /* ---------------- Bảng trượt, lớp phủ, thông báo ---------------- */
