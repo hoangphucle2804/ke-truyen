@@ -901,13 +901,13 @@ html[data-layout="list"] .xc-pb i{background:var(--accent);border-radius:2px}
 /* ----- Lucian UX/UI Prompt #321 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#321
    Rèm chuyển cảnh: rèm màu dâng từ dưới lên che màn hình, hiện tên trang đích, rồi kéo lên để lộ trang mới;
    tiêu đề và ảnh của trang mới nổi lên lần lượt. Màu rèm lấy từ bìa truyện. ----- */
-.cur{position:fixed;inset:0;z-index:90;background:var(--cu,#E2725B);transform:translateY(101%);display:grid;place-items:center;padding:0 28px;color:#fff;text-align:center;pointer-events:none}
-.cur > div{opacity:0;transform:translateY(10px);transition:opacity .3s,transform .4s}
-.cur b{display:block;max-width:15ch;margin:0 auto;font-size:32px;line-height:1.12;font-weight:900;letter-spacing:-.04em;text-wrap:balance}
-.cur small{display:block;margin-top:10px;font-size:13px;font-weight:750;opacity:.8}
-.cur.is-cover{transform:none;transition:transform .5s cubic-bezier(.7,0,.2,1);pointer-events:auto}
-.cur.is-cover > div{opacity:1;transform:none;transition-delay:.25s}
-.cur.is-lift{transform:translateY(-101%);transition:transform .55s cubic-bezier(.7,0,.2,1)}
+.kcur{position:fixed;inset:0;z-index:90;background:var(--cu,#E2725B);transform:translateY(101%);display:grid;place-items:center;padding:0 28px;color:#fff;text-align:center;pointer-events:none}
+.kcur > div{opacity:0;transform:translateY(10px);transition:opacity .3s,transform .4s}
+.kcur b{display:block;max-width:15ch;margin:0 auto;font-size:32px;line-height:1.12;font-weight:900;letter-spacing:-.04em;text-wrap:balance}
+.kcur small{display:block;margin-top:10px;font-size:13px;font-weight:750;opacity:.8}
+.kcur.is-cover{transform:none;transition:transform .5s cubic-bezier(.7,0,.2,1);pointer-events:auto}
+.kcur.is-cover > div{opacity:1;transform:none;transition-delay:.25s}
+.kcur.is-lift{transform:translateY(-101%);transition:transform .55s cubic-bezier(.7,0,.2,1)}
 .xd.cu .xd-hero{transform-origin:50% 40%;transform:scale(1.08)}
 .xd.cu.is-in .xd-hero{transform:none;transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
 .xd.cu .xd-ttl{opacity:0;transform:translateY(18px)}
@@ -1096,7 +1096,7 @@ html.c314-on,html.c314-on *{cursor:none!important}
 .c314.is-img{background:rgba(255,255,255,.92);color:#22201C;box-shadow:0 10px 24px -8px rgba(0,0,0,.4)}
 .c314 span{opacity:0;transition:opacity .2s;white-space:nowrap}
 .c314.is-img span,.c314.is-link span{opacity:1}
-.cur{color:var(--cu-ink,#fff)}
+.kcur{color:var(--cu-ink,#fff)}
 @media (prefers-reduced-motion: reduce){.c314{transition:opacity .2s}.g001-blobs i,.g001-float,.g001-sheen{animation:none}.xc.is-pop{animation:none}.czb,.b361-tx{transition:none}}
 .brand{min-width:0;flex:1}
 .brand h1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
@@ -1211,6 +1211,16 @@ html.c314-on,html.c314-on *{cursor:none!important}
 .bk-note-go{height:34px;padding:0 14px;border-radius:999px;background:var(--ink);color:var(--bg);font-size:13px;font-weight:800;flex:none}
 .bk-note-x{width:30px;height:30px;flex:none;border-radius:50%;color:var(--muted);font-size:20px;line-height:1}
 @media (prefers-reduced-motion: reduce){.d004-btn,.d004-idle,.d004-run,.d004-ok,.d004-ok span{transition:none}.d004-arw .d004-a,.d004-bar::after{animation:none}}
+.tl{overflow-anchor:none}
+/* ----- Giữ bộ nhớ cố định ----- */
+.ps-row{display:flex;align-items:center;gap:12px;padding:12px 12px 12px 14px;border-radius:16px;background:color-mix(in srgb,#F59E0B 12%,var(--surface));box-shadow:0 0 0 1px color-mix(in srgb,#F59E0B 30%,var(--line))}
+.ps-row.ok{background:color-mix(in srgb,#12B886 10%,var(--surface));box-shadow:0 0 0 1px color-mix(in srgb,#12B886 28%,var(--line))}
+.ps-ic{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;background:#F59E0B;color:#fff;font-weight:900;font-size:15px}
+.ps-row.ok .ps-ic{background:#12B886}
+.ps-row > div{flex:1;min-width:0}
+.ps-row b{display:block;font-size:14.5px;font-weight:760}
+.ps-row small{display:block;margin-top:2px;font-size:12.5px;line-height:1.4;color:var(--muted)}
+.ps-go{flex:none;height:36px;padding:0 12px;font-size:13px}
 </style>
 </head>
 <body>
@@ -1305,7 +1315,7 @@ html.c314-on,html.c314-on *{cursor:none!important}
   <div class="ov-card"><b id="ov-title">Đang thêm truyện…</b><div class="meter"><i id="ov-bar"></i></div><small id="ov-sub"></small></div>
 </div>
 <div id="toast" class="toast" hidden></div>
-<div class="cur" id="cur" aria-hidden="true"><div><b></b><small></small></div></div>
+<div class="kcur" id="cur" aria-hidden="true"><div><b></b><small></small></div></div>
 <input type="file" id="file-pick" multiple hidden>
 <input type="file" id="folder-pick" webkitdirectory multiple hidden>
 
@@ -2268,7 +2278,7 @@ function glassGo(label, b) {
 const finePtr = matchMedia('(hover: hover) and (pointer: fine)');
 (() => {
   const cur = el('div', { class: 'c314', 'aria-hidden': 'true' }, el('span')), cl = cur.firstChild; document.body.append(cur);
-  const BTN = '.btn,.ui-btn,.xd-x,.xd-nav button,.useg button,.fab-main,.fab-it,.xd-opt,.xd-go,.sheet-head button,.ba-it,.cz-nv button,.b361-pv,.b361-nx,.b361-dot,.sw,.emo,.swx-c,.xd-next,.hd-btn,.hd-undo,.wk button,.note button,.czb button,.f292-f,.f292-sort,.srt button,.xd-cz,.d004-btn,.bk-note-go,.bk-note-x';
+  const BTN = '.btn,.ui-btn,.xd-x,.xd-nav button,.useg button,.fab-main,.fab-it,.xd-opt,.xd-go,.sheet-head button,.ba-it,.cz-nv button,.b361-pv,.b361-nx,.b361-dot,.sw,.emo,.swx-c,.xd-next,.hd-btn,.hd-undo,.wk button,.note button,.czb button,.f292-f,.f292-sort,.srt button,.xd-cz,.d004-btn,.bk-note-go,.bk-note-x,.ps-go';
   const pos = { x: -99, y: -99 }, sp = { x: -99, y: -99 }, vel = { x: 0, y: 0 };
   let mode = '', tgt = null, raf = 0, last = 0, live = false;
   const enabled = () => UI.cursor !== false && finePtr.matches && !R.book;
@@ -2649,7 +2659,7 @@ function openBackup() {
       } catch (e) { data = null; sum.hidden = true; rs.label('Khôi phục từ file'); toast(e.message || 'File không đọc được.'); }
     });
     const pend = lsGet('kt-pending', []);
-    body.append(
+    body.append(persistRow(),
       el('p', { class: 'bk-file' }, el('span', { class: 'bk-ic', 'aria-hidden': 'true', text: 'KT' }), el('span', {}, el('b', { text: name }), fsz)),
       bk.el, last,
       el('ul', { class: 'bk-what' },
@@ -2661,6 +2671,36 @@ function openBackup() {
       ...(pend.length ? [el('p', { class: 'bk-last', text: `Đang chờ ${pend.length} truyện: thêm lại đúng file là tự khôi phục.` })] : []));
   }, 'Xong');
 }
+
+/* ---------------- Giữ bộ nhớ cố định ----------------
+   Xin trình duyệt đánh dấu dữ liệu của app là "cố định" để không bị tự dọn khi máy đầy.
+   Safari chỉ đồng ý khi app được mở từ biểu tượng ngoài màn hình chính; Chrome tự quyết theo mức bạn dùng trang. */
+async function askPersist() { try { return !!(await navigator.storage?.persist?.()); } catch { return false; } }
+async function isPersisted() { try { return !!(await navigator.storage?.persisted?.()); } catch { return false; } }
+function persistRow() {
+  const ic = el('span', { class: 'ps-ic', 'aria-hidden': 'true' }), t = el('b', { text: 'Đang kiểm tra bộ nhớ…' }), sub = el('small'), act = el('button', { type: 'button', class: 'btn primary ps-go', text: 'Xin giữ cố định', hidden: '' });
+  const row = el('div', { class: 'ps-row' }, ic, el('div', {}, t, sub), act);
+  const iOS = /iPhone|iPad|iPod/.test(navigator.userAgent), standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+  const paint = async () => {
+    const ok = await isPersisted(); let use = '';
+    try { const e = await navigator.storage?.estimate?.(); if (e) use = `Đang dùng ${fmtBytes(e.usage || 0)}${e.quota ? ' / ' + fmtBytes(e.quota) : ''}`; } catch {}
+    row.classList.toggle('ok', ok);
+    ic.textContent = ok ? '✓' : '!';
+    t.textContent = ok ? 'Dữ liệu đã được giữ cố định' : 'Dữ liệu chưa được giữ cố định';
+    sub.textContent = ok ? `Máy sẽ không tự dọn truyện và chỗ đọc khi đầy bộ nhớ. ${use}` :
+      iOS && !standalone ? `Safari chỉ cho giữ cố định khi bạn mở Kệ Truyện từ biểu tượng ngoài màn hình chính (Chia sẻ → Thêm vào MH chính). ${use}` :
+      `Máy có thể tự dọn khi đầy bộ nhớ. Bấm để xin giữ, và nhớ sao lưu thường xuyên. ${use}`;
+    act.hidden = ok;
+  };
+  act.addEventListener('click', async () => {
+    act.disabled = true; const ok = await askPersist(); act.disabled = false; await paint();
+    toast(ok ? 'Đã giữ cố định dữ liệu trên máy này.' : (iOS && !standalone ? 'Hãy mở Kệ Truyện từ biểu tượng ngoài màn hình chính rồi thử lại.' : 'Trình duyệt chưa đồng ý. Hãy sao lưu thường xuyên để an toàn.'));
+  });
+  paint();
+  return row;
+}
+// Mỗi lần mở app: nếu đã có truyện mà chưa được giữ cố định thì xin lại (không làm phiền nếu trình duyệt từ chối)
+setTimeout(async () => { try { if (!(await isPersisted()) && (await Store.books()).length) { await askPersist(); renderStorage(); } } catch {} }, 2500);
 function backupNote() {
   const at = lsGet('kt-bk-at', 0), snooze = lsGet('kt-bk-snooze', 0);
   if (Date.now() - at < 14 * 864e5 || Date.now() < snooze) return null;
@@ -3776,7 +3816,7 @@ async function toggleMark() {
 function openToc() {
   if (!R.book) return;
   closeMenu(); draft = null; R.popAnchor = R.trig && R.trig.id !== 'r-look' && R.trig.id !== 'r-find' ? R.trig : $('#r-more');
-  const b = R.book, total = b.chapters.length, cur = readPos()?.i ?? 0, folded = b.chapters.map(c => foldVi(c.title));
+  const b = R.book, total = b.chapters.length, cur = readPos()?.i ?? 0, folded = tocFold(b);
   let tab = 'ch';
   rs.hidden = false; rs.onclick = e => { if (e.target === rs) closeLook(true); };
   const list = el('div', { class: 'tl' });
@@ -3788,13 +3828,31 @@ function openToc() {
   const fill = (dir = 0) => {
     list.replaceChildren();
     if (tab === 'ch') {
-      const q = inp.value.trim(), f = foldVi(q); let shown = 0;
-      b.chapters.forEach((c, i) => {
-        if (q && !(folded[i].includes(f) || String(i + 1).startsWith(q))) return;
-        shown++;
-        list.append(el('button', { type: 'button', class: 'tl-i' + (i === cur ? ' cur' : ''), onclick: () => jump(i) },
-          el('span', { class: 'tl-n', text: String(i + 1) }), el('span', { class: 'tl-t', text: c.title }), i === cur ? el('span', { class: 'tl-tag', text: 'Đang đọc' }) : null));
-      });
+      const q = inp.value.trim(), f = foldVi(q), frag = document.createDocumentFragment(); let shown = 0;
+      const row = i => el('button', { type: 'button', class: 'tl-i' + (i === cur ? ' cur' : ''), onclick: () => jump(i) },
+        el('span', { class: 'tl-n', text: String(i + 1) }), el('span', { class: 'tl-t', text: b.chapters[i].title }), i === cur ? el('span', { class: 'tl-tag', text: 'Đang đọc' }) : null);
+      const g = ++tocGen;
+      if (!q && total > 400) {
+        let lo = Math.max(0, cur - 60), hi = Math.min(total, cur + 120);
+        for (let i = lo; i < hi; i++) frag.append(row(i));
+        list.append(frag); shown = total;
+        const more = () => {
+          if (g !== tocGen || !list.isConnected) return;
+          const t0 = performance.now();
+          while (performance.now() - t0 < 8 && (hi < total || lo > 0)) {
+            if (hi < total) { const fr = document.createDocumentFragment(), e = Math.min(total, hi + 120); for (let i = hi; i < e; i++) fr.append(row(i)); list.append(fr); hi = e; }
+            if (lo > 0) { const fr = document.createDocumentFragment(), s0 = Math.max(0, lo - 120); for (let i = s0; i < lo; i++) fr.append(row(i)); const h0 = list.scrollHeight; list.prepend(fr); list.scrollTop += list.scrollHeight - h0; lo = s0; }
+          }
+          if (hi < total || lo > 0) setTimeout(more, 40);
+        };
+        setTimeout(more, 420);
+      } else {
+        b.chapters.forEach((c, i) => {
+          if (q && !(folded[i].includes(f) || String(i + 1).startsWith(q))) return;
+          shown++; frag.append(row(i));
+        });
+        list.append(frag);
+      }
       if (!shown) list.append(el('div', { class: 'tl-empty', text: 'Không có chương nào khớp.' }));
       info.textContent = q ? `${shown} chương khớp` : `${cur + 1} / ${total}`;
       if (!q) requestAnimationFrame(() => list.querySelector('.cur')?.scrollIntoView({ block: 'center' }));
@@ -3828,8 +3886,9 @@ function openToc() {
     const first = list.querySelector('.tl-i');
     if (q && first) first.click(); else { err.textContent = q ? 'Không có chương nào khớp.' : 'Nhập số chương trước.'; err.hidden = false; }
   };
-  inp.addEventListener('input', () => { err.hidden = true; if (tab !== 'ch') { tab = 'ch'; tabs(); } fill(); });
-  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+  let fillT = 0;
+  inp.addEventListener('input', () => { err.hidden = true; if (tab !== 'ch') { tab = 'ch'; tabs(); } clearTimeout(fillT); fillT = setTimeout(() => fill(), total > 300 ? 120 : 0); });
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); clearTimeout(fillT); if (!/^\d+$/.test(inp.value.trim())) fill(); go(); } });
   const pillEl = el('span', { class: 'lx-pill', 'aria-hidden': 'true' });
   const tb = ['ch', 'mk'].map(k => el('button', { type: 'button', class: 'lx-tab', role: 'tab', onclick: () => { if (tab === k) return; tab = k; tabs(); fill(k === 'mk' ? 1 : -1); } }));
   const seg = el('div', { class: 'lx-tabs', role: 'tablist', 'aria-label': 'Mục lục' }, pillEl, ...tb);
@@ -3852,11 +3911,23 @@ function openToc() {
 $('#r-back').addEventListener('click', closeReader);
 $('#r-mark').addEventListener('click', toggleMark);
 $('#r-find').addEventListener('click', openFind);
-let findGen = 0;
+let findGen = 0, tocGen = 0;
 const foldVi = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd');
 const ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
 const htmlToText = h => h.replace(/<(script|style|head)[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ')
   .replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (m, e) => { if (e[0] !== '#') return ENT[e.toLowerCase()] ?? m; const c = e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : +e.slice(1); try { return String.fromCodePoint(c); } catch { return ' '; } });
+const yieldNow = () => new Promise(r => { const c = new MessageChannel(); c.port1.onmessage = () => r(); c.port2.postMessage(0); });
+const FT = { book: null, m: new Map(), size: 0 };
+async function findText(book, i, exact) {
+  if (FT.book !== book) { FT.book = book; FT.m = new Map(); FT.size = 0; }
+  let e = FT.m.get(i);
+  if (!e) { e = { t: await chapterText(book.chapters[i]), low: null, fold: null }; if (FT.size < 6e6) { FT.m.set(i, e); FT.size += e.t.length; } }
+  const k = exact ? 'low' : 'fold';
+  if (e[k] == null) e[k] = exact ? e.t.toLowerCase() : foldVi(e.t);
+  return [e.t, e[k]];
+}
+const TOCF = new WeakMap();
+const tocFold = b => { let f = TOCF.get(b); if (!f || f.length !== b.chapters.length) { f = b.chapters.map(c => foldVi(c.title)); TOCF.set(b, f); } return f; };
 async function chapterText(ch) {
   if (ch.type === 'text') { const b = await Store.file(ch.textKey); return b ? (await b.text()).replace(/\s+/g, ' ').trim().normalize('NFC') : ''; }
   if (ch.type !== 'html') return '';
@@ -3907,13 +3978,13 @@ function openFind() {
     const exact = foldVi(query) !== query.toLowerCase();        // có gõ dấu → tìm đúng dấu
     const needle = exact ? query.toLowerCase().normalize('NFC') : foldVi(query);
     const para = el('p', { class: 'sx-p' }); an.append(para);
-    let hits = 0;
+    let hits = 0, ly = performance.now(); const pf = new Map();
     for (let i = 0; i < n && hits < 120; i++) {
       if (g !== gen || rs.hidden || !pn.isConnected || R.book !== book) return;
-      if (i % 4 === 0) { info.textContent = `Đang tìm ${i + 1}/${n} · ${hits} kết quả`; await sleep(0); }
-      let text; try { text = await chapterText(book.chapters[i]); } catch { continue; }
+      if (performance.now() - ly > 16) { info.textContent = `Đang tìm ${i + 1}/${n} · ${hits} kết quả`; await yieldNow(); ly = performance.now(); }
+      for (let k = 1; k <= 6 && i + k < n; k++) if (!pf.has(i + k)) pf.set(i + k, findText(book, i + k, exact).catch(() => ['', '']));
+      let text, hay; try { [text, hay] = await (pf.get(i) || findText(book, i, exact)); } catch { continue; } finally { pf.delete(i); }
       if (!text) continue;
-      const hay = exact ? text.toLowerCase() : foldVi(text);
       let at = 0, per = 0;
       while ((at = hay.indexOf(needle, at)) >= 0 && per < 4 && hits < 120) {
         if (!idx.has(i)) addSource(i);
