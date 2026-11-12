@@ -4367,23 +4367,34 @@ const PDF_HEAD = /^\s*(?:(?:chương|chuong|chapter|hồi|quyển|phần|tiết)
 // gom các mẩu chữ của một trang thành dòng (theo đường chân chữ), giữ toạ độ để biết thụt lề, khoảng cách dòng
 async function pdfLines(page) {
   const tc = await page.getTextContent({ disableNormalization: false }), vp = page.getViewport({ scale: 1 });
-  const its = tc.items.filter(it => it.str != null && it.str !== '').map(it => {
+  let its = tc.items.filter(it => it.str != null && it.str !== '').map(it => {
     const t = it.transform, h = Math.hypot(t[2], t[3]) || it.height || 10;
     return { s: it.str, x: t[4], y: t[5], w: it.width || 0, h, eol: it.hasEOL };
-  }).sort((a, b) => b.y - a.y || a.x - b.x);
+  });
+  // chữ cái lớn đầu bài (drop cap): rất to, chỉ 1–2 ký tự → tách riêng, lát nữa gắn vào dòng đầu của đoạn
+  const hs = its.filter(i => i.s.trim()).map(i => i.h).sort((a, b) => a - b), mh = hs[Math.floor(hs.length / 2)] || 10;
+  const caps = its.filter(i => i.h > mh * 2.2 && i.s.trim().length <= 2 && /\p{L}/u.test(i.s));
+  its = its.filter(i => !caps.includes(i)).sort((a, b) => b.y - a.y || a.x - b.x);
   const lines = [];
   for (const it of its) {
     let L = lines.find(l => Math.abs(l.y - it.y) < Math.min(l.h, it.h) * .5);
     if (!L) { L = { y: it.y, h: it.h, parts: [] }; lines.push(L); }
     L.parts.push(it); L.h = Math.max(L.h, it.h);
   }
-  return { H: vp.height, W: vp.width, lines: lines.sort((a, b) => b.y - a.y).map(L => {
+  const out = lines.sort((a, b) => b.y - a.y).map(L => {
     L.parts.sort((a, b) => a.x - b.x);
     let s = '', end = null;
     for (const p of L.parts) { if (end != null && p.x - end > p.h * .22 && !/\s$/.test(s) && !/^\s/.test(p.s)) s += ' '; s += p.s; end = p.x + p.w; }
-    const x = L.parts[0].x;
-    return { t: s.replace(/\s+/g, ' ').trim().normalize('NFC'), x, r: end, y: L.y, h: L.h };
-  }).filter(l => l.t) };
+    return { t: s.replace(/\s+/g, ' ').trim().normalize('NFC'), x: L.parts[0].x, r: end, y: L.y, h: L.h };
+  }).filter(l => l.t);
+  for (const c of caps) {
+    const top = c.y + c.h * .95, zone = out.filter(l => l.y <= top && l.y >= c.y - c.h && l.x >= c.x + Math.max(c.w, c.h * .4) * .6);
+    if (!zone.length) continue;
+    const first = zone[0];                          // dòng cao nhất trong vùng chữ lớn
+    first.t = c.s.trim() + first.t; first.x = c.x; first.capStart = true;
+    for (const l of zone.slice(1)) l.capR = c.x + c.w;   // các dòng chạy cạnh chữ lớn: thụt vào nhưng không phải đoạn mới
+  }
+  return { H: vp.height, W: vp.width, lines: out };
 }
 // chữ lấy ra có đọc được không (PDF dùng phông không có bảng mã → ra ký tự lạ)
 const pdfReadable = s => { const t = s.replace(/\s+/g, ''); if (t.length < 40) return false; const ok = (t.match(/[\p{L}\p{N}\p{P}]/gu) || []).length, pua = (t.match(/[-�]/g) || []).length; return ok / t.length > .85 && pua / t.length < .02; };
@@ -4393,40 +4404,42 @@ function pdfLayout(pages) {         // tính trên cả file: dòng đầu/cuố
   for (const p of pages) for (const l of [...p.lines.slice(0, 2), ...p.lines.slice(-2)]) { if (PDF_HEAD.test(l.t)) continue; const k = pdfNorm(l.t); edge.set(k, (edge.get(k) || 0) + 1); }
   const rep = new Set([...edge].filter(([k, n]) => pages.length >= 4 && n >= pages.length * .4 && k.length < 120).map(([k]) => k));
   const body = pages.flatMap(p => p.lines.filter(l => !PDF_PAGE_NO.test(l.t) && !rep.has(pdfNorm(l.t))));
-  if (!body.length) return { rep, left: 0, right: 1, gap: 14 };
-  const cnt = new Map(); body.forEach(l => { const v = Math.round(l.x); cnt.set(v, (cnt.get(v) || 0) + 1); });
-  const left = [...cnt].sort((a, b) => b[1] - a[1])[0][0], rights = body.map(l => l.r).sort((a, b) => a - b), right = rights[Math.floor(rights.length * .9)];
+  if (!body.length) return { rep, left: 0, right: 1, gap: 14, bodyH: 10 };
+  const xs = body.map(l => l.x).sort((a, b) => a - b), left = xs[Math.floor(xs.length * .1)];
+  const hcnt = new Map(); body.forEach(l => { const v = Math.round(l.h); hcnt.set(v, (hcnt.get(v) || 0) + 1); });
+  const bodyH = +[...hcnt].sort((a, b) => b[1] - a[1])[0][0], rights = body.map(l => l.r).sort((a, b) => a - b), right = rights[Math.floor(rights.length * .9)];
   const gaps = []; for (const p of pages) for (let i = 1; i < p.lines.length; i++) { const g = p.lines[i - 1].y - p.lines[i].y; if (g > 0) gaps.push(g); }
   gaps.sort((a, b) => a - b);
-  return { rep, left, right, gap: gaps[Math.floor(gaps.length / 2)] || 14 };
+  return { rep, left, right, bodyH, gap: gaps[Math.floor(gaps.length / 2)] || 14 };
 }
-function pdfParas(pages, L = pdfLayout(pages)) {   // → mảng đoạn văn (đã bỏ đầu/cuối trang lặp lại và số trang)
-  const rep = L.rep, norm = pdfNorm;
-  const all = [];
+function pdfParas(pages, L = pdfLayout(pages), rich = false) {   // → đoạn văn (bỏ đầu/cuối trang lặp lại và số trang); rich: kèm cờ tiêu đề
+  const rep = L.rep, all = [];
   for (const p of pages) {
-    const ls = p.lines.filter((l, i) => !PDF_PAGE_NO.test(l.t) && !((i < 2 || i >= p.lines.length - 2) && rep.has(norm(l.t))));
-    ls.forEach((l, i) => all.push({ ...l, gap: i ? ls[i - 1].y - l.y : null, W: p.W, first: i === 0 }));
+    const ls = p.lines.filter((l, i) => !PDF_PAGE_NO.test(l.t) && !((i < 2 || i >= p.lines.length - 2) && rep.has(pdfNorm(l.t))));
+    ls.forEach((l, i) => all.push({ ...l, gap: i ? ls[i - 1].y - l.y : null }));
   }
   if (!all.length) return [];
-  const { left, right, gap } = L;
-  const full = right - left, paras = []; let cur = '', prev = null;
-  const push = () => { if (cur.trim()) paras.push(cur.trim()); cur = ''; };
+  const { left, right, gap, bodyH } = L, full = right - left, out = []; let cur = '', curBig = false, prev = null;
+  const push = () => { if (cur.trim()) out.push({ t: cur.trim(), big: curBig }); cur = ''; curBig = false; };
   for (const l of all) {
-    const head = PDF_HEAD.test(l.t) && l.t.length < 100, centered = l.r - l.x < full * .7 && Math.abs((l.x + l.r) / 2 - (left + right) / 2) < full * .08 && l.x > left + l.h;
-    let brk = !prev || head || centered;
+    const big = l.h >= bodyH * 1.25 && l.t.length <= 140;
+    const head = big || (PDF_HEAD.test(l.t) && l.t.length < 100), centered = !l.capR && l.r - l.x < full * .7 && Math.abs((l.x + l.r) / 2 - (left + right) / 2) < full * .08 && l.x > left + l.h;
+    let brk = !prev || l.capStart || (head && !(prev.big && big && l.gap != null && l.gap < l.h * 2.2)) || (prev.big && !big) || centered;
     if (!brk) {
+      const base = l.capR || left;
       if (l.gap != null && l.gap > gap * 1.55) brk = true;                                      // khoảng trống giữa hai đoạn
-      else if (l.x > left + l.h * .8) brk = true;                                                 // dòng thụt lề
+      else if (l.x > base + l.h * .8) brk = true;                                                 // dòng thụt lề
       else if (/[.!?…:”"»)\]]$/.test(prev.t) && prev.r < left + full * .82) brk = true;           // dòng trước kết câu và ngắn
-      else if (prev.head || prev.centered) brk = true;
+      else if ((prev.head && !prev.big) || prev.centered) brk = true;
     }
     if (brk) push();
     if (cur && /[\p{L}]-$/u.test(cur) && /^\p{Ll}/u.test(l.t)) cur = cur.slice(0, -1) + l.t; else cur += (cur ? ' ' : '') + l.t;
-    if (head || centered) push();
-    prev = { ...l, head, centered };
+    if (big) curBig = true;
+    if ((head && !big) || centered) push();
+    prev = { ...l, head, centered, big };
   }
   push();
-  return paras;
+  return rich ? out : out.map(o => o.t);
 }
 // gói ảnh thành file zip (không nén, như CBZ)
 function zipStore(entries) {          // [{name, data:Uint8Array}]
@@ -4487,7 +4500,17 @@ async function parsePdf(f, key, step) {
       const pages = sample.slice();
       for (let i = probe + 1; i <= n; i++) { pages.push(await pdfLines(await doc.getPage(i))); if (i % 4 === 0) { step(i / n, `Đang đọc chữ trang ${i}/${n}`); await sleep(0); } }
       let chapters; const L = pdfLayout(pages);
-      if (outline) {
+      const blocks = pdfParas(pages, L, true), bigs = blocks.filter(b => b.big).length;
+      if (bigs >= 3 && (!outline || bigs >= outline.length)) {
+        chapters = []; let curC = null;
+        for (const b of blocks) {
+          if (b.big) { if (curC && !curC.body.length) { curC.title += (/[:–-]$/.test(curC.title) ? ' ' : ' · ') + b.t; continue; } chapters.push(curC = { title: b.t.replace(/[.\s]+$/, ''), body: [] }); }
+          else if (curC) curC.body.push(b.t);
+          else (chapters[0]?.pre ? chapters[0] : chapters.unshift(curC = { title: 'Mở đầu', body: [], pre: true }) && curC).body.push(b.t);
+        }
+        // "phần một: em" + tên bài đầu tiên bị gộp ở trên → tách phần tên phần ra cho gọn: chỉ giữ tên bài
+        chapters = chapters.map(c => ({ title: c.title.length > 90 ? c.title.split(' · ').pop() : c.title, body: c.body.join('\n') })).filter(c => c.body.trim());
+      } else if (outline) {
         chapters = outline.map((o, j) => {
           const ps = pdfParas(pages.slice(o.page, j + 1 < outline.length ? outline[j + 1].page : n), L);
           if (ps.length && foldVi(ps[0]).replace(/\W+/g, '') === foldVi(o.title).replace(/\W+/g, '')) ps.shift();
@@ -4495,7 +4518,7 @@ async function parsePdf(f, key, step) {
         });
         const pre = pdfParas(pages.slice(0, outline[0].page), L); if (pre.join('').length > 200) chapters.unshift({ title: 'Mở đầu', body: pre.join('\n') });
         chapters = chapters.filter(c => c.body.trim());
-      } else chapters = splitText(pdfParas(pages, L).join('\n'), f.name).chapters;
+      } else chapters = splitText(blocks.map(b => b.t).join('\n'), f.name).chapters;
       if (!chapters.length) throw new Error('không tách được chữ trong file PDF này');
       // ảnh bìa: trang đầu thu nhỏ
       let cover = null; try { cover = await renderPdfPage(await doc.getPage(1), 600); } catch {}
