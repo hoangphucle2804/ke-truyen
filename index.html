@@ -2021,6 +2021,15 @@ html.c314-on,html.c314-on *{cursor:none!important}
 .nt input{min-width:0;flex:1;max-width:9em}
 /* máy tính bảng / màn rộng: thẻ "Tuần này" dàn hết bề ngang thay vì bó ở 560px */
 @media (min-width:700px){.stats{max-width:none}.stats .wk{height:90px}}
+/* ===== Phản hồi tức thì ===== */
+html{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.is-press{scale:var(--press,.96)!important;filter:brightness(.93);transition:scale .06s ease-out,filter .06s ease-out!important}
+.xc.is-press,.sheet .is-press,.rs-panel .is-press,.sp-it.is-press,.rp-it.is-press,.gp-it.is-press,.tm-mi.is-press,.sk-ms.is-press{--press:.975}
+.sw.is-press{--press:.9}
+html.kt-swipe,html.kt-swipe body{overflow:hidden}
+html.kt-swipe #reader>*,html.kt-swipe #xd{box-shadow:-24px 0 40px -24px rgba(0,0,0,.5)}
+html:not([data-fx=full]).kt-booted .greet>*{animation:none}
+.fx-note{margin:-2px 2px 0}
 </style>
 </head>
 <body>
@@ -2660,7 +2669,7 @@ function openStory(x, card) {
   })).then(() => {
     requestAnimationFrame(() => xd.classList.add('is-in'));
     $('#xd-x').focus({ preventScroll: true });
-    setTimeout(() => { XD.busy = false; XD.cool = Date.now() + 300; }, 600);
+    setTimeout(() => { XD.busy = false; XD.cool = Date.now() + fxMs(300); }, fxMs(600));
   });
 }
 function storyStep(d) {
@@ -2674,7 +2683,7 @@ function storyStep(d) {
     XD.cur.x = nx; xdCancel(); xd.classList.add('cu'); xd.classList.remove('is-in'); fillDetail(nx);
   })).then(() => {
     requestAnimationFrame(() => xd.classList.add('is-in'));
-    setTimeout(() => { XD.busy = false; XD.cool = Date.now() + 400; }, 600);
+    setTimeout(() => { XD.busy = false; XD.cool = Date.now() + fxMs(400); }, fxMs(600));
   });
 }
 function edgeBump(d) {
@@ -2691,8 +2700,8 @@ function curtain(color, label, sub, swap) {
     c.classList.remove('is-lift'); void c.offsetWidth; c.classList.add('is-cover');
     setTimeout(() => {
       try { swap(); } catch (e) { console.error(e); }
-      setTimeout(() => { c.classList.remove('is-cover'); c.classList.add('is-lift'); res(); setTimeout(() => c.classList.remove('is-lift'), 600); }, 380);
-    }, 520);
+      setTimeout(() => { c.classList.remove('is-cover'); c.classList.add('is-lift'); res(); setTimeout(() => c.classList.remove('is-lift'), fxMs(600)); }, fxMs(380));
+    }, fxMs(520));
   });
 }
 // Màu rèm của từng truyện: màu chủ đạo của ảnh bìa, đưa về độ đậm vừa để chữ trắng đọc rõ
@@ -2836,6 +2845,9 @@ function openUi() {
     body.append(
       el('div', { class: 'ui-row' }, el('div', {}, el('b', { text: 'Sao lưu & khôi phục' }), el('small', { text: `Lần gần nhất: ${fmtAgo(lsGet('kt-bk-at', 0))}` })), el('button', { type: 'button', class: 'btn primary', text: 'Mở', onclick: openBackup })),
       el('div', { class: 'ui-row' }, el('div', {}, el('b', { text: 'Truyện riêng tư' }), el('small', { text: lockCfg() ? (LOCK.open ? 'Đang hiện · bấm để khoá lại' : 'Đang giấu · cần mã để xem') : 'Ẩn truyện khỏi kệ bằng mã 6 số' })), el('button', { type: 'button', class: 'btn ghost', text: lockCfg() ? 'Mở' : 'Đặt mã', onclick: () => { closeSheet(); openPrivacy(); } })),
+      el('div', { class: 'ui-h', text: 'Hiệu ứng' }),
+      seg([['full', 'Đầy đủ'], ['lite', 'Gọn'], ['off', 'Tắt']], FX, v => { lsSet('kt-fx', v); toast('Đang áp dụng…'); setTimeout(() => location.reload(), 300); }, 'Hiệu ứng'),
+      el('p', { class: 'ui-note fx-note', text: 'Gọn: vẫn đủ hiệu ứng nhưng nhanh gấp đôi, bấm là mở ngay. Tắt: chuyển cảnh tức thì, hợp máy yếu hoặc ai thích gọn.' }),
       el('div', { class: 'ui-h', text: 'Cảnh nền' }), themePanels(),
       el('div', { class: 'ui-h', text: 'Sáng / tối' }),
       seg([['auto', 'Theo máy'], ['light', 'Sáng'], ['dark', 'Tối']], UI.mode, v => { UI.mode = v; saveUI(); applyUI(); $('#scene').classList.toggle('night', libDark()); syncThemeColor(); }, 'Sáng / tối'),
@@ -3105,7 +3117,7 @@ function glassGo(label, b) {
   btn.addEventListener('click', () => {
     if (w.dataset.state === 'load') return;
     w.dataset.state = 'load'; btn.setAttribute('aria-busy', 'true');
-    setTimeout(async () => { closeDetail(true); await openBook(b.id); }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 700);
+    setTimeout(async () => { closeDetail(true); await openBook(b.id); }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : FX === 'full' ? 700 : 140);
   });
   return w;
 }
@@ -4160,7 +4172,7 @@ async function openBook(id) {
   R.book = book; R.gen++; R.zips.clear(); R.pos = null; lastRP = null; R.hist = []; act();
   Object.assign(S, clone(GL), book.look ? clone(book.look) : {});
   document.body.classList.remove('in-lib'); document.body.classList.add('reading'); document.documentElement.classList.add('rd');
-  $('#lib-view').hidden = true; reader.hidden = false;
+  $('#lib-view').hidden = true; reader.hidden = false; fxPush([...reader.children].filter(c => c.id !== 'rsheet' && !c.hidden));
   applySettings(); setModeUI(effMode());
   setChrome(true);
   const p = await Store.progress(id);
@@ -4580,6 +4592,101 @@ document.addEventListener('keydown', e => {
   else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); turn(-1); }
 });
 function followLink(a) { const t = a.dataset.target; const idx = R.book.chapters.findIndex(c => c.entries?.includes(t)); if (idx >= 0) jumpTo(idx, 0); }
+
+/* ================= Phản hồi tức thì: Hiệu ứng Đầy đủ / Gọn / Tắt =================
+   Gọn (mặc định): giữ nguyên các hiệu ứng nhưng chạy nhanh gần gấp đôi, không bắt chờ hiệu ứng xong mới làm việc.
+   Tắt: chuyển cảnh tức thì (coi như máy đang bật "giảm chuyển động").
+   Mọi chế độ: nút lún ngay khi ngón tay chạm, rung nhẹ trên iPhone khi bật/tắt, chọn mục; vuốt từ mép trái để quay lại. */
+const FX = (() => { try { const v = localStorage.getItem('kt-fx'); return /^"?(full|lite|off)"?$/.test(v || '') ? v.replace(/"/g, '') : 'lite'; } catch { return 'lite'; } })();
+document.documentElement.dataset.fx = FX;
+const fxMs = ms => FX === 'full' ? ms : FX === 'lite' ? Math.round(ms * .45) : 0;
+if (FX === 'off') { const mm = window.matchMedia.bind(window); window.matchMedia = q => /prefers-reduced-motion:\s*reduce/.test(q) ? mm('all') : mm(q); }
+if (FX !== 'full') {
+  const RATE = FX === 'lite' ? 1.8 : 14;
+  const fast = a => { try { if (a.__kt || a.playbackRate !== 1) return; const t = a.effect && a.effect.getTiming(); if (!t || t.iterations === Infinity) return; a.__kt = 1; a.playbackRate = RATE; } catch {} };
+  const sweep = () => { for (const a of document.getAnimations()) fast(a); };
+  const an = Element.prototype.animate;
+  Element.prototype.animate = function (k, o) { const a = an.call(this, k, o); fast(a); return a; };
+  document.addEventListener('transitionrun', e => e.target.getAnimations && e.target.getAnimations().forEach(fast), true);
+  document.addEventListener('animationstart', e => e.target.getAnimations && e.target.getAnimations().forEach(fast), true);
+  // hiệu ứng CSS có độ trễ (xuất hiện lần lượt) chỉ bắt được bằng cách quét sau mỗi thao tác
+  const kick = () => { sweep(); requestAnimationFrame(() => { sweep(); requestAnimationFrame(sweep); }); setTimeout(sweep, 60); setTimeout(sweep, 160); };
+  document.addEventListener('click', kick, true); document.addEventListener('keydown', kick, true);
+  new MutationObserver(() => { if (!kick.t) kick.t = requestAnimationFrame(() => { kick.t = 0; sweep(); }); }).observe(document.body, { childList: true, subtree: true });
+}
+setTimeout(() => document.documentElement.classList.add('kt-booted'), 1600);
+
+// Nút lún ngay khi chạm (không đợi nhấc tay), nảy lại khi thả
+(() => {
+  const SEL = 'button,.xc,[role=button],[role=tab],[role=menuitem],[role=menuitemradio],[role=option],.mt,.sw,a[href],summary';
+  let el0 = null, x0 = 0, y0 = 0;
+  const off = anim => { const t = el0; if (!t) return; el0 = null; t.classList.remove('is-press'); if (anim && FX !== 'off') t.animate?.([{ scale: getComputedStyle(t).getPropertyValue('--press').trim() || '.96' }, { scale: '1' }], { duration: 260, easing: 'cubic-bezier(.3,1.7,.5,1)' }); };
+  addEventListener('pointerdown', e => {
+    if (e.button > 0) return; const t = e.target.closest && e.target.closest(SEL);
+    if (!t || t.disabled || t.closest('[data-nopress],.u362-col,#flow,#pager')) return;
+    off(false); el0 = t; x0 = e.clientX; y0 = e.clientY; t.classList.add('is-press');
+  }, { capture: true, passive: true });
+  addEventListener('pointermove', e => { if (el0 && Math.hypot(e.clientX - x0, e.clientY - y0) > 10) off(false); }, { capture: true, passive: true });
+  addEventListener('pointerup', () => off(true), { capture: true, passive: true });
+  addEventListener('pointercancel', () => off(false), { capture: true, passive: true });
+  addEventListener('scroll', () => off(false), { capture: true, passive: true });
+})();
+
+// Rung nhẹ: iPhone (iOS 18+) dùng công tắc ẩn của Safari; Android dùng rung ngắn
+const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+let hapLab = null;
+function haptic() {
+  try {
+    if (!IOS) { navigator.vibrate?.(8); return; }
+    if (!hapLab) { hapLab = document.createElement('label'); hapLab.setAttribute('aria-hidden', 'true'); hapLab.style.cssText = 'position:fixed;left:-300px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none';
+      const i = document.createElement('input'); i.type = 'checkbox'; i.setAttribute('switch', ''); i.tabIndex = -1; hapLab.append(i); document.body.append(hapLab); }
+    hapLab.click();
+  } catch {}
+}
+addEventListener('click', e => { if (hapLab && hapLab.contains(e.target)) e.stopImmediatePropagation(); }, true);   // cú bấm giả để rung: không cho lọt tới chỗ khác
+document.addEventListener('click', e => {
+  if (hapLab && hapLab.contains(e.target)) return;
+  const t = e.target.closest && e.target.closest('.sw,[role=switch],[role=tab],[role=menuitem],[role=menuitemradio],.seg button,.useg button,.tm-seg button,.f292-f,.mt,.tm-chips button,.gp-go,.rp-it');
+  if (t) haptic();
+});
+
+// Màn đọc / trang giới thiệu: trượt vào như app; vuốt từ mép trái để quay lại
+function fxPush(els, dir = 1) {
+  if (FX === 'off' || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  els.filter(Boolean).forEach(e => e.animate([{ translate: `${dir * 36}px 0`, opacity: .35 }, { translate: '0 0', opacity: 1 }], { duration: 300, easing: 'cubic-bezier(.2,.9,.25,1)' }));
+}
+(() => {
+  let s = null;
+  const sheetOpen = () => !$('#sheet').hidden || !rs.hidden || !$('#r-menu').hidden || !$('#overlay').hidden || document.querySelector('.sp-ov.on');
+  const targets = mode => mode === 'r' ? [...reader.children].filter(c => c.id !== 'rsheet') : [$('#xd')];
+  document.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) return; const t = e.touches[0];
+    if (t.clientX > (R.mode === 'page' ? 16 : 24)) return;
+    const mode = !reader.hidden && R.book ? 'r' : !$('#xd').hidden ? 'x' : null;
+    if (!mode || sheetOpen()) return;
+    s = { mode, x: t.clientX, y: t.clientY, t: performance.now(), dx: 0, on: false, els: targets(mode) };
+  }, { passive: true, capture: true });
+  document.addEventListener('touchmove', e => {
+    if (!s) return; const t = e.touches[0], dx = t.clientX - s.x, dy = t.clientY - s.y;
+    if (!s.on) { if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { s = null; return; } if (dx < 10) return; s.on = true; document.documentElement.classList.add('kt-swipe'); }
+    e.preventDefault(); e.stopPropagation();
+    s.dx = Math.max(0, dx); s.v = s.dx / Math.max(1, performance.now() - s.t);
+    s.els.forEach(el => { el.style.translate = `${s.dx}px 0`; });
+  }, { passive: false, capture: true });
+  const end = () => {
+    if (!s) return; const S = s; s = null; document.documentElement.classList.remove('kt-swipe');
+    if (!S.on) return;
+    const go = S.dx > innerWidth * .32 || (S.v > .55 && S.dx > 40), W = innerWidth;
+    const anims = S.els.map(el => el.animate([{ translate: `${S.dx}px 0` }, { translate: go ? `${W}px 0` : '0 0' }], { duration: go ? 200 : 260, easing: go ? 'cubic-bezier(.3,.6,.4,1)' : 'cubic-bezier(.3,1.4,.5,1)' }));
+    S.els.forEach(el => { el.style.translate = go ? `${W}px 0` : ''; });
+    Promise.all(anims.map(a => a.finished.catch(() => {}))).then(async () => {
+      if (!go) return;
+      if (S.mode === 'r') { await closeReader(); } else { closeDetail(true); }
+      S.els.forEach(el => { el.style.translate = ''; });
+    });
+  };
+  document.addEventListener('touchend', end, { capture: true }); document.addEventListener('touchcancel', end, { capture: true });
+})();
 
 /* ================= Hẹn giờ đọc =================
    Đặt "đọc trong bao lâu" hoặc "dừng lúc mấy giờ". Khi đang hẹn: một nút tách đôi nhỏ nổi trong màn đọc
@@ -6983,7 +7090,7 @@ async function closeReader() {
   reader.hidden = true; $('#lib-view').hidden = false;
   document.body.classList.remove('reading'); document.documentElement.classList.remove('rd'); document.body.classList.add('in-lib');
   $('meta[name="theme-color"]').setAttribute('content', getComputedStyle(document.body).backgroundColor);
-  window.scrollTo(0, 0); await renderLibrary();
+  window.scrollTo(0, 0); await renderLibrary(); fxPush([$('#lib-view')], -1);
 }
 function toChapStart() {
   if (R.mode === 'page') { if (P.cur) { P.tok++; P.anim = false; P.page = 0; setTrack(0, false); updateBars(); scheduleSave(); } }
