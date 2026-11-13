@@ -2030,6 +2030,11 @@ html.kt-swipe,html.kt-swipe body{overflow:hidden}
 html.kt-swipe #reader>*,html.kt-swipe #xd{box-shadow:-24px 0 40px -24px rgba(0,0,0,.5)}
 html:not([data-fx=full]).kt-booted .greet>*{animation:none}
 .fx-note{margin:-2px 2px 0}
+/* ===== Hai trang như sách mở (màn hình rộng, chế độ lật trang) ===== */
+#reader.two .pg-view::after{content:"";position:absolute;z-index:3;top:-4px;bottom:-4px;left:50%;width:56px;margin-left:-28px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,currentColor 4%,transparent) 38%,color-mix(in srgb,currentColor 11%,transparent) 50%,color-mix(in srgb,currentColor 4%,transparent) 62%,transparent)}
+#reader.two .pg-view::before{content:"";position:absolute;z-index:3;top:0;bottom:0;left:50%;width:1px;pointer-events:none;background:color-mix(in srgb,currentColor 9%,transparent)}
+.rs-item .grow .rs-sub{display:block;margin-top:2px;font-size:12px;font-weight:500;color:var(--rs-sub,var(--muted));line-height:1.35}
 </style>
 </head>
 <body>
@@ -4289,12 +4294,15 @@ function syncEnd() {
 function pgGeom() {
   const r = pgView.getBoundingClientRect();
   P.vw = r.width; P.vh = r.height;
-  P.mg = Math.round(clamp(themeCfg().mg, 4, P.vw * 0.18));
+  P.two = lsGet('kt-two', true) !== false && P.vw >= 900 && P.vw >= P.vh * 1.15 && !(R.book && R.book.kind === 'comic');
+  const cwEm = parseFloat((COLW[S.colw] || COLW.medium)[0]), maxW = cwEm ? cwEm * S.fs : Infinity;   // một trang trên màn rộng: giữ dòng chữ không quá dài (theo "Độ rộng cột chữ")
+  P.mg = P.two ? Math.round(clamp(P.vw * 0.045, 28, 64)) : Math.round(Math.max(clamp(themeCfg().mg, 4, P.vw * 0.18), (P.vw - maxW) / 2));
+  reader.classList.toggle('two', P.two);
   pgTrack.style.setProperty('--pgh', Math.floor(P.vh * 0.92) + 'px'); pgTrack.style.setProperty('--pgfull', P.vh + 'px');
 }
 function measure(s) {
-  const w = P.vw - 2 * P.mg, st = s.el.style;
-  st.width = w + 'px'; st.height = P.vh + 'px'; st.columnWidth = w + 'px'; st.columnGap = 2 * P.mg + 'px';
+  const w = P.vw - 2 * P.mg, st = s.el.style, cw = P.two ? (w - 2 * P.mg) / 2 - 0.5 : w;
+  st.width = w + 'px'; st.height = P.vh + 'px'; st.columnWidth = cw + 'px'; st.columnGap = 2 * P.mg + 'px';
   s.pages = Math.max(1, Math.round((s.el.scrollWidth + 2 * P.mg) / P.vw));
 }
 function place() {
@@ -7580,7 +7588,7 @@ function lookComic() {
       el('div', { class: 'rs-item' }, play, el('span', { class: 'grow', text: 'Tự cuộn' }), el('div', { style: 'width:44%' }, spd)),
       el('div', { class: 'rs-item' }, el('span', { class: 'grow', text: 'Khoảng cách trang' }), seg([[0, 'Liền'], [8, 'Nhỏ'], [24, 'Vừa']], S.comic.gap, v => { S.comic.gap = v; })),
       el('div', { class: 'rs-item' }, el('span', { class: 'grow', text: 'Màu nền' }), seg([['#000000', 'Đen'], ['#ffffff', 'Trắng'], ['#2a2a2c', 'Xám']], S.comic.bg, v => { S.comic.bg = v; })),
-      colRow(), wakeRow(), bookRow()),
+      colRow(), twoRow(), wakeRow(), bookRow()),
     el('p', { class: 'rs-note', text: 'Chạm hai lần vào tranh để phóng to, chạm hai lần nữa để thu lại. Khi đang tự cuộn, chạm vào tranh để dừng.' })));
 }
 const COLW = { narrow: ['30em', '620px'], medium: ['38em', '820px'], wide: ['48em', '1100px'], full: ['none', 'none'] };   // [cột chữ, khung truyện tranh]
@@ -7589,6 +7597,10 @@ function colRow() {
   const seg = el('div', { class: 'seg2' }, ...[['narrow', 'Hẹp'], ['medium', 'Vừa'], ['wide', 'Rộng'], ['full', 'Hết cỡ']].map(([v, l]) =>
     el('button', { type: 'button', class: v === S.colw ? 'on' : '', text: l, onclick: () => { keepPlace(() => { S.colw = v; applySettings(); }); lookAny(); } })));
   return el('div', { class: 'rs-item' }, el('span', { class: 'grow', text: R.book && R.book.kind === 'comic' ? 'Độ rộng tranh' : 'Độ rộng cột chữ' }), seg);
+}
+function twoRow() {
+  const s = sw(lsGet('kt-two', true) !== false, on => { lsSet('kt-two', on); relayout(); });
+  return el('div', { class: 'rs-item' }, el('span', { class: 'grow' }, 'Hai trang như sách mở', el('small', { class: 'rs-sub', text: 'Khi lật trang trên màn hình rộng nằm ngang (iPad xoay ngang, laptop)' })), s.el);
 }
 function wakeRow() {
   const s = sw(S.wake, on => { S.wake = on; saveSettings(); wake(on); });
@@ -7722,7 +7734,7 @@ function lookMain() {
     el('div', { class: 'rs-group' },
       el('div', { class: 'rs-item' }, el('span', { class: 'grow', text: 'Tự chuyển tối theo giờ' }), night.el),
       el('div', { class: 'rs-item' }, el('span', { class: 'grow', text: 'Khung giờ tối' }), times),
-      colRow(), wakeRow(), bookRow()),
+      colRow(), twoRow(), wakeRow(), bookRow()),
     el('button', { type: 'button', class: 'rs-wide', onclick: () => lookCustom(true) }, el('span', { html: ICON.gear }), el('span', { text: 'Tuỳ chỉnh' }))));
 }
 function sampleText() {
