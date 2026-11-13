@@ -1,10 +1,10 @@
 // Kệ Truyện – service worker.
-// Trang chính (index.html): luôn lấy bản mới nhất từ mạng (bỏ qua mọi lớp lưu tạm); mất mạng hoặc mạng quá chậm thì dùng bản đã lưu.
+// Trang chính (index.html): mở NGAY bằng bản đã lưu (không chờ mạng), đồng thời tải bản mới ở nền;
+// có bản mới thì báo cho app, app tự làm mới khi bạn đang ở kệ (đang đọc thì chờ về kệ).
 // Ảnh/icon/manifest: dùng bản đã lưu cho nhanh, đồng thời cập nhật ngầm.
-const CACHE='ke-truyen-v52';
+const CACHE='ke-truyen-v53';
 const PAGE='./index.html';
 const SHELL=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
-const WAIT_NET=3500; // quá thời gian này mà mạng chưa trả lời thì mở bản đã lưu
 
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL.map(u=>new Request(u,{cache:'reload'})))).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
@@ -12,7 +12,7 @@ self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.
 self.addEventListener('fetch',e=>{
   const req=e.request; if(req.method!=='GET'||new URL(req.url).origin!==location.origin) return;
   const isPage=req.mode==='navigate'||/\/(index\.html)?$/.test(new URL(req.url).pathname);
-  e.respondWith(isPage?pageFirst():assetFirst(req));
+  e.respondWith(isPage?pageFirst(e):assetFirst(req));
 });
 // App đang mở hỏi "có bản mới chưa?"
 self.addEventListener('message',e=>{ if(e.data==='check-update') e.waitUntil(checkUpdate()); });
@@ -32,16 +32,13 @@ async function refresh(c){
 async function checkUpdate(){
   try{ const c=await caches.open(CACHE); if((await refresh(c)).changed) await notify(); }catch{}
 }
-// Trang chính: mạng trước; lỗi/chậm thì dùng bản cũ, và báo cho app khi bản mới về tới.
-async function pageFirst(){
+// Trang chính: bản đã lưu trước (mở tức thì), kiểm tra bản mới ở nền. Chưa có bản lưu (lần đầu) thì lấy từ mạng.
+async function pageFirst(e){
   const c=await caches.open(CACHE);
-  let late=false;
-  const net=refresh(c).then(x=>{ if(late&&x.changed) notify(); return x.res; }).catch(()=>null);
-  const r=await Promise.race([net,new Promise(res=>setTimeout(()=>res(null),WAIT_NET))]);
-  if(r) return r;
-  late=true;
   const old=await c.match(PAGE);
-  return old || (await net) || new Response('Offline',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}});
+  if(old){ e.waitUntil(checkUpdate()); return old; }
+  try{ const {res}=await refresh(c); if(res) return res; }catch{}
+  return (await c.match('./')) || new Response('Offline',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}});
 }
 // Tài nguyên khác: bản đã lưu trước, cập nhật ngầm.
 async function assetFirst(req){
