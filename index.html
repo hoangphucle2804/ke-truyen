@@ -2293,6 +2293,7 @@ async function importFiles(fileList, target, opts = {}) {
   const book = target || { id: uid(), title: '', created: Date.now(), lastRead: Date.now(), chapters: [], files: [], hasCover: false };
   let n = book.files.reduce((m, f) => Math.max(m, f.n + 1), 0);
   const errors = []; let firstMeta = null, coverSource = null, added = 0;
+  const dup = isNew ? null : dupGuard(book.chapters);
   showOverlay(opts.label || (isNew ? 'Đang thêm truyện…' : 'Đang thêm chương…'));
   for (let idx = 0; idx < files.length; idx++) {
     const f = files[idx];
@@ -2303,6 +2304,7 @@ async function importFiles(fileList, target, opts = {}) {
       const key = `${book.id}/f${n}`;
       if (ext === 'pdf') {
         meta = await parsePdf(f, key, (fr, t) => updateOverlay((idx + fr * .98) / files.length, `${idx + 1}/${files.length} · ${t}`));
+        if (dup && meta.pdf === 'text') { dup.filter(meta); if (!meta.chapters.length) continue; }
         if (meta.pdf === 'text') for (let j = 0; j < meta.chapters.length; j++) {
           const c = meta.chapters[j]; c.type = 'text'; c.textKey = `${key}_t${j}`;
           await Store.putFile(c.textKey, new Blob([c.body], { type: 'text/plain' })); delete c.body;
@@ -2311,6 +2313,7 @@ async function importFiles(fileList, target, opts = {}) {
         delete meta.cover;
       } else if (ext === 'txt') {
         meta = splitText(decodeText(await f.arrayBuffer()), f.name);
+        if (dup) { dup.filter(meta); if (!meta.chapters.length) continue; }
         for (let j = 0; j < meta.chapters.length; j++) {
           const c = meta.chapters[j]; c.type = 'text'; c.textKey = `${key}_t${j}`;
           await Store.putFile(c.textKey, new Blob([c.body], { type: 'text/plain' })); delete c.body;
@@ -2318,6 +2321,7 @@ async function importFiles(fileList, target, opts = {}) {
       } else {
         const zip = await openZip(f);
         meta = ext === 'epub' ? await parseEpub(zip, f.name) : await parseCbz(zip, f.name);
+        if (dup) { dup.filter(meta); if (!meta.chapters.length) continue; }
         await Store.putFile(key, new Blob([f], { type: 'application/zip' }));
         if (!coverSource && meta.coverPath && zip.has(meta.coverPath)) coverSource = () => zip.blob(meta.coverPath);
       }
@@ -2331,7 +2335,7 @@ async function importFiles(fileList, target, opts = {}) {
   }
   updateOverlay(1, 'Đang lưu…');
   if (opts.meta && added) Object.assign(book, opts.meta);
-  if (!added) { hideOverlay(); if (!opts.batch) showErrors(errors, 'Không thêm được file nào'); return { added, errors }; }
+  if (!added) { hideOverlay(); if (dup && dup.skipped.length && !errors.length) { if (!opts.batch) toast(`Không có chương mới: cả ${dup.skipped.length} chương đều đã có trong truyện.`); return { added, errors, dupSkipped: dup.skipped.length }; } if (!opts.batch) showErrors(errors, 'Không thêm được file nào'); return { added, errors }; }
   book.chapters.sort((a, b) => ncmp(a.src, b.src) || a.sub - b.sub);
   const types = new Set(book.chapters.map(c => c.type));
   book.kind = types.size === 1 && types.has('images') ? 'comic' : types.has('images') ? 'mixed' : 'novel';
@@ -2340,9 +2344,10 @@ async function importFiles(fileList, target, opts = {}) {
   await Store.putBook(book);
   await applyPendingFor(book);
   hideOverlay();
-  if (opts.batch) return { added, errors };
+  if (opts.batch) return { added, errors, dupSkipped: dup ? dup.skipped.length : 0 };
   await renderLibrary();
-  const msg = `${isNew ? 'Đã thêm' : 'Đã bổ sung'} ${added} file${skipped ? ` (bỏ qua ${skipped} file không hỗ trợ)` : ''}.`;
+  const msg = isNew ? `Đã thêm ${added} file${skipped ? ` (bỏ qua ${skipped} file không hỗ trợ)` : ''}.`
+    : `Đã bổ sung ${dup.kept} chương mới` + (dup.skipped.length ? `, bỏ qua ${dup.skipped.length} chương đã có (${dup.range()})` : '') + (skipped ? `, bỏ qua ${skipped} file không hỗ trợ` : '') + '.';
   if (errors.length) showErrors(errors, msg);
   else if (isNew && files.length > 1 && book.title === 'Truyện mới') renameSheet(book, 'Đặt tên cho bộ truyện');
   else toast(msg);
@@ -4412,6 +4417,28 @@ document.addEventListener('keydown', e => {
   else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); turn(-1); }
 });
 function followLink(a) { const t = a.dataset.target; const idx = R.book.chapters.findIndex(c => c.entries?.includes(t)); if (idx >= 0) jumpTo(idx, 0); }
+
+/* Chống trùng khi thêm chương: so theo số chương (+ số quyển nếu có). Nếu chính truyện đang có nhiều số chương lặp
+   (mỗi quyển đánh số lại từ 1 mà tên chương không ghi quyển) thì chỉ coi là trùng khi tên chương giống hệt. */
+function dupGuard(existing) {
+  const nm = t => foldVi(String(t || '')).replace(/[^a-z0-9]+/g, ' ').trim();
+  const numKey = c => { const n = chNum(c.title); return n == null ? null : chVol(c.title) + '|' + n; };
+  const cnt = new Map(); for (const c of existing) { const k = numKey(c); if (k) cnt.set(k, (cnt.get(k) || 0) + 1); }
+  const byNum = [...cnt.values()].filter(v => v > 1).length <= 3;
+  const have = new Set(), names = new Set();
+  for (const c of existing) { const k = numKey(c); if (k && byNum) have.add(k); const t = nm(c.title); if (t.length >= 6) names.add(t); }
+  const G = { skipped: [], kept: 0,
+    filter(meta) {
+      meta.chapters = meta.chapters.filter(c => {
+        const k = numKey(c), t = nm(c.title);
+        const isDup = (k && byNum && have.has(k)) || (t.length >= 6 && names.has(t));
+        if (isDup) { G.skipped.push(c.title || ''); return false; }
+        if (k && byNum) have.add(k); if (t.length >= 6) names.add(t); G.kept++; return true;
+      });
+    },
+    range() { const ns = G.skipped.map(chNum).filter(x => x != null); if (ns.length === G.skipped.length && ns.length) { const a = Math.min(...ns), b = Math.max(...ns); return a === b ? `chương ${a}` : b - a + 1 === ns.length ? `chương ${a}–${b}` : `${ns.length} chương từ ${a} đến ${b}`; } return G.skipped.slice(0, 2).join(', ') + (G.skipped.length > 2 ? '…' : ''); } };
+  return G;
+}
 
 /* ================= Thông báo "Đã giữ lửa hôm nay" =================
    Khi thời gian đọc trong ngày vừa đủ mức để giữ chuỗi, một dải thông báo rơi xuống từ trên màn hình đọc:
