@@ -2035,6 +2035,14 @@ html:not([data-fx=full]).kt-booted .greet>*{animation:none}
   background:linear-gradient(90deg,transparent,color-mix(in srgb,currentColor 4%,transparent) 38%,color-mix(in srgb,currentColor 11%,transparent) 50%,color-mix(in srgb,currentColor 4%,transparent) 62%,transparent)}
 #reader.two .pg-view::before{content:"";position:absolute;z-index:3;top:0;bottom:0;left:50%;width:1px;pointer-events:none;background:color-mix(in srgb,currentColor 9%,transparent)}
 .rs-item .grow .rs-sub{display:block;margin-top:2px;font-size:12px;font-weight:500;color:var(--rs-sub,var(--muted));line-height:1.35}
+/* ===== Lật tờ giấy quanh gáy (hai trang) ===== */
+.curl.flip{perspective:2400px;perspective-origin:50% 50%}
+.fl-leaf{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
+.fl-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform-style:preserve-3d}
+.fl-face>.curl-box{box-shadow:0 0 24px rgba(0,0,0,.18)}
+.fl-shade{position:absolute;inset:0;pointer-events:none}
+.fl-cast{position:absolute;top:0;bottom:0;pointer-events:none;z-index:1}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.28s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
 </style>
 </head>
 <body>
@@ -4178,7 +4186,7 @@ async function openBook(id) {
   Object.assign(S, clone(GL), book.look ? clone(book.look) : {});
   document.body.classList.remove('in-lib'); document.body.classList.add('reading'); document.documentElement.classList.add('rd');
   $('#lib-view').hidden = true; reader.hidden = false; fxPush([...reader.children].filter(c => c.id !== 'rsheet' && !c.hidden));
-  applySettings(); setModeUI(effMode());
+  S.mode = modeFor(isWide()); applySettings(); setModeUI(effMode());
   setChrome(true);
   const p = await Store.progress(id);
   if (splitComicChapters(book, p)) {
@@ -4193,11 +4201,8 @@ async function openBook(id) {
 }
 function setModeUI(m) { R.mode = m; const pg = m === 'page'; reader.classList.toggle('paged-ui', pg); if (pg) reader.classList.remove('solid'); flow.hidden = pg; pager.hidden = !pg; document.documentElement.classList.toggle('paged', pg); }
 function setReadMode(m) {
-  const p = readPos(); S.mode = m; applySettings();
-  const em = effMode();
-  if (!R.book || em === R.mode) return;
-  R.gen++; clearSections(); clearPager(); setModeUI(em); window.scrollTo(0, 0);
-  jumpTo(p ? p.i : 0, p ? p.frac : 0);
+  if (isWide()) S.modeWide = m; else S.modeNarrow = m;
+  swapMode(m); saveSettings();
 }
 function jumpTo(i, frac = 0) {
   if (!R.book) return;
@@ -4417,6 +4422,7 @@ function pageBox(pos) {
     el('div', { class: 'pg-foot', text: footLabel(pos) }));
 }
 function curlStart(dir, gy) {
+  if (P.two) return flipStart(dir, gy);
   const pr = pager.getBoundingClientRect(), W = pr.width, H = pr.height, from = P.page, to = from + dir;
   const page = pageBox(dir > 0 ? from : to), flap = pageBox(dir > 0 ? from : to);
   const shadow = el('div', { class: 'curl-shadow' }), shade = el('div', { class: 'curl-shade' });
@@ -4439,6 +4445,7 @@ function clipPoly(W, H, d, sgn) {
   return out.length < 3 ? 'polygon(0 0,0 0,0 0)' : 'polygon(' + out.map(q => q[0].toFixed(1) + 'px ' + q[1].toFixed(1) + 'px').join(',') + ')';
 }
 function curlSet(fx, fy) {
+  if (CU && CU.flip) return flipSet(fx);
   const c = CU; c.fx = fx; c.fy = fy;
   const dx = c.W - fx, dy = c.gy - fy, len = Math.hypot(dx, dy);
   if (len < 0.5) { c.page.style.clipPath = 'none'; c.flap.style.clipPath = 'polygon(0 0,0 0,0 0)'; c.shadow.style.opacity = '0'; return; }
@@ -4600,6 +4607,65 @@ document.addEventListener('keydown', e => {
   else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); turn(-1); }
 });
 function followLink(a) { const t = a.dataset.target; const idx = R.book.chapters.findIndex(c => c.entries?.includes(t)); if (idx >= 0) jumpTo(idx, 0); }
+
+/* ================= Màn hình rộng: tự mở dạng sách; lật tờ giấy quanh gáy; chuyển kiểu đọc êm ================= */
+// Màn hình rộng nằm ngang (iPad ngang, laptop) có kiểu đọc riêng — mặc định "Lật trang – như sách" hai trang.
+// Màn hình hẹp (iPhone, iPad dọc) giữ kiểu đọc bạn chọn (mặc định cuộn dọc). Xoay máy là tự đổi, giữ nguyên chỗ đọc.
+const isWide = () => lsGet('kt-two', true) !== false && innerWidth >= 900 && innerWidth >= innerHeight * 1.15;
+function modeFor(wide) {
+  if (S.modeNarrow == null) S.modeNarrow = S.mode || 'scroll';
+  if (wide && !(R.book && R.book.kind === 'comic')) return S.modeWide || 'curl';
+  return (R.book && R.book.look && R.book.look.mode) || S.modeNarrow;
+}
+// đổi kiểu đọc mà giữ chỗ đang đọc, có chuyển cảnh mờ dần nhẹ
+function swapMode(m) {
+  let p = readPos(); S.mode = m; applySettings();
+  const em = effMode(); if (!R.book || em === R.mode) return;
+  // xoay qua rồi xoay lại mà chưa đọc thêm: về đúng trang cũ (tránh lệch một trang do làm tròn)
+  const mm = swapMode.memo; if (p && mm && mm.at && mm.at.i === p.i && Math.abs(mm.at.frac - p.frac) < .004 && mm.mode === em) p = mm.from;
+  const from = p, was = R.mode;
+  const run = async () => { R.gen++; clearSections(); clearPager(); setModeUI(em); window.scrollTo(0, 0); await jumpTo(p ? p.i : 0, p ? p.frac : 0); swapMode.memo = { from, mode: was, at: readPos() }; };
+  if (FX === 'off' || matchMedia('(prefers-reduced-motion: reduce)').matches) { run(); return; }
+  if (document.startViewTransition) { try { document.startViewTransition(() => run()); return; } catch {} }
+  Promise.resolve(run()).then(() => [flow, pager].forEach(n => n.hidden || n.animate([{ opacity: 0, scale: '.985' }, { opacity: 1, scale: '1' }], { duration: 280, easing: 'cubic-bezier(.2,.8,.2,1)' })));
+}
+function syncWide() {
+  if (!R.book) return;
+  const want = modeFor(isWide());
+  if (want !== S.mode) swapMode(want);
+}
+let wideT; window.addEventListener('resize', () => { clearTimeout(wideT); wideT = setTimeout(syncWide, 160); });
+
+/* Lật trang hai trang như sách thật: tờ bên phải nhấc lên, quay quanh gáy (3D), mặt sau là trang trái của cặp kế;
+   bóng đổ lên trang bên dưới, mặt giấy tối dần khi nghiêng. Lật lùi thì tờ bên trái quay về phải. */
+function flipStart(dir, gy) {
+  const pr = pager.getBoundingClientRect(), vr = pgView.getBoundingClientRect(), W = pr.width, H = pr.height, from = P.page, to = from + dir;
+  const X = vr.left - pr.left + vr.width / 2;                 // vị trí gáy sách
+  const half = (pos, side) => { const b = pageBox(pos); b.style.clipPath = side === 'L' ? `inset(0 ${W - X}px 0 0)` : `inset(0 0 0 ${X}px)`; return b; };
+  const under = pageBox(to), fixed = half(from, dir > 0 ? 'L' : 'R');
+  const front = half(from, dir > 0 ? 'R' : 'L'), back = half(to, dir > 0 ? 'L' : 'R');
+  const fShade = el('div', { class: 'fl-shade' }), bShade = el('div', { class: 'fl-shade' }), cast = el('div', { class: 'fl-cast' });
+  front.append(fShade); back.append(bShade);
+  const fFace = el('div', { class: 'fl-face' }, front), bFace = el('div', { class: 'fl-face fl-back' }, back);
+  bFace.style.transformOrigin = fFace.style.transformOrigin = `${X}px 50%`; bFace.style.transform = `rotateY(${dir > 0 ? 180 : -180}deg)`;
+  const leaf = el('div', { class: 'fl-leaf', style: `transform-origin:${X}px 50%` }, fFace, bFace);
+  const ov = el('div', { class: 'curl flip' }, under, cast, fixed, leaf);
+  pager.append(ov); $('#pg-ribbon').hidden = true;
+  if (dir > 0) { setTrack(to, false); $('#pg-foot').textContent = footLabel(to); }
+  CU = { flip: true, dir, from, to, ov, leaf, fShade, bShade, cast, X, W, H, gy, open: { x: W, y: gy }, closed: { x: -W * 1.08, y: gy } };
+  const s = dir > 0 ? CU.open : CU.closed; flipSet(s.x);
+}
+function flipSet(fx) {
+  const c = CU; c.fx = fx; c.fy = c.gy;
+  const p = clamp(c.dir > 0 ? (c.W - fx) / (2.08 * c.W) : (fx + 1.08 * c.W) / (2.08 * c.W), 0, 1), e = p, a = e * 180, s = Math.sin(e * Math.PI);
+  c.leaf.style.transform = `rotateY(${c.dir > 0 ? -a : a}deg)`;
+  c.fShade.style.background = c.dir > 0 ? `linear-gradient(90deg,rgba(0,0,0,${(.32 * e).toFixed(3)}) ${c.X}px,rgba(0,0,0,${(.12 * e).toFixed(3)}) 100%)` : `linear-gradient(270deg,rgba(0,0,0,${(.32 * e).toFixed(3)}) ${c.W - c.X}px,rgba(0,0,0,${(.12 * e).toFixed(3)}) 100%)`;
+  c.bShade.style.background = `rgba(0,0,0,${(.22 * (1 - e)).toFixed(3)})`;
+  const w = Math.max(0, (c.W - c.X) * (1 - Math.abs(Math.cos(e * Math.PI))) * .55);   // bóng tờ giấy đổ lên trang dưới, cạnh gáy
+  c.cast.style.cssText = c.dir > 0
+    ? `left:${c.X}px;width:${w.toFixed(1)}px;background:linear-gradient(90deg,rgba(0,0,0,${(.28 * s).toFixed(3)}),transparent)`
+    : `left:${(c.X - w).toFixed(1)}px;width:${w.toFixed(1)}px;background:linear-gradient(270deg,rgba(0,0,0,${(.28 * s).toFixed(3)}),transparent)`;
+}
 
 /* ================= Phản hồi tức thì: Hiệu ứng Đầy đủ / Gọn / Tắt =================
    Gọn (mặc định): giữ nguyên các hiệu ứng nhưng chạy nhanh gần gấp đôi, không bắt chờ hiệu ứng xong mới làm việc.
@@ -7599,8 +7665,8 @@ function colRow() {
   return el('div', { class: 'rs-item' }, el('span', { class: 'grow', text: R.book && R.book.kind === 'comic' ? 'Độ rộng tranh' : 'Độ rộng cột chữ' }), seg);
 }
 function twoRow() {
-  const s = sw(lsGet('kt-two', true) !== false, on => { lsSet('kt-two', on); relayout(); });
-  return el('div', { class: 'rs-item' }, el('span', { class: 'grow' }, 'Hai trang như sách mở', el('small', { class: 'rs-sub', text: 'Khi lật trang trên màn hình rộng nằm ngang (iPad xoay ngang, laptop)' })), s.el);
+  const s = sw(lsGet('kt-two', true) !== false, on => { lsSet('kt-two', on); syncWide(); relayout(); });
+  return el('div', { class: 'rs-item' }, el('span', { class: 'grow' }, 'Màn hình rộng: mở dạng sách', el('small', { class: 'rs-sub', text: 'iPad xoay ngang, laptop: tự chuyển sang lật trang hai trang như sách mở; xoay dọc thì về kiểu đọc thường' })), s.el);
 }
 function wakeRow() {
   const s = sw(S.wake, on => { S.wake = on; saveSettings(); wake(on); });
