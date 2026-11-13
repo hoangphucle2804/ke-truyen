@@ -1374,7 +1374,7 @@ html.c314-on,html.c314-on *{cursor:none!important}
 .stats-top .sk-chips{display:flex;gap:6px;align-items:center}
 .sk-chip{height:30px;padding:0 11px;border-radius:999px;font-size:12.5px;font-weight:750;display:inline-flex;align-items:center;gap:5px;transition:transform .2s cubic-bezier(.3,1.4,.5,1)}
 .sk-chip:active{transform:scale(.94)}
-.sk-chip.fire{background:color-mix(in srgb,#ff7a1a 14%,var(--surface));color:#d9530c}
+.sk-chip.fire{background:color-mix(in srgb,var(--fc1,#ff7a1a) 16%,var(--surface));color:color-mix(in srgb,var(--fc2,#d9530c) 85%,var(--ink))}
 .sk-chip.fire.zero{background:color-mix(in srgb,var(--ink) 6%,var(--surface));color:var(--muted)}
 .sk-chip.rc{background:var(--ink);color:var(--bg)}
 .sheet-body.sk,.sheet-body.rp{grid-auto-rows:max-content}
@@ -1387,17 +1387,20 @@ html.c314-on,html.c314-on *{cursor:none!important}
 @media (prefers-reduced-motion:reduce){.rn-c{transition:none}}
 /* ngọn lửa (#379) */
 .fl{position:relative;width:120px;height:144px;transform:scale(var(--s,.8));transform-origin:50% 90%;transition:transform .8s cubic-bezier(.3,1.4,.5,1)}
-.fl svg{position:relative;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 6px 18px rgba(255,110,30,.35))}
-.fl-glow{position:absolute;left:50%;bottom:-6px;width:150px;height:70px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(255,140,40,.45),transparent);filter:blur(6px)}
+.fl svg{position:relative;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 6px 18px rgba(var(--glow,255,110,30),.4))}
+.fl.rb svg{animation:flRb 9s linear infinite}
+@keyframes flRb{to{filter:drop-shadow(0 6px 18px rgba(var(--glow),.45)) hue-rotate(360deg)}}
+.fl.rb svg{filter:drop-shadow(0 6px 18px rgba(var(--glow),.45)) hue-rotate(0deg)}
+.fl-glow{position:absolute;left:50%;bottom:-6px;width:150px;height:70px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(var(--glow,255,140,40),.5),transparent);filter:blur(6px)}
 .sk-hero{position:relative;display:grid;justify-items:center;gap:10px;padding:18px 14px 18px;border-radius:26px;color:#fff3e4;overflow:hidden;
-  background:radial-gradient(120% 80% at 50% 10%,#3b1d0d,#1b0d06 70%);box-shadow:inset 0 0 0 1px rgba(255,170,90,.14),0 14px 34px -18px rgba(80,30,5,.6)}
+  background:radial-gradient(120% 80% at 50% 10%,var(--hb1,#3b1d0d),var(--hb2,#1b0d06) 70%);box-shadow:inset 0 0 0 1px rgba(var(--glow,255,170,90),.18),0 14px 34px -18px rgba(80,30,5,.6)}
 .sk-hero .fl{margin-top:-8px;margin-bottom:-26px}
 .sk-ct{display:flex;align-items:baseline;gap:8px}
 .sk-ct .rn.big{font-size:56px;font-weight:850;letter-spacing:-.03em;color:#fff}
-.sk-ct b{font-size:15px;font-weight:700;color:#ffc89a}
+.sk-ct b{font-size:15px;font-weight:700;color:var(--hink,#ffc89a)}
 .sk-wk{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;width:100%;max-width:330px}
 .sk-wk>div{display:grid;justify-items:center;gap:6px}
-.sk-dy{font-size:11px;font-weight:700;color:#d7a985}
+.sk-dy{font-size:11px;font-weight:700;color:var(--hink,#d7a985);opacity:.8}
 .sk-dt{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1.5px rgba(255,190,130,.18);position:relative}
 .sk-dt.on{background:linear-gradient(160deg,#ffb547,#f5462a);box-shadow:0 4px 12px -4px rgba(255,100,30,.8);animation:skPop .5s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--k) * 70ms + .2s)}
 .sk-dt.on::after{content:"";position:absolute;inset:0;margin:auto;width:12px;height:7px;border:solid #fff;border-width:0 0 2.5px 2.5px;transform:translateY(-2px) rotate(-45deg)}
@@ -1406,7 +1409,7 @@ html.c314-on,html.c314-on *{cursor:none!important}
 @keyframes skPop{from{transform:scale(.3);opacity:0}}
 .sk-bd{position:absolute;top:14px;right:14px;padding:5px 10px;border-radius:999px;background:linear-gradient(135deg,#ffd27a,#ff8a1f);color:#3b1600;font-size:11.5px;font-weight:850;transform:scale(0) rotate(-12deg);transition:transform .6s cubic-bezier(.3,1.7,.5,1) .9s}
 .sk-hero.week .sk-bd{transform:none}
-.sk-msg{margin:2px 6px 0;font-size:13px;line-height:1.45;text-align:center;color:#f1d3b8}
+.sk-msg{margin:2px 6px 0;font-size:13px;line-height:1.45;text-align:center;color:var(--hink,#f1d3b8)}
 .sk-card{padding:14px;border-radius:20px;background:var(--surface);box-shadow:var(--k-sh,0 0 0 1px var(--line))}
 /* lưới (#151) */
 .sk-mo{display:grid;grid-template-columns:repeat(3,1fr);font-size:11px;color:var(--muted);font-weight:650;margin-bottom:6px}
@@ -1516,6 +1519,43 @@ html.c314-on,html.c314-on *{cursor:none!important}
 .st.hold .st-bars-top,.st.hold .st-hd{opacity:0;transition:opacity .25s}
 .rc-note .bk-note-ic{font-size:20px}
 @media (prefers-reduced-motion:reduce){.st-cube{transition:none}.st-in>*,.sk-dt.on,.rp-it{animation:none}}
+
+/* bậc lửa, tiến độ hôm nay, chặng đường */
+.sk-dt.on{background:linear-gradient(160deg,var(--d1,#ffb547),var(--d2,#f5462a))}
+.sk-hero .sk-dt.on{box-shadow:0 4px 12px -4px rgba(var(--glow,255,100,30),.85)}
+.sk-dt.part{background:conic-gradient(rgba(var(--glow,255,160,60),.9) var(--p),rgba(255,255,255,.07) 0)}
+.sk-dt.part::before{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--hb2,#1b0d06)}
+.sk-tier{margin-top:-4px;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.02em;color:var(--hb2,#1b0d06);background:linear-gradient(135deg,#fff,var(--hink,#ffc89a));box-shadow:0 6px 18px -8px rgba(var(--glow,255,140,40),.9)}
+.sk-tp{width:100%;max-width:330px;display:grid;gap:6px}
+.sk-tp-h{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--hink,#ffc89a)}
+.sk-tp-h b{color:#fff;font-variant-numeric:tabular-nums}
+.sk-tp-b{height:8px;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden}
+.sk-tp-b i{display:block;height:100%;border-radius:inherit;transform-origin:left;transform:scaleX(var(--w));background:linear-gradient(90deg,var(--hink,#ffc89a),#fff);box-shadow:0 0 12px rgba(var(--glow,255,140,40),.8);animation:skGrow 1s cubic-bezier(.2,1,.3,1) both .3s}
+.sk-tp.done .sk-tp-h span::after{content:" ✓"}
+@keyframes skGrow{from{transform:scaleX(0)}}
+.sk-rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sk-rules>div{padding:10px 8px;border-radius:16px;text-align:center;background:var(--surface);box-shadow:var(--k-sh,0 0 0 1px var(--line));display:grid;gap:2px}
+.sk-rules b{font-size:15px;font-weight:800}
+.sk-rules small{font-size:11.5px;color:var(--muted)}
+.sk-rules .on{background:color-mix(in srgb,#ff7a1a 13%,var(--surface));box-shadow:0 0 0 1.5px color-mix(in srgb,#ff7a1a 55%,transparent)}
+.sk-road{display:grid;gap:0;padding:6px 4px;border-radius:20px;background:var(--surface);box-shadow:var(--k-sh,0 0 0 1px var(--line))}
+.sk-ms{position:relative;display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:10px;padding:8px 10px;animation:skIn .45s cubic-bezier(.2,1,.3,1) both;animation-delay:calc(var(--k) * 55ms)}
+.sk-ms+.sk-ms::before{content:"";position:absolute;left:29px;top:-10px;width:2px;height:20px;background:var(--line)}
+.sk-ms.done+.sk-ms::before{background:linear-gradient(var(--c1),var(--c2))}
+.sk-ms-f{position:relative;width:30px;height:36px;justify-self:center;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:linear-gradient(0deg,var(--c1),var(--c2));clip-path:path("M15 0C19 9 30 15 30 24A15 12 0 0 1 0 24C0 15 11 9 15 0Z");filter:grayscale(1) opacity(.35)}
+.sk-ms-f .cr{position:absolute;inset:0}
+.sk-ms.done .sk-ms-f{filter:none}
+.sk-ms.here .sk-ms-f{animation:skFlick 1.6s ease-in-out infinite}
+.sk-ms-t{display:grid;gap:1px;min-width:0}
+.sk-ms-t b{font-size:14px;font-weight:750}
+.sk-ms-t small{font-size:11.5px;color:var(--muted)}
+.sk-ms em{font-style:normal;font-size:11.5px;font-weight:750;color:var(--muted);white-space:nowrap}
+.sk-ms.here{border-radius:14px;background:color-mix(in srgb,var(--c1) 12%,transparent)}
+.sk-ms.here em,.sk-ms.next em{color:var(--c2)}
+.sk-ms.next em{padding:3px 8px;border-radius:999px;background:color-mix(in srgb,var(--c1) 16%,transparent)}
+@keyframes skFlick{50%{transform:scale(1.08) translateY(-1px)}}
+@keyframes skIn{from{opacity:0;transform:translateY(6px)}}
+@media (prefers-reduced-motion:reduce){.fl.rb svg,.sk-ms,.sk-ms.here .sk-ms-f,.sk-tp-b i{animation:none}}
 /* nhận truyện từ công cụ tải */
 .sheet-body.rv{grid-auto-rows:max-content}
 .rv-card{display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;background:color-mix(in srgb,var(--accent) 9%,var(--surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 22%,transparent)}
@@ -1808,6 +1848,34 @@ html.c314-on,html.c314-on *{cursor:none!important}
 .gp-it small{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
 .gp-n{width:30px;height:30px;flex:none;border-radius:10px;display:grid;place-items:center;font-size:13px;font-weight:850;background:color-mix(in srgb,var(--accent) 14%,var(--surface));color:color-mix(in srgb,var(--accent) 80%,var(--ink))}
 .gp-go{width:100%}
+/* ===== Thông báo giữ lửa ===== */
+.skt{position:fixed;z-index:1200;left:50%;top:calc(env(safe-area-inset-top,0px) + 58px);width:min(calc(100vw - 24px),380px);display:grid;grid-template-columns:46px 1fr 34px;align-items:center;gap:12px;padding:10px 14px 10px 10px;border-radius:22px;
+  color:#fff;background:radial-gradient(140% 120% at 0% 0%,var(--b1),var(--b2) 75%);box-shadow:0 0 0 1px rgba(var(--glow),.28),0 18px 40px -16px rgba(var(--glow),.55),0 8px 22px -10px rgba(0,0,0,.5);
+  transform:translate(-50%,-140%) scale(.9);opacity:0;transition:transform .6s cubic-bezier(.3,1.45,.45,1),opacity .25s;cursor:pointer;touch-action:none;overflow:hidden;-webkit-user-select:none;user-select:none}
+.skt.in{transform:translate(-50%,0) scale(1);opacity:1}
+.skt.out{transform:translate(-50%,-140%) scale(.92);opacity:0;transition:transform .4s cubic-bezier(.5,0,.75,0),opacity .3s .1s}
+.skt::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);transform:translateX(-120%);pointer-events:none}
+.skt.lit::after{transform:translateX(120%);transition:transform 1.1s cubic-bezier(.3,.7,.3,1) .1s}
+.skt-fl{position:relative;width:46px;height:46px;border-radius:15px;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.skt-fl .fl{position:absolute;left:50%;top:50%;width:120px;height:144px;transform:translate(-50%,-52%) scale(.34)!important;transform-origin:50% 50%!important;transition:none;margin:0!important}
+.skt-fl .fl-glow{display:none}
+.skt-tx{display:grid;gap:1px;min-width:0}
+.skt-tx b{font-size:15px;font-weight:820;letter-spacing:-.01em}
+.skt-tx small{font-size:12.5px;font-weight:650;color:var(--ink);display:flex;align-items:baseline;white-space:nowrap}
+.skt-tx small .rn{font-weight:850;color:#fff;margin:0 .25em;font-size:13.5px}
+.skt-tx em{font-style:normal;font-size:11.5px;font-weight:650;color:var(--ink);opacity:.75}
+.skt-ok svg{width:34px;height:34px;display:block;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.skt-ok circle{stroke:var(--c1);stroke-width:3;stroke-dasharray:98;stroke-dashoffset:98;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset .7s cubic-bezier(.6,0,.2,1) .45s}
+.skt-ok path{stroke:#fff;stroke-width:3.2;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .35s ease-out 1.05s}
+.skt.in .skt-ok circle,.skt.in .skt-ok path{stroke-dashoffset:0}
+.skt.up{box-shadow:0 0 0 1.5px rgba(var(--glow),.6),0 18px 46px -12px rgba(var(--glow),.8),0 8px 22px -10px rgba(0,0,0,.5);overflow:visible}
+.skt.up .skt-tx b{background:linear-gradient(90deg,#fff,var(--ink),#fff);-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200% 100%;animation:sktShine 2.2s linear infinite}
+.skt-sp{position:absolute;left:28px;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;pointer-events:none;animation:sktSp 1s cubic-bezier(.2,.8,.3,1) forwards}
+@keyframes sktSp{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+@keyframes sktShine{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.skt,.skt.out{transition:opacity .2s}.skt{transform:translate(-50%,0)}.skt::after{display:none}.skt-ok circle,.skt-ok path{transition:none}.skt.up .skt-tx b{animation:none}}
+/* bỏ nút mục lục trùng ở thanh trên (đã có nút ở thanh dưới) */
+#r-toc{display:none!important}
 </style>
 </head>
 <body>
@@ -3422,15 +3490,13 @@ function libTop(books, pmap) {
   const days = WD.map((_, k) => { const d = new Date(now); d.setDate(now.getDate() - dow + k); return today(d); });
   const mins = days.map(k => Math.round((ST.days[k] || 0) / 60));
   const pagesWeek = days.reduce((s, k) => s + (ST.pages[k] || 0), 0);
-  let streak = 0; const d = new Date(now);
-  if (!((ST.days[today(d)] || 0) >= 60)) d.setDate(d.getDate() - 1);
-  while ((ST.days[today(d)] || 0) >= 60) { streak++; d.setDate(d.getDate() - 1); }
+  const SW = streakWalk(), streak = SW.cur, FT = flTier(streak);
   const big = el('b', { text: String(mins[dow]) }), cap = el('small', { text: 'phút hôm nay' }), max = Math.max(10, ...mins);
   const wk = el('div', { class: 'wk' });
   mins.forEach((m, k) => wk.append(el('button', { type: 'button', class: k === dow ? 'on' : '', 'aria-label': `${WDL[k]}: ${m} phút`, style: `height:${Math.max(7, m / max * 100)}%`,
     onclick: ev => { [...wk.children].forEach(x => x.classList.remove('on')); ev.currentTarget.classList.add('on'); big.textContent = m; cap.textContent = k === dow ? 'phút hôm nay' : 'phút ' + WDL[k]; } })));
   if (UI.stats) out.push(el('div', { class: 'stats' },
-    el('div', { class: 'stats-top' }, el('span', { text: 'Tuần này' }), el('span', { class: 'sk-chips' }, el('button', { type: 'button', class: 'sk-chip fire' + (streak ? '' : ' zero'), 'aria-label': `Chuỗi ${streak} ngày, mở chi tiết`, text: `🔥 ${streak} ngày`, onclick: openStreak }), el('button', { type: 'button', class: 'sk-chip rc', text: 'Tổng kết ›', onclick: openRecapPick }))),
+    el('div', { class: 'stats-top' }, el('span', { text: 'Tuần này' }), el('span', { class: 'sk-chips' }, el('button', { type: 'button', class: 'sk-chip fire' + (streak ? '' : ' zero') + (SW.todayDone ? ' ok' : ''), style: streak ? `--fc1:${FT.o[0]};--fc2:${FT.o[2]}` : null, 'aria-label': `Chuỗi ${streak} ngày (${FT.name}), hôm nay ${Math.floor(SW.todaySec / 60)}/${SW.todayNeed / 60} phút. Mở chi tiết`, title: `${FT.name} · hôm nay ${Math.floor(SW.todaySec / 60)}/${SW.todayNeed / 60} phút`, text: `🔥 ${streak} ngày${SW.todayDone ? '' : ` · ${Math.floor(SW.todaySec / 60)}/${SW.todayNeed / 60}′`}`, onclick: openStreak }), el('button', { type: 'button', class: 'sk-chip rc', text: 'Tổng kết ›', onclick: openRecapPick }))),
     el('div', { class: 'stats-nums' }, el('div', {}, big, cap), el('div', {}, el('b', { text: String(pagesWeek) }), el('small', { text: 'trang tuần này' }))),
     wk, el('div', { class: 'wk-l' }, ...WD.map(w => el('span', { text: w })))));
   return out;
@@ -3814,6 +3880,7 @@ const act = () => { lastAct = Date.now(); };
 setInterval(() => {
   if (!R.book || reader.hidden || document.visibilityState !== 'visible' || Date.now() - lastAct > 120000) return;
   const k = today(); ST.days[k] = (ST.days[k] || 0) + 5; lsSet('kt-stats', ST);
+  try { streakCheck(); } catch (e) {}
 }, 5000);
 function addPages(n) { const k = today(); ST.pages[k] = (ST.pages[k] || 0) + n; lsSet('kt-stats', ST); }
 let SPD = +lsGet('kt-speed', 16) || 16;            // tốc độ đọc, ký tự / giây
@@ -4346,6 +4413,41 @@ document.addEventListener('keydown', e => {
 });
 function followLink(a) { const t = a.dataset.target; const idx = R.book.chapters.findIndex(c => c.entries?.includes(t)); if (idx >= 0) jumpTo(idx, 0); }
 
+/* ================= Thông báo "Đã giữ lửa hôm nay" =================
+   Khi thời gian đọc trong ngày vừa đủ mức để giữ chuỗi, một dải thông báo rơi xuống từ trên màn hình đọc:
+   ngọn lửa nhỏ bùng lên, số ngày lăn lên, vòng tròn tự vẽ quanh dấu ✓. Lên bậc lửa mới thì có thêm pháo sáng. */
+function streakCheck() {
+  if (lsGet('kt-sk-told', '') === today()) return;
+  const W = streakWalk(); if (!W.todayDone) return;
+  lsSet('kt-sk-told', today()); streakToast(W.cur);
+}
+function streakToast(n) {
+  document.querySelector('.skt')?.remove();
+  const T = flTier(n), up = FL_TIERS.some(t => t.min === n && n > 1), rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const nextM = needMin(n + 1), more = nextM > needMin(n);
+  const fl = flame(n), num = rollNum(String(n));
+  const ring = el('span', { class: 'skt-ok', 'aria-hidden': 'true', html: '<svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5"/><path d="M11.5 18.5l4.4 4.3 8.6-9"/></svg>' });
+  const box = el('div', { class: 'skt' + (up ? ' up' : ''), role: 'status', 'aria-live': 'polite', style: `--b1:${T.bg[0]};--b2:${T.bg[1]};--ink:${T.ink};--glow:${T.glow};--c1:${T.o[0]};--c2:${T.o[2]}` },
+    el('span', { class: 'skt-fl' }, fl.el),
+    el('span', { class: 'skt-tx' },
+      el('b', { text: up ? `Lên bậc mới: ${T.name}!` : 'Đã giữ lửa hôm nay!' }),
+      el('small', {}, 'Chuỗi ', num.el, ` ngày${up ? '' : ' · ' + T.name}`),
+      more ? el('em', { text: `Từ mai cần ${nextM} phút mỗi ngày` }) : null),
+    ring);
+  let gone = false;
+  const hide = () => { if (gone) return; gone = true; box.classList.add('out'); setTimeout(() => box.remove(), rm ? 0 : 420); };
+  box.addEventListener('click', hide);
+  let y0 = null; box.addEventListener('pointerdown', e => { y0 = e.clientY; });
+  box.addEventListener('pointermove', e => { if (y0 != null && y0 - e.clientY > 24) { y0 = null; hide(); } });
+  document.body.append(box);
+  requestAnimationFrame(() => requestAnimationFrame(() => { box.classList.add('in'); setTimeout(() => { num.go(); fl.flare(); box.classList.add('lit'); }, rm ? 0 : 380); }));
+  if (up && !rm) setTimeout(() => {               // pháo sáng khi lên bậc
+    for (let i = 0; i < 18; i++) { const a = i / 18 * Math.PI * 2, r = 46 + Math.random() * 40;
+      const s = el('i', { class: 'skt-sp', style: `--dx:${(Math.cos(a) * r).toFixed(0)}px;--dy:${(Math.sin(a) * r * .7).toFixed(0)}px;background:${i % 3 ? T.o[0] : T.sp}` }); box.append(s); setTimeout(() => s.remove(), 1100); }
+  }, 520);
+  setTimeout(hide, up ? 6500 : 4800);
+}
+
 /* ================= PDF =================
    Dùng pdf.js (Mozilla, Apache-2.0) để trong thư mục ./pdfjs/ cạnh index.html; chỉ tải khi bạn thêm file PDF.
    · PDF chữ  → tách thành chữ, ghép lại thành đoạn văn và chương (theo mục lục của PDF, hoặc dòng "Chương N"),
@@ -4504,7 +4606,7 @@ async function parsePdf(f, key, step) {
       if (bigs >= 3 && (!outline || bigs >= outline.length)) {
         chapters = []; let curC = null;
         for (const b of blocks) {
-          if (b.big) { if (curC && !curC.body.length) { curC.title += (/[:–-]$/.test(curC.title) ? ' ' : ' · ') + b.t; continue; } chapters.push(curC = { title: b.t.replace(/[.\s]+$/, ''), body: [] }); }
+          if (b.big) { if (curC && !curC.body.length) { curC.title += (/[:–-]$/.test(curC.title) || (curC.title.split('(').length > curC.title.split(')').length) ? ' ' : ' · ') + b.t; continue; } chapters.push(curC = { title: b.t.replace(/[.\s]+$/, ''), body: [] }); }
           else if (curC) curC.body.push(b.t);
           else (chapters[0]?.pre ? chapters[0] : chapters.unshift(curC = { title: 'Mở đầu', body: [], pre: true }) && curC).body.push(b.t);
         }
@@ -5308,14 +5410,47 @@ setInterval(() => {                                  // cùng nhịp 5 giây v�
   (ST.hr[m] ||= Array(24).fill(0))[now.getHours()] += 5;
   ST.bt[id] = R.book.title;
 }, 5000);
-const READ_MIN = 60;                                  // một ngày "có đọc" = ít nhất 1 phút
+const READ_MIN = 60;                                  // "có đọc" (cho tổng kết) = ít nhất 1 phút
 const dayOn = k => (ST.days[k] || 0) >= READ_MIN;
-function streakNow() { let s = 0; const d = new Date(); if (!dayOn(today(d))) d.setDate(d.getDate() - 1); while (dayOn(today(d))) { s++; d.setDate(d.getDate() - 1); } return s; }
-function streakBest(keys = Object.keys(ST.days)) {
+/* Luật giữ chuỗi: ngày thứ 1–20 của chuỗi cần ≥15 phút, ngày 21–50 cần ≥30 phút, từ ngày 51 trở đi cần ≥45 phút.
+   Những ngày trước khi có luật mới vẫn tính theo luật cũ (≥1 phút) để chuỗi đang có không bị mất. */
+const needMin = n => n <= 20 ? 15 : n <= 50 ? 30 : 45;
+const skRule = () => { let d = lsGet('kt-sk-rule', null); if (!d) { d = today(); lsSet('kt-sk-rule', d); } return d; };
+function streakWalk() {
+  const t = today(), rule = skRule(), keys = Object.keys(ST.days).filter(k => ST.days[k] > 0).sort(), ok = {};
+  let run = 0, best = 0, before = 0;
+  if (keys.length && keys[0] <= t) {
+    const d = new Date(keys[0] + 'T12:00:00'), end = new Date(t + 'T12:00:00');
+    for (; d <= end; d.setDate(d.getDate() + 1)) {
+      const k = today(d); if (k === t) before = run;
+      const need = k < rule ? READ_MIN : needMin(run + 1) * 60;
+      if ((ST.days[k] || 0) >= need) { run++; ok[k] = run; } else if (k !== t) run = 0;   // hôm nay chưa đủ thì chuỗi chưa mất
+      best = Math.max(best, run);
+    }
+  }
+  const todayNeed = (t < rule ? 1 : needMin(before + 1)) * 60;
+  return { cur: run, best, ok, before, todayDone: !!ok[t], todayNeed, todaySec: ST.days[t] || 0 };
+}
+function streakNow() { return streakWalk().cur; }
+function streakBest(keys) {
+  const W = streakWalk(); if (!keys) return W.best;
   let best = 0, run = 0, prev = null;
-  for (const k of keys.filter(dayOn).sort()) { const d = new Date(k + 'T12:00:00'); run = prev && (d - prev) / 864e5 < 1.5 ? run + 1 : 1; best = Math.max(best, run); prev = d; }
+  for (const k of keys.filter(k => W.ok[k]).sort()) { const d = new Date(k + 'T12:00:00'); run = prev && (d - prev) / 864e5 < 1.5 ? run + 1 : 1; best = Math.max(best, run); prev = d; }
   return best;
 }
+/* Các bậc lửa: chuỗi càng dài lửa càng đổi màu; từ 100 ngày lửa đổi cả hình dạng */
+const FL_TIERS = [
+  { min: 0, name: 'Tàn tro', o: ['#9AA0A6', '#7B8088', '#5F646B'], m: ['#C9CDD2', '#9AA0A6'], c: ['#F1F3F5', '#DEE2E6'], glow: '150,150,160', sp: '#CED4DA', bg: ['#2a2a2e', '#141416'], ink: '#d9d9de' },
+  { min: 1, name: 'Lửa nhóm', o: ['#FF7A1A', '#F5462A', '#D9262B'], m: ['#FFC24A', '#FF8A1F'], c: ['#FFFBEA', '#FFE27A'], glow: '255,140,40', sp: '#FFD08A', bg: ['#3b1d0d', '#1b0d06'], ink: '#ffc89a' },
+  { min: 7, name: 'Lửa đỏ', o: ['#FF5A1F', '#E8202A', '#A5122B'], m: ['#FFAA33', '#FF5A1F'], c: ['#FFF6D6', '#FFD25E'], glow: '255,70,30', sp: '#FFB08A', bg: ['#40120c', '#1d0605'], ink: '#ffb4a0' },
+  { min: 20, name: 'Lửa vàng', o: ['#FFB000', '#FF8A00', '#E85D04'], m: ['#FFE066', '#FFC300'], c: ['#FFFFFF', '#FFF3B0'], glow: '255,190,40', sp: '#FFF0A0', bg: ['#3d2a06', '#1a1103'], ink: '#ffe08a' },
+  { min: 50, name: 'Lửa lam', o: ['#4DABF7', '#1C7ED6', '#3B2FBF'], m: ['#99E9F2', '#3BC9DB'], c: ['#FFFFFF', '#E3FAFC'], glow: '60,160,255', sp: '#C5F6FA', bg: ['#0c2340', '#060f1d'], ink: '#a5d8ff' },
+  { min: 100, name: 'Vương miện lửa tím', o: ['#DA77F2', '#9C36B5', '#5F3DC4'], m: ['#F3D9FA', '#CC5DE8'], c: ['#FFFFFF', '#FFDEEB'], glow: '190,80,240', sp: '#F8D7FF', bg: ['#2b0f3d', '#12061c'], ink: '#eebefa', crown: 1 },
+  { min: 200, name: 'Phượng hoàng ngọc', o: ['#20C997', '#0CA678', '#087F5B'], m: ['#96F2D7', '#38D9A9'], c: ['#FFFFFF', '#E6FCF5'], glow: '32,201,151', sp: '#C3FAE8', bg: ['#06302a', '#031512'], ink: '#96f2d7', crown: 1, wings: 1 },
+  { min: 365, name: 'Lửa bất diệt', o: ['#FF6B6B', '#CC5DE8', '#339AF0'], m: ['#FFE066', '#FF8787'], c: ['#FFFFFF', '#FFF9DB'], glow: '255,120,200', sp: '#FFFFFF', bg: ['#1f1033', '#0a0614'], ink: '#ffd6f5', crown: 1, wings: 1, orbit: 1, rainbow: 1 },
+];
+const flTier = n => FL_TIERS.reduce((a, t) => n >= t.min ? t : a, FL_TIERS[0]);
+const nextTier = n => FL_TIERS.find(t => t.min > n) || null;
 const sumG = (g, pre) => Object.entries(ST[g] || {}).reduce((s, [k, v]) => s + (!pre || k.startsWith(pre) ? v : 0), 0);
 
 /* ---- số lăn (Lucian UX/UI Prompt #098 · MIT License (c) 2026 Seokwoooo): mỗi chữ số là một dải 0–9, lăn lệch nhau 45ms, hơi vượt rồi dừng ---- */
@@ -5330,15 +5465,25 @@ function rollNum(str, cls = '') {
 
 /* ---- Lucian UX/UI Prompt #379 · MIT License (c) 2026 Seokwoooo · ngọn lửa chuỗi ngày: 3 lớp lửa đung đưa, tia lửa bay lên, càng dài càng to ---- */
 function flame(level) {
-  const uid = 'fl' + Math.random().toString(36).slice(2, 7);
-  const tmp = el('div'); tmp.innerHTML = `<svg viewBox="0 0 120 144"><defs><linearGradient id="${uid}o" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FF7A1A"/><stop offset=".55" stop-color="#F5462A"/><stop offset="1" stop-color="#D9262B"/></linearGradient><linearGradient id="${uid}m" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FFC24A"/><stop offset="1" stop-color="#FF8A1F"/></linearGradient><linearGradient id="${uid}c" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FFFBEA"/><stop offset="1" stop-color="#FFE27A"/></linearGradient></defs><g class="fl-sp"></g><path class="fl-o" fill="url(#${uid}o)"/><path class="fl-m" fill="url(#${uid}m)"/><path class="fl-c" fill="url(#${uid}c)"/></svg>`;
+  const T = flTier(level), uid = 'fl' + Math.random().toString(36).slice(2, 7), NS = 'http://www.w3.org/2000/svg';
+  const grad = (id, cs) => `<linearGradient id="${uid}${id}" x1="0" y1="1" x2="0" y2="0">${cs.map((c, i) => `<stop offset="${(i / (cs.length - 1)).toFixed(2)}" stop-color="${c}"/>`).join('')}</linearGradient>`;
+  const tmp = el('div'); tmp.innerHTML = `<svg viewBox="0 0 120 144"><defs>${grad('o', T.o)}${grad('m', T.m)}${grad('c', T.c)}</defs><g class="fl-wg"></g><g class="fl-or fl-back"></g><g class="fl-sd"></g><g class="fl-sp"></g><path class="fl-o" fill="url(#${uid}o)"/><path class="fl-m" fill="url(#${uid}m)"/><path class="fl-c" fill="url(#${uid}c)"/><g class="fl-or fl-front"></g></svg>`;
   const svg = tmp.firstChild;
-  const box = el('div', { class: 'fl', 'aria-hidden': 'true' }, el('div', { class: 'fl-glow' }), svg);
-  const LY = [[svg.querySelector('.fl-o'), 40, 126, 0, 1], [svg.querySelector('.fl-m'), 28, 88, 1.7, .8], [svg.querySelector('.fl-c'), 15, 48, 3.1, .55]];
-  const PRO = [[.05, .6], [.19, .96], [.37, 1], [.55, .8], [.71, .52], [.85, .26]], CX = 60, BASE = 138;
+  const box = el('div', { class: 'fl' + (T.rainbow ? ' rb' : '') + (T.crown ? ' crown' : ''), 'aria-hidden': 'true', style: `--glow:${T.glow}` }, el('div', { class: 'fl-glow' }), svg);
+  const mk = (g, tag, attrs) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); g.append(n); return n; };
+  // lớp lửa: [node, rộng, cao, pha, độ đung đưa, tâm x, nghiêng]
+  const LY = [[svg.querySelector('.fl-o'), 40, 126, 0, 1, 60, 0], [svg.querySelector('.fl-m'), 28, 88, 1.7, .8, 60, 0], [svg.querySelector('.fl-c'), 15, 48, 3.1, .55, 60, 0]];
+  if (T.crown) {                                         // từ 100 ngày: hai ngọn lửa phụ hai bên, nghiêng ra ngoài như vương miện
+    const sd = svg.querySelector('.fl-sd');
+    for (const [cx, lean] of [[33, -1], [87, 1]]) {
+      LY.unshift([mk(sd, 'path', { fill: `url(#${uid}o)`, opacity: '.92' }), 20, 74, 1 + lean, .9, cx, lean]);
+      LY.push([mk(sd, 'path', { fill: `url(#${uid}m)` }), 12, 44, 2 + lean, .7, cx, lean]);
+    }
+  }
+  const PRO = [[.05, .6], [.19, .96], [.37, 1], [.55, .8], [.71, .52], [.85, .26]], BASE = 138;
   let flare = 0;
-  const outline = ([node, W, H, ph, swk], t) => {
-    const w = W * (1 + flare * .08), h = H * (1 + flare * .2), sw = f => (Math.sin(t * 1.7 + ph) * .6 + Math.sin(t * 2.9 + ph * 2) * .4) * h * .13 * swk * Math.pow(f, 1.5);
+  const outline = ([node, W, H, ph, swk, CX, lean], t) => {
+    const w = W * (1 + flare * .08), h = H * (1 + flare * .2), sw = f => (Math.sin(t * 1.7 + ph) * .6 + Math.sin(t * 2.9 + ph * 2) * .4) * h * .13 * swk * Math.pow(f, 1.5) + lean * h * .32 * f * f;
     const Rr = [], Ll = [];
     for (const [f, q] of PRO) { const y = BASE - f * h, x = q * w, s0 = sw(f); Rr.push([CX + x + s0 + Math.sin(t * 6.1 + f * 7 + ph) * w * .07 * f, y]); Ll.unshift([CX - x + s0 - Math.sin(t * 5.3 + f * 6 + ph + 2) * w * .07 * f, y]); }
     const tip = [CX + sw(1) + Math.sin(t * 4.3 + ph) * w * .12, BASE - h * (1 + Math.sin(t * 5.2 + ph) * .035)];
@@ -5346,20 +5491,34 @@ function flame(level) {
     for (let i = 0; i < n; i++) { const a = P[(i - 1 + n) % n], b = P[i], c = P[(i + 1) % n], e = P[(i + 2) % n]; d += ` C${(b[0] + (c[0] - a[0]) / 6).toFixed(1)} ${(b[1] + (c[1] - a[1]) / 6).toFixed(1)} ${(c[0] - (e[0] - b[0]) / 6).toFixed(1)} ${(c[1] - (e[1] - b[1]) / 6).toFixed(1)} ${c[0].toFixed(1)} ${c[1].toFixed(1)}`; }
     node.setAttribute('d', d + 'Z');
   };
+  // từ 200 ngày: đôi cánh lửa vỗ chậm phía sau
+  const WG = T.wings ? [-1, 1].map(sd => [sd, mk(svg.querySelector('.fl-wg'), 'path', { fill: `url(#${uid}o)`, opacity: '.6' }), mk(svg.querySelector('.fl-wg'), 'path', { fill: `url(#${uid}m)`, opacity: '.55' })]) : [];
+  const wings = t => WG.forEach(([sd, a, b]) => {
+    const fl = Math.sin(t * 2.2) * 9 + flare * 10, X = x => (60 + sd * x).toFixed(1);
+    a.setAttribute('d', `M${X(12)} 118 C${X(40)} 112 ${X(62)} ${(84 - fl).toFixed(1)} ${X(70)} ${(40 - fl * 1.6).toFixed(1)} C${X(58)} ${(62 - fl).toFixed(1)} ${X(48)} 74 ${X(40)} 82 C${X(46)} 66 ${X(44)} ${(56 - fl).toFixed(1)} ${X(38)} ${(48 - fl).toFixed(1)} C${X(34)} 70 ${X(26)} 90 ${X(14)} 100 Z`);
+    b.setAttribute('d', `M${X(14)} 116 C${X(36)} 110 ${X(50)} ${(92 - fl * .7).toFixed(1)} ${X(56)} ${(64 - fl).toFixed(1)} C${X(44)} 80 ${X(32)} 92 ${X(16)} 104 Z`);
+  });
+  // từ 365 ngày: các đốm sáng bay vòng quanh ngọn lửa
+  const OR = T.orbit ? Array.from({ length: 5 }, (_, k) => ({ k, b: mk(svg.querySelector('.fl-back'), 'circle', { fill: T.sp }), f: mk(svg.querySelector('.fl-front'), 'circle', { fill: '#fff' }) })) : [];
+  const orbit = t => OR.forEach(({ k, b, f }) => {
+    const a = t * 1.3 + k * Math.PI * 2 / 5, x = 60 + Math.cos(a) * 54, y = 92 + Math.sin(a) * 14, front = Math.sin(a) > 0, r = 1.6 + (Math.sin(a) + 1) * 1.1;
+    for (const [n, on] of [[f, front], [b, !front]]) { n.setAttribute('cx', x.toFixed(1)); n.setAttribute('cy', y.toFixed(1)); n.setAttribute('r', on ? r.toFixed(2) : 0); n.setAttribute('opacity', on ? (front ? .95 : .6) : 0); }
+  });
   const spg = svg.querySelector('.fl-sp'), SP = [];
-  for (let k = 0; k < 8; k++) { const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('fill', '#FFD08A'); spg.append(c); SP.push({ el: c, t0: -1 }); }
+  for (let k = 0; k < 12; k++) SP.push({ el: mk(spg, 'circle', { fill: T.sp }), t0: -1 });
   const sparks = now => SP.forEach((p, k) => {
-    const on = k < 2 + Math.round(Math.min(6, level * .7) + flare * 3);
-    if (p.t0 < 0 || now - p.t0 > p.life) { if (!on) { p.el.setAttribute('r', 0); p.t0 = -1; return; } p.t0 = now + Math.random() * 600; p.life = 900 + Math.random() * 700; p.x = CX + (Math.random() - .5) * 30; p.dx = (Math.random() - .5) * 30; p.r = 1 + Math.random() * 1.6; }
+    const on = level > 0 && k < 2 + Math.round(Math.min(T.crown ? 10 : 6, level * .7) + flare * 3);
+    if (p.t0 < 0 || now - p.t0 > p.life) { if (!on) { p.el.setAttribute('r', 0); p.t0 = -1; return; } p.t0 = now + Math.random() * 600; p.life = 900 + Math.random() * 700; p.x = 60 + (Math.random() - .5) * (T.crown ? 70 : 30); p.dx = (Math.random() - .5) * 30; p.r = 1 + Math.random() * 1.6; }
     const q = (now - p.t0) / p.life; if (q < 0) { p.el.setAttribute('r', 0); return; }
     p.el.setAttribute('cx', (p.x + p.dx * q + Math.sin(q * 9 + k) * 3).toFixed(1)); p.el.setAttribute('cy', (BASE - 70 - q * 80).toFixed(1)); p.el.setAttribute('r', (p.r * (1 - q)).toFixed(2)); p.el.setAttribute('opacity', (1 - q).toFixed(2));
   });
-  const size = lv => { box.style.setProperty('--s', (.72 + Math.min(lv, 30) * .012 + (lv >= 7 ? .04 : 0)).toFixed(3)); };
+  const size = lv => { box.style.setProperty('--s', (lv === 0 ? .66 : .72 + Math.min(lv, 30) * .012 + (lv >= 7 ? .04 : 0) - (T.crown ? .06 : 0)).toFixed(3)); };
   size(level);
   const rm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const frame = now => { if (!box.isConnected) return; const t = now / 1000; flare = Math.max(0, flare - .02); LY.forEach(L => outline(L, t)); sparks(now); requestAnimationFrame(frame); };
-  if (rm) LY.forEach(L => outline(L, 0)); else requestAnimationFrame(t => { LY.forEach(L => outline(L, t / 1000)); requestAnimationFrame(frame); });
-  return { el: box, flare: () => { flare = 1; }, level: lv => { level = lv; size(lv); } };
+  const draw = t => { LY.forEach(L => outline(L, t)); wings(t); orbit(t); };
+  const frame = now => { if (!box.isConnected) return; flare = Math.max(0, flare - .02); draw(now / 1000); sparks(now); requestAnimationFrame(frame); };
+  if (rm) draw(0); else requestAnimationFrame(t => { draw(t / 1000); requestAnimationFrame(frame); });
+  return { el: box, tier: T, flare: () => { flare = 1; }, level: lv => { level = lv; size(lv); } };
 }
 
 /* ---- Huy hiệu (Lucian UX/UI Prompt #386 · MIT License (c) 2026 Seokwoooo): mở khoá thì ổ khoá bay lên, huy chương lắc, vệt sáng quét qua, tia lửa toả ra ---- */
@@ -5367,6 +5526,9 @@ const BADGES = [
   ['s3', 'Khởi động', 'Đọc 3 ngày liên tục', () => streakBest(), 3, ['#FFB547', '#FF7A45'], '🔥'],
   ['s7', 'Tròn tuần', 'Đọc 7 ngày liên tục', () => streakBest(), 7, ['#FF922B', '#F03E3E'], '🗓️'],
   ['s30', 'Bền bỉ', 'Đọc 30 ngày liên tục', () => streakBest(), 30, ['#B197FC', '#7048E8'], '💎'],
+  ['s50', 'Lửa lam', 'Đọc 50 ngày liên tục', () => streakBest(), 50, ['#74C0FC', '#1C7ED6'], '🔷'],
+  ['s100', 'Vương miện', 'Đọc 100 ngày liên tục', () => streakBest(), 100, ['#E599F7', '#9C36B5'], '👑'],
+  ['s365', 'Bất diệt', 'Đọc 365 ngày liên tục', () => streakBest(), 365, ['#FF8787', '#7048E8'], '🌈'],
   ['c100', 'Trăm chương', 'Đọc xong 100 chương', () => sumG('ch'), 100, ['#38D9A9', '#0CA678'], '📚'],
   ['c1000', 'Nghìn chương', 'Đọc xong 1.000 chương', () => sumG('ch'), 1000, ['#4DABF7', '#1C7ED6'], '🏯'],
   ['h50', 'Mọt truyện', '50 giờ đọc', () => Math.floor(sumG('days') / 3600), 50, ['#F783AC', '#D6336C'], '🌙'],
@@ -5396,17 +5558,37 @@ function badgeGrid() {
 function openStreak() {
   openSheet('Chuỗi ngày đọc', body => {
     body.classList.add('sk');
-    const cur = streakNow(), best = streakBest(), todayOn = dayOn(today());
+    const W = streakWalk(), cur = W.cur, best = W.best, todayOn = W.todayDone, T = flTier(cur), NX = nextTier(cur);
     const fl = flame(cur);
     const num = rollNum(String(cur), 'big');
     const now = new Date(), dow = (now.getDay() + 6) % 7, wk = el('div', { class: 'sk-wk' });
-    WD.forEach((w, k) => { const d = new Date(now); d.setDate(now.getDate() - dow + k); const key = today(d), on = dayOn(key);
-      wk.append(el('div', {}, el('span', { class: 'sk-dy', text: w }), el('span', { class: 'sk-dt' + (on ? ' on' : '') + (k === dow ? ' today' : '') + (k > dow ? ' fut' : ''), style: `--k:${k}` }))); });
+    WD.forEach((w, k) => { const d = new Date(now); d.setDate(now.getDate() - dow + k); const key = today(d), on = !!W.ok[key], part = k === dow && !on ? Math.min(1, W.todaySec / W.todayNeed) : 0;
+      wk.append(el('div', {}, el('span', { class: 'sk-dy', text: w }), el('span', { class: 'sk-dt' + (on ? ' on' : '') + (part > 0 ? ' part' : '') + (k === dow ? ' today' : '') + (k > dow ? ' fut' : ''), style: `--k:${k};--p:${(part * 100).toFixed(0)}%` }))); });
     const full = [...wk.querySelectorAll('.sk-dt')].every(x => x.classList.contains('on'));
-    const hero = el('div', { class: 'sk-hero' + (full ? ' week' : '') }, fl.el,
-      el('div', { class: 'sk-ct', 'aria-live': 'polite' }, num.el, el('b', { text: 'ngày liên tục' })), wk,
+    const needM = Math.round(W.todayNeed / 60), readM = Math.floor(W.todaySec / 60), left = Math.max(0, needM - readM);
+    const nextNeed = needMin(cur + (todayOn ? 1 : 2));     // ngày kế tiếp cần bao nhiêu phút
+    const msg = todayOn
+      ? `Hôm nay đã giữ lửa ✓ Ngày mai cần ${nextNeed} phút.` + (nextNeed > needMin(cur) ? ` Từ ngày ${cur + 1} mức đọc tăng lên ${nextNeed} phút.` : '')
+      : cur === 0 ? `Đọc ${needM} phút hôm nay để nhóm lửa 🔥` : `Còn ${left} phút nữa để chuỗi lên ${cur + 1} ngày.`;
+    const prog = el('div', { class: 'sk-tp' + (todayOn ? ' done' : ''), role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(needM), 'aria-valuenow': String(Math.min(readM, needM)), 'aria-label': `Hôm nay ${readM}/${needM} phút` },
+      el('div', { class: 'sk-tp-h' }, el('span', { text: 'Hôm nay' }), el('b', { text: `${Math.min(readM, 999)} / ${needM} phút` })),
+      el('div', { class: 'sk-tp-b' }, el('i', { style: `--w:${Math.min(1, W.todaySec / W.todayNeed).toFixed(3)}` })));
+    const hero = el('div', { class: 'sk-hero' + (full ? ' week' : ''), style: `--hb1:${T.bg[0]};--hb2:${T.bg[1]};--hink:${T.ink};--glow:${T.glow};--d1:${T.o[0]};--d2:${T.o[2]}` }, fl.el,
+      el('div', { class: 'sk-ct', 'aria-live': 'polite' }, num.el, el('b', { text: 'ngày liên tục' })),
+      el('span', { class: 'sk-tier', text: T.name }), prog, wk,
       el('span', { class: 'sk-bd', text: 'Đủ tuần!' }),
-      el('p', { class: 'sk-msg', text: cur === 0 ? 'Đọc ít nhất 1 phút hôm nay để nhóm lửa 🔥' : todayOn ? `Hôm nay đã đọc, giữ lửa thêm ngày mai nhé. Kỷ lục: ${best} ngày.` : `Hôm nay chưa đọc: đọc 1 phút để chuỗi lên ${cur + 1} ngày. Kỷ lục: ${best} ngày.` }));
+      el('p', { class: 'sk-msg', text: msg + ` Kỷ lục: ${best} ngày.` }));
+    // Chặng đường lửa: mỗi mốc đổi màu (và từ 100 ngày đổi cả dáng) ngọn lửa
+    const RULES = [[1, 20, 15], [21, 50, 30], [51, Infinity, 45]];
+    const road = el('div', { class: 'sk-road' }, ...FL_TIERS.slice(1).map((t, i) => {
+      const done = cur >= t.min, here = T === t, nxt = NX === t;
+      const r = RULES.find(([a, b]) => t.min >= a && t.min <= b);
+      return el('div', { class: 'sk-ms' + (done ? ' done' : '') + (here ? ' here' : '') + (nxt ? ' next' : ''), style: `--k:${i};--c1:${t.o[0]};--c2:${t.o[2]}` },
+        el('span', { class: 'sk-ms-f', 'aria-hidden': 'true' }),
+        el('span', { class: 'sk-ms-t' }, el('b', { text: t.name }), el('small', { text: `${t.min} ngày${t.wings ? ' · mọc cánh' : t.crown ? ' · đổi dáng' : ''}${t.rainbow ? ' · cầu vồng' : ''}` })),
+        el('em', { text: done ? (here ? 'Đang ở đây' : 'Đã đạt') : nxt ? `còn ${t.min - cur} ngày` : `${r ? r[2] : 45} ph/ngày` }));
+    }));
+    const rules = el('div', { class: 'sk-rules' }, ...RULES.map(([a, b, m]) => el('div', { class: cur + 1 >= a && cur + 1 <= b ? 'on' : '' }, el('b', { text: `${m} phút` }), el('small', { text: b === Infinity ? `từ ngày ${a}` : `ngày ${a}–${b}` }))));
     // Lucian UX/UI Prompt #151 · MIT License (c) 2026 Seokwoooo · lưới 12 tuần, kéo thanh hoặc chạm ô để xem từng ngày
     const start = new Date(now); start.setDate(now.getDate() - dow - 77);
     const cells = [], heat = el('div', { class: 'sk-heat', role: 'img', 'aria-label': 'Số phút đọc mỗi ngày trong 12 tuần' });
@@ -5425,6 +5607,8 @@ function openStreak() {
     const bg = badgeGrid();
     const totH = Math.floor(sumG('days') / 3600), totC = sumG('ch');
     body.append(hero,
+      el('div', { class: 'ui-h', text: 'Mức đọc để giữ chuỗi' }), rules,
+      el('div', { class: 'ui-h', text: 'Chặng đường lửa' }), road,
       el('div', { class: 'ui-h', text: '12 tuần gần đây' }), el('div', { class: 'sk-card' }, months, heat, range, el('div', { class: 'sk-row' }, dt, ct), legend),
       el('div', { class: 'sk-tot' }, el('div', {}, el('b', { text: String(best) }), el('small', { text: 'kỷ lục ngày' })), el('div', {}, el('b', { text: totH.toLocaleString('vi-VN') }), el('small', { text: 'giờ đã đọc' })), el('div', {}, el('b', { text: totC.toLocaleString('vi-VN') }), el('small', { text: 'chương xong' }))),
       el('div', { class: 'ui-h', text: 'Huy hiệu' }), bg.el,
@@ -6742,7 +6926,7 @@ function lookCustom(fresh) {
     const out = el('span', { class: 'sl-val', text: fmt(val(k)) });
     const inp = el('input', { type: 'range', class: 'rg', min, max, step, value: val(k), 'aria-label': label });
     inp.disabled = !draft.custom;
-    inp.addEventListener('input', () => { draft[k] = +inp.value; out.textContent = fmt(+inp.value); fill(inp); upd(); });
+    inp.addEventListener('input', () => { if (!draft) draft = JSON.parse(JSON.stringify(S.over[S.theme] || {})); draft[k] = +inp.value; out.textContent = fmt(+inp.value); fill(inp); upd(); });
     fill(inp); sliders.push({ inp, out, k, fmt });
     return el('div', { class: 'sl' }, el('div', { class: 'sl-label', text: label }), el('div', { class: 'sl-row' }, bubbled(inp, fmt), out));
   };
@@ -6769,7 +6953,7 @@ function lookCustom(fresh) {
     el('div', { class: 'rs-head' },
       el('button', { type: 'button', class: 'rs-x', 'aria-label': 'Huỷ thay đổi', html: ICON.x, onclick: () => { draft = null; endLive(); lookMain(); } }),
       el('h3', { text: `Tuỳ chỉnh “${t.name}”` }),
-      el('button', { type: 'button', class: 'rs-x ok', 'aria-label': 'Lưu', html: ICON.check, onclick: saveDraft })),
+      el('button', { type: 'button', class: 'rs-x ok', 'aria-label': 'Lưu', html: ICON.check, onclick: () => saveDraft() })),
     el('div', { class: 'pv' }, el('div', { class: 'pv-aa', text: 'Aa' }), el('p', { class: 'pv-text', text: sampleText() })));
   upd();
   rs.replaceChildren(panel(top,
