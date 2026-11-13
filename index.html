@@ -2019,6 +2019,8 @@ html.c314-on,html.c314-on *{cursor:none!important}
 .rs-item:has(>.nt)>.grow{white-space:nowrap}
 .rs-item>.nt{flex:1 1 100%;min-width:0}
 .nt input{min-width:0;flex:1;max-width:9em}
+/* máy tính bảng / màn rộng: thẻ "Tuần này" dàn hết bề ngang thay vì bó ở 560px */
+@media (min-width:700px){.stats{max-width:none}.stats .wk{height:90px}}
 </style>
 </head>
 <body>
