@@ -2014,6 +2014,11 @@ html.c314-on,html.c314-on *{cursor:none!important}
 .u080-t b.in{opacity:0;transform:translateY(10px)}
 .u080-sub{margin:4px 0 0;font-size:13px;font-weight:650;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (prefers-reduced-motion:reduce){.u080-core,.u082-ring svg{animation:none}}
+/* khung giờ tối: nhãn một dòng, hai ô giờ xuống dòng riêng */
+.rs-item:has(>.nt){flex-wrap:wrap;row-gap:8px}
+.rs-item:has(>.nt)>.grow{white-space:nowrap}
+.rs-item>.nt{flex:1 1 100%;min-width:0}
+.nt input{min-width:0;flex:1;max-width:9em}
 </style>
 </head>
 <body>
@@ -2176,6 +2181,7 @@ const Store = {
 const MIME = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp', avif: 'image/avif', svg: 'image/svg+xml', bmp: 'image/bmp' };
 const extOf = n => (n.match(/\.([a-z0-9]+)$/i) || [, ''])[1].toLowerCase();
 const isImg = n => /^(jpe?g|png|gif|webp|avif|bmp)$/.test(extOf(n));
+let IMPORTING = 0;   // đang thêm truyện: cho phép nạp file lớn hơn vào bộ nhớ để đọc nhanh
 async function openZip(blob) {
   const tailLen = Math.min(blob.size, 65557);
   const tail = new DataView(await blob.slice(blob.size - tailLen).arrayBuffer());
@@ -2196,10 +2202,11 @@ async function openZip(blob) {
     o += 46 + nl + xl + cl;
   }
   const find = n => entries.get(n) || lower.get(String(n).toLowerCase());
+  const whole = blob.size <= (IMPORTING ? 40 : 12) * 1024 * 1024 && entries.size > 8 ? new Uint8Array(await blob.arrayBuffer()) : null;
   async function raw(e) {
-    const h = new DataView(await blob.slice(e.lho, e.lho + 30).arrayBuffer());
-    const start = e.lho + 30 + h.getUint16(26, true) + h.getUint16(28, true);
-    const data = blob.slice(start, start + e.csize);
+    let start, data;
+    if (whole) { const h = new DataView(whole.buffer, e.lho, 30); start = e.lho + 30 + h.getUint16(26, true) + h.getUint16(28, true); data = new Blob([whole.subarray(start, start + e.csize)]); }
+    else { const h = new DataView(await blob.slice(e.lho, e.lho + 30).arrayBuffer()); start = e.lho + 30 + h.getUint16(26, true) + h.getUint16(28, true); data = blob.slice(start, start + e.csize); }
     if (e.method === 0) return data;
     if (e.method === 8) {
       if (typeof DecompressionStream === 'undefined') throw new Error('trình duyệt quá cũ, hãy cập nhật iOS');
@@ -2423,7 +2430,8 @@ function guessTitle(files, firstMeta) {
   const t = firstMeta?.title || '';
   return t && !/^(ch|chương|chapter)[\s._-]*\d/i.test(t) ? t : '';
 }
-async function importFiles(fileList, target, opts = {}) {
+async function importFiles(...a) { IMPORTING++; try { return await importFiles0(...a); } finally { IMPORTING--; } }
+async function importFiles0(fileList, target, opts = {}) {
   const files = [...fileList].filter(f => SUPPORTED.test(f.name)).sort((a, b) => ncmp(a.name, b.name));
   const skipped = fileList.length - files.length;
   if (!files.length) { if (!opts.batch) toast('Chưa hỗ trợ loại file này. Hãy chọn file EPUB, PDF, FB2, MOBI/AZW3, CBZ hoặc TXT.'); return { added: 0, errors: [] }; }
@@ -2432,7 +2440,7 @@ async function importFiles(fileList, target, opts = {}) {
   const book = target || { id: uid(), title: '', created: Date.now(), lastRead: Date.now(), chapters: [], files: [], hasCover: false };
   let n = book.files.reduce((m, f) => Math.max(m, f.n + 1), 0);
   const errors = []; let firstMeta = null, coverSource = null, added = 0;
-  const dup = isNew ? null : dupGuard(book.chapters), lastNums = [];
+  const dup = isNew && files.length < 2 ? null : dupGuard(book.chapters), lastNums = [];   // nhiều file một lúc: bỏ cả chương trùng giữa các file
   showOverlay(opts.label || (isNew ? 'Đang thêm truyện…' : 'Đang thêm chương…'), isNew ? 'add' : 'sync', isNew ? null : book); OVX.n = files.length;
   for (let idx = 0; idx < files.length; idx++) {
     const f = files[idx];
@@ -2495,7 +2503,7 @@ async function importFiles(fileList, target, opts = {}) {
     : { title: `Đã nối ${dup.kept} chương mới`, sub: dup.skipped.length ? `Bỏ qua ${dup.skipped.length} chương đã có` : `Truyện có ${book.chapters.length} chương` });
   if (opts.batch) return { added, errors, dupSkipped: dup ? dup.skipped.length : 0 };
   await renderLibrary();
-  const msg = isNew ? `Đã thêm ${added} file${skipped ? ` (bỏ qua ${skipped} file không hỗ trợ)` : ''}.`
+  const msg = isNew ? `Đã thêm ${added} file${skipped ? ` (bỏ qua ${skipped} file không hỗ trợ)` : ''}${dup && dup.skipped.length ? `, bỏ qua ${dup.skipped.length} chương trùng giữa các file` : ''}.`
     : `Đã bổ sung ${dup.kept} chương mới` + (dup.skipped.length ? `, bỏ qua ${dup.skipped.length} chương đã có (${dup.range()})` : '') + (skipped ? `, bỏ qua ${skipped} file không hỗ trợ` : '') + '.';
   if (errors.length) showErrors(errors, msg);
   else if (isNew && files.length > 1 && book.title === 'Truyện mới') renameSheet(book, 'Đặt tên cho bộ truyện');
@@ -3151,6 +3159,7 @@ const finePtr = matchMedia('(hover: hover) and (pointer: fine)');
   document.addEventListener('scroll', () => { if (live) kick(); }, { passive: true, capture: true });
   document.documentElement.addEventListener('mouseleave', () => cur.classList.remove('is-on'));
   document.addEventListener('pointerdown', e => { if (live) cur.animate?.([{ scale: 1 }, { scale: .85 }, { scale: 1 }], { duration: 260 }); }, { passive: true });
+  document.addEventListener('click', () => setTimeout(() => { if (!live) return; if (!enabled()) { setLive(false); return; } const [m, t, label] = kind(document.elementFromPoint(pos.x, pos.y)); if (m !== mode || t !== tgt) { mode = m; tgt = t; cur.className = 'c314 is-on' + (m ? ' is-' + m : ''); cl.textContent = label; kick(); } }, 650), true);
 })();
 
 /* ---------------- Cá nhân hoá app: tên kệ, logo, lời chào, màu nhấn ---------------- */
@@ -3763,7 +3772,7 @@ function holdDel(b, body, mid, tail) {
 }
 function showErrors(errors, heading) {
   openSheet(heading, body => {
-    body.append(el('p', { text: `${errors.length} file không đọc được. Các file này có thể bị hỏng khi tải về; hãy tải lại rồi thêm lại vào bộ truyện.` }),
+    body.append(el('p', { text: `${errors.length} file không đọc được.` + (errors.every(e => /khoá bản quyền|DRM/.test(String(e.msg || e.message || e))) ? ' Xem lý do bên dưới.' : ' Các file này có thể bị hỏng khi tải về; hãy tải lại rồi thêm lại vào bộ truyện.') }),
       el('ul', { style: 'margin:0;padding-left:18px;font-size:13px;color:var(--muted);display:grid;gap:4px' }, ...errors.slice(0, 40).map(t => el('li', { text: t }))),
       el('div', { class: 'sheet-actions' }, el('button', { class: 'btn primary', type: 'button', text: 'Đã hiểu', onclick: closeSheet })));
   });
@@ -5086,18 +5095,19 @@ async function askSame(files, fileList, gTitle) {
 function dupGuard(existing) {
   const nm = t => foldVi(String(t || '')).replace(/[^a-z0-9]+/g, ' ').trim();
   const numKey = c => { const n = chNum(c.title); return n == null ? null : chVol(c.title) + '|' + n; };
-  const cnt = new Map(); for (const c of existing) { const k = numKey(c); if (k) cnt.set(k, (cnt.get(k) || 0) + 1); }
-  const byNum = [...cnt.values()].filter(v => v > 1).length <= 3;
-  const have = new Set(), names = new Set();
-  for (const c of existing) { const k = numKey(c); if (k && byNum) have.add(k); const t = nm(c.title); if (t.length >= 6) names.add(t); }
+  // so với các chương đã có + các file trước trong cùng lần thêm; chương lặp số NGAY TRONG một file không bị bỏ
+  const cnt = new Map(), names = new Set(); let dupKeys = 0;
+  const addAll = list => { for (const c of list) { const k = numKey(c); if (k) { const v = (cnt.get(k) || 0) + 1; cnt.set(k, v); if (v === 2) dupKeys++; } const t = nm(c.title); if (t.length >= 6) names.add(t); } };
+  addAll(existing);
   const G = { skipped: [], kept: 0,
     filter(meta) {
+      const byNum = dupKeys <= 3;                     // truyện đánh số lại theo quyển (lặp số nhiều) thì chỉ bỏ chương trùng tên
       meta.chapters = meta.chapters.filter(c => {
         const k = numKey(c), t = nm(c.title);
-        const isDup = (k && byNum && have.has(k)) || (t.length >= 6 && names.has(t));
-        if (isDup) { G.skipped.push(c.title || ''); return false; }
-        if (k && byNum) have.add(k); if (t.length >= 6) names.add(t); G.kept++; return true;
+        if ((k && byNum && cnt.has(k)) || (t.length >= 6 && names.has(t))) { G.skipped.push(c.title || ''); return false; }
+        G.kept++; return true;
       });
+      addAll(meta.chapters);
     },
     range() { const ns = G.skipped.map(chNum).filter(x => x != null); if (ns.length === G.skipped.length && ns.length) { const a = Math.min(...ns), b = Math.max(...ns); return a === b ? `chương ${a}` : b - a + 1 === ns.length ? `chương ${a}–${b}` : `${ns.length} chương từ ${a} đến ${b}`; } return G.skipped.slice(0, 2).join(', ') + (G.skipped.length > 2 ? '…' : ''); } };
   return G;
@@ -5359,7 +5369,10 @@ async function groupPicked(files) {
     if (!g.title && t && !chapterTitle) g.title = t;
   }
   for (const g of groups.values()) if (!g.title) g.title = g.files.length === 1 ? prettyName(g.files[0].name) : guessTitle(g.files, null);
-  return [...groups.values()];
+  const out = [];                                       // khác tên file nhưng cùng tên truyện (vd. tải hai lần) -> một truyện
+  for (const g of groups.values()) { const k = seriesKey(g.title), m = k.replace(/\s/g, '').length >= 3 && out.find(o => seriesKey(o.title) === k);
+    if (m) { m.files.push(...g.files); m.size += g.size; } else out.push(g); }
+  return out;
 }
 async function importPicked(fileList, target) {
   const files = [...fileList].filter(f => SUPPORTED.test(f.name));
@@ -5560,7 +5573,7 @@ function splitMenu(b, card) {
     ['custom', 'Tuỳ chỉnh', 'Màu, biểu tượng, ảnh bìa riêng', 'brush', 'sheet', () => storyCustom(b)],
     ['pin', pinned ? 'Bỏ ghim' : 'Ghim lên đầu', pinned ? 'Trả về chỗ cũ trên kệ' : 'Luôn đứng đầu kệ', 'pin', 'quick', () => saveBookUi(b, { pin: !pinned }), pinned ? 'Đã bỏ ghim' : 'Đã ghim lên đầu'],
     b.srcLast ? ['dl', 'Tải tiếp', `Chương mới từ ${host}`, 'dl', 'sheet', () => fetchMore(b)] : null,
-    ['add', 'Thêm chương', 'Nối thêm file EPUB, TXT, CBZ', 'add', 'sheet', () => pickFiles(b)],
+    ['add', 'Thêm chương', 'Nối thêm file truyện vào bộ này', 'add', 'sheet', () => pickFiles(b)],
     ['audit', 'Kiểm tra chương', 'Tìm chương thiếu, trùng, lệch', 'audit', 'sheet', () => openAudit(b)],
     b.kind === 'comic' ? null : ['norm', 'Chuẩn hoá chữ', b.norm ? 'Đang bật cho truyện này' : 'Sửa dấu câu, khoảng trắng', 'norm', 'sheet', () => openNorm(b)],
     b.kind === 'comic' ? null : ['filter', 'Lọc chữ', 'Ẩn dòng rác, thay chữ', 'filter', 'sheet', () => openFilter(b)],
