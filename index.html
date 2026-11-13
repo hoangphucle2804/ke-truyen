@@ -842,7 +842,7 @@ html:not([data-skin="lucian"]) .fab-main:focus-visible{outline-color:var(--accen
 html:not([data-skin="lucian"]) .fab-it:focus-visible i{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--accent)}
 html:not([data-skin="lucian"]) #fab-file i{background:var(--k-fab)}
 html:not([data-skin="lucian"]) #fab-folder i{background:var(--k-f2)}
-html:not([data-skin="lucian"]) #fab-sample i{background:var(--k-f3)}
+html:not([data-skin="lucian"]) #fab-backup i{background:var(--k-f3)}
 html:not([data-skin="lucian"]) .xd{background:var(--bg)}
 html:not([data-skin="lucian"]) .xd-m{background:var(--surface)}
 html:not([data-skin="lucian"]) .xd-bar i{background:var(--k-grad)}
@@ -1918,7 +1918,7 @@ html.c314-on,html.c314-on *{cursor:none!important}
     <span class="fab-halo" aria-hidden="true"></span>
     <button class="fab-it" type="button" id="fab-file" style="--c:linear-gradient(140deg,#5B8CFF,#3D6BFF)"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3.5h7l4 4V20a.5.5 0 0 1-.5.5h-10A.5.5 0 0 1 7 20z"/><path d="M14 3.5V8h4M10 13h5M10 16.5h5"/></svg></i><span>Chọn file</span></button>
     <button class="fab-it" type="button" id="fab-folder" style="--c:linear-gradient(140deg,#FFC24B,#F59E0B)" hidden><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg></i><span>Cả thư mục</span></button>
-    <button class="fab-it" type="button" id="fab-sample" style="--c:linear-gradient(140deg,#22C3A6,#119C72)"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 5.5c2.5-1 5-1 7 .5 2-1.500 4.500-1.500 7-.5v13c-2.500-1-5-1-7 .5-2-1.500-4.500-1.500-7-.5z"/><path d="M12 6v13"/></svg></i><span>Sách mẫu</span></button>
+    <button class="fab-it" type="button" id="fab-backup" style="--c:linear-gradient(140deg,#9775FA,#6741D9)"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7.5h16v11a1.500 1.500 0 0 1-1.500 1.500h-13A1.500 1.500 0 0 1 4 18.500z"/><path d="M3 4.5h18v3H3zM12 10.5v6M9.300 13.800 12 16.500l2.700-2.700"/></svg></i><span>Sao lưu</span></button>
     <button class="fab-main" type="button" id="fab-main" aria-expanded="false" aria-label="Thêm truyện"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 6v16M6 14h16"/></svg></button>
   </div>
   <div class="drop-hint" id="drop-hint" hidden><div>Thả file hoặc thư mục truyện vào đây</div></div>
@@ -3660,7 +3660,7 @@ $('#btn-import').addEventListener('click', () => pickFiles(null));
   });
   act('#fab-file', () => pickFiles(null));
   act('#fab-folder', () => { const inp = $('#folder-pick'); inp.value = ''; inp.click(); });
-  act('#fab-sample', () => addSample());
+  act('#fab-backup', () => setTimeout(openBackup, 200));
   fab.addEventListener('keydown', e => { if (e.key === 'Escape' && fab.classList.contains('is-open')) { e.preventDefault(); setOpen(false); main.focus(); } });
   document.addEventListener('pointerdown', e => { if (fab.classList.contains('is-open') && !fab.contains(e.target)) setOpen(false); });
 })();
