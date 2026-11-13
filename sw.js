@@ -2,7 +2,7 @@
 // Trang chính (index.html): mở NGAY bằng bản đã lưu (không chờ mạng), đồng thời tải bản mới ở nền;
 // có bản mới thì báo cho app, app tự làm mới khi bạn đang ở kệ (đang đọc thì chờ về kệ).
 // Ảnh/icon/manifest: dùng bản đã lưu cho nhanh, đồng thời cập nhật ngầm.
-const CACHE='ke-truyen-v55';
+const CACHE='ke-truyen-v57';
 const PAGE='./index.html';
 const SHELL=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 

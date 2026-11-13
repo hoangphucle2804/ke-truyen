@@ -179,8 +179,9 @@ html.paged,html.paged body{overflow:hidden;height:100%;overscroll-behavior:none}
 .pager .chap.text .content{max-width:none}
 .pager .chap img{max-height:var(--pgh,80vh);width:auto;max-width:100%;margin:0 auto .8em;break-inside:avoid;object-fit:contain;display:block}
 html.rd{background:var(--rbg)}
-.curl{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
-.curl-box{position:absolute;left:0;top:0;width:100%;height:100%;background:var(--rbg);overflow:hidden}
+.curl{position:absolute;inset:0;z-index:2;pointer-events:none;clip-path:inset(-160px 0 -160px 0)}
+.curl-box{position:absolute;left:0;top:0;width:100%;height:100%;background:var(--rbg)}
+.curl-box::before{content:"";position:absolute;left:0;right:0;top:-160px;bottom:-160px;background:var(--rbg)}
 .curl-inner{position:absolute;inset:0}
 .curl-view{position:absolute;overflow:hidden}
 .curl{z-index:4}
@@ -2037,11 +2038,16 @@ html:not([data-fx=full]).kt-booted .greet>*{animation:none}
 .rs-item .grow .rs-sub{display:block;margin-top:2px;font-size:12px;font-weight:500;color:var(--rs-sub,var(--muted));line-height:1.35}
 /* ===== Lật tờ giấy quanh gáy (hai trang) ===== */
 .curl.flip{perspective:2400px;perspective-origin:50% 50%}
-.fl-leaf{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform}
-.fl-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform-style:preserve-3d}
-.fl-face>.curl-box{box-shadow:0 0 24px rgba(0,0,0,.18)}
+.fl-strip{position:absolute;top:0;bottom:0;transform-style:preserve-3d;will-change:transform}
+.fl-face{position:absolute;top:0;bottom:0;left:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.fl-face>.curl-box{position:absolute;top:0;height:100%}
+.fl-face .curl-box::before{display:none}
+.fl-back{transform:rotateY(180deg)}
 .fl-shade{position:absolute;inset:0;pointer-events:none}
 .fl-cast{position:absolute;top:0;bottom:0;pointer-events:none;z-index:1}
+.curl.flip>.fl-strip,.fl-mir{z-index:2}
+.fl-mir{position:absolute;inset:0;transform-style:preserve-3d;transform:scaleX(-1)}
+.curl.flip.fl-warm{visibility:hidden}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.28s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
 </style>
 </head>
@@ -4329,7 +4335,7 @@ function addPg(s) {
 }
 function clearPager() {
   for (const s of [P.prev, P.cur, P.next]) if (s) dispose(s);
-  curlCancel(); P.prev = P.cur = P.next = null; P.anim = false; P.tok++; pgTrack.replaceChildren();
+  curlCancel(); if (P.fw) { P.fw.b.ov.remove(); P.fw = null; } P.prev = P.cur = P.next = null; P.anim = false; P.tok++; pgTrack.replaceChildren();
   pgView.style.opacity = '';
 }
 async function pageJump(i, frac) {
@@ -4382,7 +4388,7 @@ function goPos(pos) {
     pgView.style.transition = 'opacity .13s ease'; pgView.style.opacity = '0';
     setTimeout(() => { if (tok !== P.tok) return; setTrack(pos, false); pgView.style.opacity = '1'; setTimeout(done, 130); }, 130);
   } else if (S.mode === 'none' || matchMedia('(prefers-reduced-motion: reduce)').matches) { setTrack(pos, false); done(); }
-  else if (S.mode === 'curl') curlTurn(pos - P.page);
+  else if (S.mode === 'curl' || S.mode === 'book') curlTurn(pos - P.page);
   else { setTrack(pos, true); const t = setTimeout(done, 400); pgTrack.addEventListener('transitionend', () => { clearTimeout(t); done(); }, { once: true }); }
 }
 function settle(pos) {
@@ -4394,7 +4400,7 @@ function settle(pos) {
     P.next = P.cur; P.cur = P.prev; P.prev = null; P.page = clamp(P.cur.pages + pos, 0, P.cur.pages - 1);
   } else P.page = clamp(pos, 0, P.cur.pages - 1);
   place(); setTrack(P.page, false); addPages(1);
-  updateBars(); scheduleSave(); pgNeighbors();
+  updateBars(); scheduleSave(); pgNeighbors(); warmSoon();
 }
 function snapBack() { if (P.cur) setTrack(P.page, S.mode === 'slide'); }
 
@@ -4422,7 +4428,7 @@ function pageBox(pos) {
     el('div', { class: 'pg-foot', text: footLabel(pos) }));
 }
 function curlStart(dir, gy) {
-  if (P.two) return flipStart(dir, gy);
+  if (S.mode === 'book') return flipStart(dir, gy);
   const pr = pager.getBoundingClientRect(), W = pr.width, H = pr.height, from = P.page, to = from + dir;
   const page = pageBox(dir > 0 ? from : to), flap = pageBox(dir > 0 ? from : to);
   const shadow = el('div', { class: 'curl-shadow' }), shade = el('div', { class: 'curl-shade' });
@@ -4436,7 +4442,7 @@ function curlStart(dir, gy) {
   const s = dir > 0 ? CU.open : CU.closed; curlSet(s.x, s.y);
 }
 function clipPoly(W, H, d, sgn) {
-  const pts = [[0, 0], [W, 0], [W, H], [0, H]], out = [];
+  const pts = [[0, -160], [W, -160], [W, H + 160], [0, H + 160]], out = [];
   for (let i = 0; i < 4; i++) {
     const a = pts[i], b = pts[(i + 1) % 4], da = sgn * d(a[0], a[1]), db = sgn * d(b[0], b[1]);
     if (da >= 0) out.push(a);
@@ -4476,10 +4482,10 @@ function curlFinish(commit, ms = 300) {
   const tgt = (c.dir > 0) === commit ? c.closed : c.open;
   curlAnim(tgt.x, tgt.y, ms, () => {
     c.ov.remove(); CU = null; P.anim = false;
-    if (commit) settle(c.to); else { if (c.dir > 0) setTrack(c.from, false); updateBars(); }
+    if (commit) settle(c.to); else { if (c.dir > 0) setTrack(c.from, false); updateBars(); warmSoon(); }
   });
 }
-function curlTurn(dir) { P.anim = true; curlStart(dir, pager.getBoundingClientRect().height * 0.82); curlFinish(true, 520); }
+function curlTurn(dir) { P.anim = true; curlStart(dir, pager.getBoundingClientRect().height * 0.82); curlFinish(true, CU && CU.flip ? 640 : 520); }
 function curlCancel() { if (CU) { CU.ov.remove(); CU = null; } }
 
 /* Vuốt, chạm hai bên mép, cuộn chuột, phím mũi tên */
@@ -4491,13 +4497,13 @@ pgView.addEventListener('pointerdown', e => {
 pgView.addEventListener('pointermove', e => {
   if (!drag || drag.dead) return;
   const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-  if (drag.curl) { if (!CU) { drag = null; return; } drag.dx = dx; curlSet((CU.dir > 0 ? CU.W : -CU.W) + 2 * dx, CU.gy + dy * 0.6); return; }
+  if (drag.curl) { if (!CU) { drag = null; return; } drag.dx = dx; curlSet(CU.flip ? dx : (CU.dir > 0 ? CU.W : -CU.W) + 2 * dx, CU.gy + dy * 0.6); return; }
   if (P.anim) return;
   if (!drag.on) {
     if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy)) return;
     drag.on = true; try { pgView.setPointerCapture(drag.id); } catch {}
     if (R.chrome) setChrome(false);
-    if (S.mode === 'curl' && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if ((S.mode === 'curl' || S.mode === 'book') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       const dir = dx < 0 ? 1 : -1;
       if (blocked(dir)) { drag.dead = true; return; }
       P.anim = true; drag.curl = true;
@@ -4518,7 +4524,7 @@ pgView.addEventListener('pointerup', e => {
   if (d.dead) return;
   if (d.curl) {
     const v = d.dx / Math.max(1, performance.now() - d.t), c = CU;
-    const commit = c.dir > 0 ? (c.fx < c.W * 0.4 || v < -0.4) && v < 0.4 : (c.fx > -c.W * 0.4 || v > 0.4) && v > -0.4;
+    const commit = c.flip ? (c.dir > 0 ? (c.fx < -c.span / 2 || v < -0.4) && v < 0.4 : (c.fx > c.span / 2 || v > 0.4) && v > -0.4) : c.dir > 0 ? (c.fx < c.W * 0.4 || v < -0.4) && v < 0.4 : (c.fx > -c.W * 0.4 || v > 0.4) && v > -0.4;
     curlFinish(commit);
     return;
   }
@@ -4609,12 +4615,12 @@ document.addEventListener('keydown', e => {
 function followLink(a) { const t = a.dataset.target; const idx = R.book.chapters.findIndex(c => c.entries?.includes(t)); if (idx >= 0) jumpTo(idx, 0); }
 
 /* ================= Màn hình rộng: tự mở dạng sách; lật tờ giấy quanh gáy; chuyển kiểu đọc êm ================= */
-// Màn hình rộng nằm ngang (iPad ngang, laptop) có kiểu đọc riêng — mặc định "Lật trang – như sách" hai trang.
+// Màn hình rộng nằm ngang (iPad ngang, laptop) có kiểu đọc riêng — mặc định "Lật trang – giấy cong 3D" hai trang.
 // Màn hình hẹp (iPhone, iPad dọc) giữ kiểu đọc bạn chọn (mặc định cuộn dọc). Xoay máy là tự đổi, giữ nguyên chỗ đọc.
 const isWide = () => lsGet('kt-two', true) !== false && innerWidth >= 900 && innerWidth >= innerHeight * 1.15;
 function modeFor(wide) {
   if (S.modeNarrow == null) S.modeNarrow = S.mode || 'scroll';
-  if (wide && !(R.book && R.book.kind === 'comic')) return S.modeWide || 'curl';
+  if (wide && !(R.book && R.book.kind === 'comic')) return S.modeWide || 'book';
   return (R.book && R.book.look && R.book.look.mode) || S.modeNarrow;
 }
 // đổi kiểu đọc mà giữ chỗ đang đọc, có chuyển cảnh mờ dần nhẹ
@@ -4636,35 +4642,98 @@ function syncWide() {
 }
 let wideT; window.addEventListener('resize', () => { clearTimeout(wideT); wideT = setTimeout(syncWide, 160); });
 
-/* Lật trang hai trang như sách thật: tờ bên phải nhấc lên, quay quanh gáy (3D), mặt sau là trang trái của cặp kế;
-   bóng đổ lên trang bên dưới, mặt giấy tối dần khi nghiêng. Lật lùi thì tờ bên trái quay về phải. */
-function flipStart(dir, gy) {
+/* Lật trang hai trang như sách thật: tờ giấy bên phải nhấc lên, quay quanh gáy và CONG như giấy thật
+   (chia thành nhiều dải nối nhau, mỗi dải nghiêng thêm một chút, mép giấy đi sau gáy).
+   Mép tờ giấy luôn nằm dưới ngón tay; mặt sau là trang trái của cặp kế; ánh sáng thay đổi theo độ nghiêng từng dải,
+   bóng đổ lên trang bên dưới. Lật lùi thì tờ bên trái quay về phải. */
+const FLN = 10;
+function flipBuild(dir) {
   const pr = pager.getBoundingClientRect(), vr = pgView.getBoundingClientRect(), W = pr.width, H = pr.height, from = P.page, to = from + dir;
-  const X = vr.left - pr.left + vr.width / 2;                 // vị trí gáy sách
-  const half = (pos, side) => { const b = pageBox(pos); b.style.clipPath = side === 'L' ? `inset(0 ${W - X}px 0 0)` : `inset(0 0 0 ${X}px)`; return b; };
-  const under = pageBox(to), fixed = half(from, dir > 0 ? 'L' : 'R');
-  const front = half(from, dir > 0 ? 'R' : 'L'), back = half(to, dir > 0 ? 'L' : 'R');
-  const fShade = el('div', { class: 'fl-shade' }), bShade = el('div', { class: 'fl-shade' }), cast = el('div', { class: 'fl-cast' });
-  front.append(fShade); back.append(bShade);
-  const fFace = el('div', { class: 'fl-face' }, front), bFace = el('div', { class: 'fl-face fl-back' }, back);
-  bFace.style.transformOrigin = fFace.style.transformOrigin = `${X}px 50%`; bFace.style.transform = `rotateY(${dir > 0 ? 180 : -180}deg)`;
-  const leaf = el('div', { class: 'fl-leaf', style: `transform-origin:${X}px 50%` }, fFace, bFace);
-  const ov = el('div', { class: 'curl flip' }, under, cast, fixed, leaf);
-  pager.append(ov); $('#pg-ribbon').hidden = true;
-  if (dir > 0) { setTrack(to, false); $('#pg-foot').textContent = footLabel(to); }
-  CU = { flip: true, dir, from, to, ov, leaf, fShade, bShade, cast, X, W, H, gy, open: { x: W, y: gy }, closed: { x: -W * 1.08, y: gy } };
-  const s = dir > 0 ? CU.open : CU.closed; flipSet(s.x);
+  const one = !P.two;                                         // một trang (điện thoại): gáy ở mép trái màn hình
+  const rev = one && dir < 0;                                 // lật lùi một trang = tờ trước đó lật tới, chạy ngược lại
+  const A = rev ? to : from, Bp = rev ? from : to;            // tờ đang nhấc lên / trang nằm bên dưới
+  const X = one ? 0 : vr.left - pr.left + vr.width / 2;       // vị trí gáy sách
+  const h = one ? W : dir > 0 ? W - X : X, sw = h / FLN;     // bề rộng tờ giấy, mỗi dải
+  const half = (pos, side) => { const b = pageBox(pos); b.style.clipPath = side === 'L' ? `inset(-160px ${W - X}px -160px 0)` : `inset(-160px 0 -160px ${X}px)`; return b; };
+  const under = pageBox(one ? Bp : to), fixed = one ? null : half(from, dir > 0 ? 'L' : 'R');
+  // một mặt của một dải: khung hẹp, bên trong là bản sao trang dịch sang đúng chỗ
+  // lật lùi = lật tới soi gương qua gáy (dựng giống hệt rồi lật gương cả khối, chữ trong từng dải lật gương lại cho đọc xuôi)
+  const mir = !one && dir < 0;
+  const face = (pos, x0, back) => {
+    const b = pageBox(pos); b.style.left = -x0 + 'px'; b.style.width = W + 'px';
+    if (mir) { b.style.transform = 'scaleX(-1)'; b.style.transformOrigin = `${sw / 2 + .3 + x0}px 50%`; }
+    const inn = b.querySelector('.curl-inner'); if (inn) inn.style.transform = `translate(${-pos * P.vw}px,0)`;   // không tạo lớp 3D riêng (tránh mất mảng khi nghiêng)
+    const sh = el('div', { class: 'fl-shade' });
+    return [el('div', { class: 'fl-face' + (back ? ' fl-back' : ''), style: `width:${sw + .6}px` }, b, sh), sh];
+  };
+  const strips = []; let parent = null, root = null;
+  for (let i = 0; i < FLN; i++) {
+    const fx0 = dir > 0 || one ? X + i * sw : X - (i + 1) * sw;              // vùng của dải trên trang đang đọc
+    const bx0 = dir > 0 ? X - (i + 1) * sw : X + i * sw;              // vùng tương ứng trên trang mặt sau
+    const [ff, fs] = face(one ? A : from, fx0, false);
+    let bf, bs;
+    if (one) { bs = el('div', { class: 'fl-shade' }); bf = el('div', { class: 'fl-face fl-back', style: `width:${sw + .6}px` }, el('div', { class: 'curl-box' }), bs); }   // mặt sau tờ giấy: giấy trơn
+    else [bf, bs] = face(to, bx0, true);
+    const st = el('div', { class: 'fl-strip', style: `width:${sw}px;left:${parent ? sw : X}px;transform-origin:0 50%` }, ff, bf);
+    strips.push({ st, fs, bs });
+    if (parent) parent.append(st); else root = st;
+    parent = st;
+  }
+  const cast = el('div', { class: 'fl-cast' });
+  const leaf = mir ? el('div', { class: 'fl-mir', style: `transform-origin:${X}px 50%` }, root) : root;
+  const ov = el('div', { class: 'curl flip' + (one ? ' fl-one' : '') }, under, cast, ...(fixed ? [fixed] : []), leaf);
+  return { ov, strips, cast, X, W, H, h, from, to, rev, one, span: one ? h : 2 * h };
 }
+// dựng sẵn tờ giấy cho lần lật tới khi máy rảnh, để lúc chạm vào là lật ngay không khựng
+
+const flipKey = dir => P.cur ? [dir, P.cur.i, P.cur.pages, P.page, P.vw, P.vh, $('#pg-head').textContent].join('|') : '';
+function flipWarm(dir = 1) {
+  if (!P.cur || CU || R.mode !== 'page' || S.mode !== 'book') return;
+  const k = flipKey(dir); if (P.fw && P.fw.k === k) return;
+  if (P.fw) P.fw.b.ov.remove();
+  if (dir > 0 ? P.page + 1 >= P.cur.pages && !P.next : P.page <= 0 && !P.prev) { P.fw = null; return; }
+  const b = flipBuild(dir); b.ov.classList.add('fl-warm'); pager.append(b.ov); P.fw = { k, b };
+}
+function flipStart(dir, gy) {
+  let b;
+  if (P.fw && P.fw.k === flipKey(dir)) { b = P.fw.b; b.ov.classList.remove('fl-warm'); P.fw = null; }
+  else { if (P.fw) { P.fw.b.ov.remove(); P.fw = null; } b = flipBuild(dir); pager.append(b.ov); }
+  $('#pg-ribbon').hidden = true;
+  if (dir > 0) { setTrack(b.to, false); $('#pg-foot').textContent = footLabel(b.to); }
+  const c = dir > 0 ? -b.span : b.span;
+  CU = { flip: true, dir, gy, ...b, open: { x: dir > 0 ? 0 : c, y: gy }, closed: { x: dir > 0 ? c : 0, y: gy } };
+  flipSet(0);
+}
+let fwT; const warmSoon = () => { clearTimeout(fwT); fwT = setTimeout(() => (window.requestIdleCallback || setTimeout)(() => flipWarm(1)), 250); };
+pgView.addEventListener('pointerdown', e => flipWarm(e.clientX - pgView.getBoundingClientRect().left < P.vw * .35 ? -1 : 1), true);
+// fx = quãng ngón tay đã kéo (âm khi lật tới)
 function flipSet(fx) {
   const c = CU; c.fx = fx; c.fy = c.gy;
-  const p = clamp(c.dir > 0 ? (c.W - fx) / (2.08 * c.W) : (fx + 1.08 * c.W) / (2.08 * c.W), 0, 1), e = p, a = e * 180, s = Math.sin(e * Math.PI);
-  c.leaf.style.transform = `rotateY(${c.dir > 0 ? -a : a}deg)`;
-  c.fShade.style.background = c.dir > 0 ? `linear-gradient(90deg,rgba(0,0,0,${(.32 * e).toFixed(3)}) ${c.X}px,rgba(0,0,0,${(.12 * e).toFixed(3)}) 100%)` : `linear-gradient(270deg,rgba(0,0,0,${(.32 * e).toFixed(3)}) ${c.W - c.X}px,rgba(0,0,0,${(.12 * e).toFixed(3)}) 100%)`;
-  c.bShade.style.background = `rgba(0,0,0,${(.22 * (1 - e)).toFixed(3)})`;
-  const w = Math.max(0, (c.W - c.X) * (1 - Math.abs(Math.cos(e * Math.PI))) * .55);   // bóng tờ giấy đổ lên trang dưới, cạnh gáy
-  c.cast.style.cssText = c.dir > 0
-    ? `left:${c.X}px;width:${w.toFixed(1)}px;background:linear-gradient(90deg,rgba(0,0,0,${(.28 * s).toFixed(3)}),transparent)`
-    : `left:${(c.X - w).toFixed(1)}px;width:${w.toFixed(1)}px;background:linear-gradient(270deg,rgba(0,0,0,${(.28 * s).toFixed(3)}),transparent)`;
+  const p0 = clamp(c.dir > 0 ? -fx / c.span : fx / c.span, 0, 1), p = c.rev ? 1 - p0 : p0;
+  const a = Math.acos(clamp(1 - 2 * p, -1, 1)) * 180 / Math.PI;      // mép giấy nằm dưới ngón tay
+  const B = 62 * Math.sin(p * Math.PI) * (1 - .35 * p);               // độ cong: nhiều nhất lúc giữa chừng
+  const sg = -1, n = c.strips.length;   // lật lùi đã được soi gương nên luôn tính như lật tới
+  const th = clamp(a + B / 2, 0, 180), ang = [];
+  let acc = 0;
+  c.strips.forEach((s, i) => { const d = i === 0 ? th : -B / (n - 1); acc += d; ang.push(clamp(acc, 0, 180)); s.st.style.transform = `rotateY(${(sg * d).toFixed(2)}deg)`; });
+  // ánh sáng mượt theo độ cong: tính ở từng mối nối rồi tô dải màu chuyển giữa hai mối nối (không bị sọc)
+  const jt = k => k <= 0 ? ang[0] : k >= n ? ang[n - 1] : (ang[k - 1] + ang[k]) / 2;
+  const fa = t => (.30 * Math.sin(t * Math.PI / 180) + .04 * p).toFixed(3), ba = t => (.26 * Math.sin(t * Math.PI / 180) + .05 * (1 - p)).toFixed(3);
+  c.strips.forEach((s, i) => {
+    const j0 = jt(i), j1 = jt(i + 1);                                  // mối nối phía gáy, phía mép
+    const [fl, fr] = [j0, j1];                                         // trái/phải của mặt trước
+    s.fs.style.background = `linear-gradient(90deg,rgba(0,0,0,${fa(fl)}),rgba(0,0,0,${fa(fr)}))`;
+    s.bs.style.background = `linear-gradient(90deg,rgba(0,0,0,${ba(fr)}),rgba(0,0,0,${ba(fl)}))`;   // mặt sau bị lật gương
+  });
+  const s = Math.sin(p * Math.PI), w = Math.max(0, c.h * (1 - Math.abs(1 - 2 * p)) * .5);
+  if (c.one) {   // một trang: bóng tờ giấy đổ lên trang dưới, ngay sát mép giấy
+    const ex = Math.max(0, c.h * (1 - 2 * p)), cw = c.h * .22 * s;
+    c.cast.style.cssText = `left:${ex.toFixed(1)}px;width:${cw.toFixed(1)}px;background:linear-gradient(90deg,rgba(0,0,0,${(.28 * s).toFixed(3)}),transparent)`;
+    return;
+  }
+  c.cast.style.cssText = c.dir > 0 || c.rev
+    ? `left:${c.X}px;width:${w.toFixed(1)}px;background:linear-gradient(90deg,rgba(0,0,0,${(.30 * s).toFixed(3)}),transparent)`
+    : `left:${(c.X - w).toFixed(1)}px;width:${w.toFixed(1)}px;background:linear-gradient(270deg,rgba(0,0,0,${(.30 * s).toFixed(3)}),transparent)`;
 }
 
 /* ================= Phản hồi tức thì: Hiệu ứng Đầy đủ / Gọn / Tắt =================
@@ -7548,7 +7617,7 @@ function keepPlace(fn) {
   if (p) { const s = R.secs.find(x => x.i === p.i); if (s) window.scrollTo(0, absTop(s.el) + p.frac * s.el.getBoundingClientRect().height); }
 }
 let draft = null;
-const MODES = [['scroll', 'Cuộn dọc'], ['curl', 'Lật trang – như sách'], ['slide', 'Lật trang – trượt'], ['fade', 'Lật trang – mờ dần'], ['none', 'Lật trang – tức thì']];
+const MODES = [['scroll', 'Cuộn dọc'], ['curl', 'Lật trang – như sách'], ['book', 'Lật trang – giấy cong 3D'], ['slide', 'Lật trang – trượt'], ['fade', 'Lật trang – mờ dần'], ['none', 'Lật trang – tức thì']];
 const LOOKS = [['auto', 'Tự động theo máy'], ['light', 'Luôn sáng'], ['dark', 'Luôn tối']];
 document.addEventListener('click', e => { const t = e.target.closest?.('#r-toc,#r-tocb,#r-pos,#r-more,#r-look,#r-find'); if (t) R.trig = t; }, true);
 /* Lucian UX/UI Prompt #289 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#289
