@@ -1876,6 +1876,12 @@ html.c314-on,html.c314-on *{cursor:none!important}
 @media (prefers-reduced-motion:reduce){.skt,.skt.out{transition:opacity .2s}.skt{transform:translate(-50%,0)}.skt::after{display:none}.skt-ok circle,.skt-ok path{transition:none}.skt.up .skt-tx b{animation:none}}
 /* bỏ nút mục lục trùng ở thanh trên (đã có nút ở thanh dưới) */
 #r-toc{display:none!important}
+/* ===== Báo chương còn thiếu ===== */
+.gp-warn{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;padding:12px 14px;border-radius:18px;background:color-mix(in srgb,#f59f00 13%,var(--surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,#f59f00 35%,transparent)}
+.gp-warn-ic{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:18px;color:#fff;background:linear-gradient(160deg,#ffb547,#e8590c);box-shadow:0 6px 14px -6px rgba(232,89,12,.8)}
+.gp-warn b{display:block;font-size:15px;font-weight:780}
+.gp-warn small{display:block;margin-top:2px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.gp-it small .gp-into{color:#0ca678;font-weight:700}
 </style>
 </head>
 <body>
@@ -2263,7 +2269,7 @@ function splitText(text, fname) {
 }
 
 /* ---------------- Thêm truyện ---------------- */
-const SUPPORTED = /\.(epub|cbz|zip|txt|pdf)$/i;
+const SUPPORTED = /\.(epub|cbz|zip|txt|pdf|fb2|mobi|azw3|azw|prc)$/i;
 async function makeThumb(blob) {
   let src;
   try { src = await createImageBitmap(blob); }
@@ -2287,22 +2293,29 @@ function guessTitle(files, firstMeta) {
 async function importFiles(fileList, target, opts = {}) {
   const files = [...fileList].filter(f => SUPPORTED.test(f.name)).sort((a, b) => ncmp(a.name, b.name));
   const skipped = fileList.length - files.length;
-  if (!files.length) { if (!opts.batch) toast('Chưa hỗ trợ loại file này. Hãy chọn file EPUB, PDF, CBZ hoặc TXT.'); return { added: 0, errors: [] }; }
+  if (!files.length) { if (!opts.batch) toast('Chưa hỗ trợ loại file này. Hãy chọn file EPUB, PDF, FB2, MOBI/AZW3, CBZ hoặc TXT.'); return { added: 0, errors: [] }; }
   try { await navigator.storage?.persist?.(); } catch {}
   const isNew = !target;
   const book = target || { id: uid(), title: '', created: Date.now(), lastRead: Date.now(), chapters: [], files: [], hasCover: false };
   let n = book.files.reduce((m, f) => Math.max(m, f.n + 1), 0);
   const errors = []; let firstMeta = null, coverSource = null, added = 0;
-  const dup = isNew ? null : dupGuard(book.chapters);
+  const dup = isNew ? null : dupGuard(book.chapters), lastNums = [];
   showOverlay(opts.label || (isNew ? 'Đang thêm truyện…' : 'Đang thêm chương…'));
   for (let idx = 0; idx < files.length; idx++) {
     const f = files[idx];
     updateOverlay(idx / files.length, `${idx + 1}/${files.length} · ${f.name}`);
     try {
-      const ext = extOf(f.name);
+      const ext = extOf(f.name), conv = /^(fb2|mobi|azw3|azw|prc)$/.test(ext) || /\.fb2\.zip$/i.test(f.name);
       let meta;
       const key = `${book.id}/f${n}`;
-      if (ext === 'pdf') {
+      if (conv) {                     // FB2 / Kindle: chuyển thành EPUB trong máy rồi đọc như EPUB
+        updateOverlay(idx / files.length, `${idx + 1}/${files.length} · Đang chuyển ${f.name}`);
+        const eb = await convertBook(f), zip = await openZip(eb);
+        meta = await parseEpub(zip, f.name);
+        if (dup) { dup.filter(meta); if (!meta.chapters.length) continue; }
+        await Store.putFile(key, eb);
+        if (!coverSource && meta.coverPath && zip.has(meta.coverPath)) coverSource = () => zip.blob(meta.coverPath);
+      } else if (ext === 'pdf') {
         meta = await parsePdf(f, key, (fr, t) => updateOverlay((idx + fr * .98) / files.length, `${idx + 1}/${files.length} · ${t}`));
         if (dup && meta.pdf === 'text') { dup.filter(meta); if (!meta.chapters.length) continue; }
         if (meta.pdf === 'text') for (let j = 0; j < meta.chapters.length; j++) {
@@ -2325,6 +2338,7 @@ async function importFiles(fileList, target, opts = {}) {
         await Store.putFile(key, new Blob([f], { type: 'application/zip' }));
         if (!coverSource && meta.coverPath && zip.has(meta.coverPath)) coverSource = () => zip.blob(meta.coverPath);
       }
+      if (opts.meta) lastNums.push(...meta.chapters.map(c => chNum(c.title)));
       meta.chapters.forEach((c, j) => { c.id = `c${n}_${j}`; c.file = key; c.src = f.name; c.sub = j; });
       book.files.push({ n, key, name: f.name, size: f.size });
       book.chapters.push(...meta.chapters);
@@ -2334,9 +2348,9 @@ async function importFiles(fileList, target, opts = {}) {
     } catch (e) { errors.push(`${f.name}: ${e.message || e}`); }
   }
   updateOverlay(1, 'Đang lưu…');
-  if (opts.meta && added) Object.assign(book, opts.meta);
+  if (opts.meta && added) { Object.assign(book, opts.meta); const ns = lastNums.filter(x => x != null); if (ns.length) book.srcLastN = Math.max(...ns); }
   if (!added) { hideOverlay(); if (dup && dup.skipped.length && !errors.length) { if (!opts.batch) toast(`Không có chương mới: cả ${dup.skipped.length} chương đều đã có trong truyện.`); return { added, errors, dupSkipped: dup.skipped.length }; } if (!opts.batch) showErrors(errors, 'Không thêm được file nào'); return { added, errors }; }
-  book.chapters.sort((a, b) => ncmp(a.src, b.src) || a.sub - b.sub);
+  sortChapters(book.chapters);
   const types = new Set(book.chapters.map(c => c.type));
   book.kind = types.size === 1 && types.has('images') ? 'comic' : types.has('images') ? 'mixed' : 'novel';
   if (isNew) { book.title = opts.title || guessTitle(files, firstMeta) || 'Truyện mới'; book.author = firstMeta?.creator || ''; book.desc = cleanDesc(firstMeta?.desc || ''); }
@@ -2350,6 +2364,7 @@ async function importFiles(fileList, target, opts = {}) {
     : `Đã bổ sung ${dup.kept} chương mới` + (dup.skipped.length ? `, bỏ qua ${dup.skipped.length} chương đã có (${dup.range()})` : '') + (skipped ? `, bỏ qua ${skipped} file không hỗ trợ` : '') + '.';
   if (errors.length) showErrors(errors, msg);
   else if (isNew && files.length > 1 && book.title === 'Truyện mới') renameSheet(book, 'Đặt tên cho bộ truyện');
+  else if (!isNew || files.length > 1) addReport(book, msg);
   else toast(msg);
 }
 
@@ -3518,7 +3533,7 @@ function emptyState() {
       el('li', {}, el('div', { html: 'Bấm <b>Thêm truyện</b>, mở thư mục chứa truyện trong ứng dụng Tệp.' })),
       el('li', {}, el('div', { html: 'Bấm <b>Chọn</b> ở góc trên, chọn tất cả các chương (ví dụ 209 file EPUB). Các phần của cùng một truyện được gộp thành <b>một bộ</b>, xếp đúng thứ tự chương; chọn nhiều truyện khác nhau thì mỗi truyện thành một bộ riêng.' })),
       el('li', {}, el('div', { html: 'Chạm vào bìa để đọc. Truyện tranh cuộn dọc liền mạch qua các chương, chạm giữa màn hình để hiện mục lục.' }))),
-    el('div', { class: 'formats' }, ...['EPUB truyện chữ', 'EPUB truyện tranh', 'PDF', 'CBZ / ZIP ảnh', 'TXT'].map(t => el('span', { class: 'chip', text: t }))),
+    el('div', { class: 'formats' }, ...['EPUB truyện chữ', 'EPUB truyện tranh', 'PDF', 'FB2', 'MOBI / AZW3', 'CBZ / ZIP ảnh', 'TXT'].map(t => el('span', { class: 'chip', text: t }))),
     el('div', { class: 'row' },
       el('button', { class: 'btn primary', type: 'button', text: 'Thêm truyện', onclick: () => pickFiles(null) }),
       canFolder ? el('button', { class: 'btn ghost', type: 'button', text: 'Thêm cả thư mục', onclick: () => $('#btn-folder').click() }) : null,
@@ -3677,7 +3692,7 @@ function groupEntries(entries) {
 }
 async function importEntries(entries) {
   const { groups, skipped } = groupEntries(entries);
-  if (!groups.length) { toast('Không có file EPUB, PDF, CBZ hoặc TXT nào trong đó.'); return; }
+  if (!groups.length) { toast('Không có file truyện nào (EPUB, PDF, FB2, MOBI/AZW3, CBZ, TXT) trong đó.'); return; }
   const books = await Store.books().catch(() => []);
   const have = new Set(books.flatMap(b => b.files.map(f => f.name + '|' + f.size)));
   const todo = groups.filter(g => !g.files.every(f => have.has(f.name + '|' + f.size)));
@@ -4418,6 +4433,317 @@ document.addEventListener('keydown', e => {
 });
 function followLink(a) { const t = a.dataset.target; const idx = R.book.chapters.findIndex(c => c.entries?.includes(t)); if (idx >= 0) jumpTo(idx, 0); }
 
+/* ================= FB2 và MOBI / AZW3 (Kindle không khoá) =================
+   Cả hai được chuyển ngay trong máy thành một EPUB gọn, rồi đi tiếp đường EPUB sẵn có (mục lục, ảnh, bìa, giới thiệu).
+   File Kindle có khoá bản quyền (DRM) thì báo rõ và không mở — app không gỡ khoá. */
+const XH = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const sniffImg = u8 => u8[0] === 0xFF && u8[1] === 0xD8 ? ['image/jpeg', 'jpg'] : u8[0] === 0x89 && u8[1] === 0x50 ? ['image/png', 'png'] : u8[0] === 0x47 && u8[1] === 0x49 ? ['image/gif', 'gif']
+  : u8[0] === 0x42 && u8[1] === 0x4D ? ['image/bmp', 'bmp'] : u8[8] === 0x57 && u8[9] === 0x45 ? ['image/webp', 'webp'] : null;
+function mkEpub({ title, author = '', desc = '', lang = 'vi', chapters, images = [], cover = null }) {
+  const enc = new TextEncoder(), E = [], man = [], spine = [], nav = [];
+  E.push({ name: 'mimetype', data: enc.encode('application/epub+zip') });
+  E.push({ name: 'META-INF/container.xml', data: enc.encode('<?xml version="1.0"?><container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>') });
+  chapters.forEach((c, i) => {
+    const f = `c${String(i + 1).padStart(4, '0')}.xhtml`;
+    E.push({ name: 'OEBPS/' + f, data: enc.encode(`<?xml version="1.0" encoding="utf-8"?>\n<html xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"/><title>${XH(c.title)}</title></head><body>${c.html}</body></html>`) });
+    man.push(`<item id="c${i}" href="${f}" media-type="application/xhtml+xml"/>`); spine.push(`<itemref idref="c${i}"/>`);
+    nav.push(`<navPoint id="n${i}" playOrder="${i + 1}"><navLabel><text>${XH(c.title)}</text></navLabel><content src="${f}"/></navPoint>`);
+  });
+  images.forEach((im, i) => { E.push({ name: 'OEBPS/' + im.name, data: im.data }); man.push(`<item id="i${i}" href="${XH(im.name)}" media-type="${im.type}"${im.name === cover ? ' properties="cover-image"' : ''}/>`); });
+  const ci = cover ? images.findIndex(x => x.name === cover) : -1;
+  E.push({ name: 'OEBPS/toc.ncx', data: enc.encode(`<?xml version="1.0" encoding="utf-8"?><ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1"><head/><docTitle><text>${XH(title)}</text></docTitle><navMap>${nav.join('')}</navMap></ncx>`) });
+  E.push({ name: 'OEBPS/content.opf', data: enc.encode(`<?xml version="1.0" encoding="utf-8"?><package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="id"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:identifier id="id">kt-${uid()}</dc:identifier><dc:title>${XH(title)}</dc:title>${author ? `<dc:creator>${XH(author)}</dc:creator>` : ''}${desc ? `<dc:description>${XH(desc)}</dc:description>` : ''}<dc:language>${XH(lang)}</dc:language>${ci >= 0 ? `<meta name="cover" content="i${ci}"/>` : ''}</metadata><manifest><item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>${man.join('')}</manifest><spine toc="ncx">${spine.join('')}</spine></package>`) });
+  return zipStore(E);
+}
+
+/* ---------- FB2 ---------- */
+async function fb2ToEpub(blob) {
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  const head = new TextDecoder('latin1').decode(bytes.subarray(0, 300)), em = /encoding\s*=\s*["']([\w-]+)["']/i.exec(head);
+  let txt; try { txt = new TextDecoder(em ? em[1] : 'utf-8').decode(bytes); } catch { txt = new TextDecoder().decode(bytes); }
+  let d = new DOMParser().parseFromString(txt, 'application/xml');
+  if (d.getElementsByTagName('parsererror').length) {          // FB2 lỗi cú pháp nhẹ (dấu & trần…): sửa rồi đọc lại
+    d = new DOMParser().parseFromString(txt.replace(/&(?!(?:[a-z]+|#\d+|#x[\da-f]+);)/gi, '&amp;'), 'application/xml');
+    if (d.getElementsByTagName('parsererror').length) throw new Error('File FB2 bị lỗi, không đọc được');
+  }
+  const all = (r, n) => r ? [...r.getElementsByTagNameNS('*', n)] : [], one = (r, n) => all(r, n)[0];
+  const kids = (r, n) => r ? [...r.children].filter(c => c.localName === n) : [];
+  const hrefOf = e => { for (const a of e.attributes) if (/(^|:)href$/i.test(a.name)) return a.value.replace(/^#/, ''); return ''; };
+  const ti = one(d, 'title-info');
+  const title = (one(ti, 'book-title')?.textContent || '').replace(/\s+/g, ' ').trim();
+  const author = all(ti, 'author').map(a => ['first-name', 'middle-name', 'last-name'].map(k => one(a, k)?.textContent.trim()).filter(Boolean).join(' ') || one(a, 'nickname')?.textContent.trim() || '').filter(Boolean).join(', ');
+  const desc = (one(ti, 'annotation')?.textContent || '').replace(/\s+/g, ' ').trim(), lang = one(ti, 'lang')?.textContent.trim() || 'vi';
+  const images = [], imgName = new Map();
+  for (const b of all(d, 'binary')) {
+    try {
+      const raw = atob(b.textContent.replace(/\s+/g, '')), u8 = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) u8[i] = raw.charCodeAt(i);
+      const t = sniffImg(u8) || [b.getAttribute('content-type') || 'image/jpeg', 'jpg'], name = `img/${images.length}.${t[1]}`;
+      images.push({ name, type: t[0], data: u8 }); imgName.set(b.getAttribute('id'), name);
+    } catch {}
+  }
+  const cvEl = one(one(ti, 'coverpage'), 'image'), cover = cvEl ? imgName.get(hrefOf(cvEl)) || null : null;
+  const TAG = { emphasis: 'i', strong: 'b', strikethrough: 's', sup: 'sup', sub: 'sub', code: 'code', subtitle: 'h4', epigraph: 'blockquote', cite: 'blockquote', 'text-author': 'p', v: 'p', table: 'table', tr: 'tr', td: 'td', th: 'th' };
+  const conv = n => {
+    if (n.nodeType === 3) return XH(n.nodeValue);
+    if (n.nodeType !== 1) return '';
+    const k = n.localName, inner = () => [...n.childNodes].map(conv).join('');
+    if (k === 'p') return `<p>${inner()}</p>`;
+    if (k === 'empty-line') return '<p><br/></p>';
+    if (k === 'image') { const s = imgName.get(hrefOf(n)); return s ? `<p class="img"><img src="${XH(s)}" alt=""/></p>` : ''; }
+    if (k === 'title') return `<h3>${[...n.children].map(c => XH(c.textContent.trim())).filter(Boolean).join('<br/>')}</h3>`;
+    if (k === 'a') return /note/.test(n.getAttribute('type') || '') ? `<sup>${inner()}</sup>` : inner();
+    if (k === 'poem' || k === 'stanza') return `<div class="poem">${inner()}</div>`;
+    if (k === 'section') return inner();
+    const t = TAG[k]; return t ? `<${t}>${inner()}</${t}>` : inner();
+  };
+  const titleOf = sec => { const ps = [...(kids(sec, 'title')[0]?.children || [])].map(p => p.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean);
+    return ps.length < 2 ? ps[0] || '' : /[:.\-–]$/.test(ps[0]) ? ps.join(' ') : ps.join(': '); };
+  const chapters = [];
+  const walk = (sec, parent) => {
+    const subs = kids(sec, 'section'), t = titleOf(sec);
+    const own = [...sec.childNodes].filter(c => !(c.nodeType === 1 && (c.localName === 'section' || c.localName === 'title'))).map(conv).join('').trim();
+    if (!subs.length || own.replace(/<[^>]+>/g, '').trim().length > 40 || /<img/.test(own)) chapters.push({ title: t || parent || `Phần ${chapters.length + 1}`, html: (t ? `<h2>${XH(t)}</h2>` : '') + own });
+    subs.forEach(s => walk(s, t || parent));
+  };
+  const bodies = all(d, 'body'), main = bodies.filter(b => !/notes|comments/i.test(b.getAttribute('name') || ''));
+  for (const b of main) { const secs = kids(b, 'section'); if (secs.length) secs.forEach(s => walk(s, '')); else walk(b, title); }
+  const notes = bodies.find(b => /notes|comments/i.test(b.getAttribute('name') || ''));
+  if (notes) chapters.push({ title: 'Chú thích', html: '<h2>Chú thích</h2>' + [...notes.children].filter(c => c.localName !== 'title').map(conv).join('') });
+  if (!chapters.length) throw new Error('File FB2 không có nội dung');
+  return mkEpub({ title, author, desc, lang, chapters, images, cover });
+}
+
+/* ---------- MOBI / AZW3 ---------- */
+function palmdocUnpack(src) {
+  const out = new Uint8Array(src.length * 8 + 16); let o = 0;
+  for (let i = 0; i < src.length;) {
+    const c = src[i++];
+    if (c >= 1 && c <= 8) { for (let k = 0; k < c && i < src.length; k++) out[o++] = src[i++]; }
+    else if (c < 0x80) out[o++] = c;
+    else if (c >= 0xC0) { out[o++] = 0x20; out[o++] = c ^ 0x80; }
+    else { const x = (c << 8) | src[i++], dist = (x >> 3) & 0x7FF, n = (x & 7) + 3; for (let k = 0; k < n; k++) { out[o] = out[o - dist]; o++; } }
+  }
+  return out.subarray(0, o);
+}
+function huffReader(recs) {
+  const H = recs[0], hv = new DataView(H.buffer, H.byteOffset, H.byteLength);
+  if (String.fromCharCode(...H.subarray(0, 4)) !== 'HUFF') throw new Error('Bảng nén HUFF hỏng');
+  const o1 = hv.getUint32(8), o2 = hv.getUint32(12), dict1 = [], mincode = [0], maxcode = [0x100000000 - 1];
+  for (let i = 0; i < 256; i++) { const v = hv.getUint32(o1 + i * 4), len = v & 0x1F, term = v & 0x80, mx = Math.floor(v / 256); dict1.push([len, term, (mx + 1) * 2 ** (32 - len) - 1]); }
+  for (let l = 1; l <= 32; l++) { mincode[l] = hv.getUint32(o2 + (l - 1) * 8) * 2 ** (32 - l); maxcode[l] = (hv.getUint32(o2 + (l - 1) * 8 + 4) + 1) * 2 ** (32 - l) - 1; }
+  const dict = [];
+  for (const C of recs.slice(1)) {
+    const cv = new DataView(C.buffer, C.byteOffset, C.byteLength);
+    if (String.fromCharCode(...C.subarray(0, 4)) !== 'CDIC') break;
+    const phrases = cv.getUint32(8), bits = cv.getUint32(12), n = Math.min(2 ** bits, phrases - dict.length);
+    for (let i = 0; i < n; i++) { const off = cv.getUint16(16 + i * 2), bl = cv.getUint16(16 + off); dict.push([C.subarray(18 + off, 18 + off + (bl & 0x7FFF)), !!(bl & 0x8000)]); }
+  }
+  const unpack = data => {
+    const buf = new Uint8Array(data.length + 8); buf.set(data);
+    const dv = new DataView(buf.buffer); let bitsleft = data.length * 8, pos = 0, hi = dv.getUint32(0), lo = dv.getUint32(4), n = 32;
+    const parts = []; let size = 0;
+    for (;;) {
+      if (n <= 0) { pos += 4; hi = dv.getUint32(pos); lo = dv.getUint32(pos + 4); n += 32; }
+      const code = n === 32 ? hi : n === 0 ? lo : ((hi << (32 - n)) | (lo >>> n)) >>> 0;
+      let [len, term, mx] = dict1[code >>> 24];
+      if (!term) { while (code < mincode[len]) len++; mx = maxcode[len]; }
+      n -= len; bitsleft -= len; if (bitsleft < 0) break;
+      const r = Math.floor((mx - code) / 2 ** (32 - len)), e = dict[r];
+      if (!e) throw new Error('Bảng nén HUFF hỏng');
+      if (!e[1]) { dict[r] = [null, true]; e[0] = unpack(e[0]); e[1] = true; dict[r] = e; }
+      parts.push(e[0]); size += e[0].length;
+    }
+    const out = new Uint8Array(size); let o = 0; for (const p of parts) { out.set(p, o); o += p.length; } return out;
+  };
+  return unpack;
+}
+function mobiToEpub(buf) {
+  const u8 = new Uint8Array(buf), dv = new DataView(buf), asc = (a, o, n) => String.fromCharCode(...a.subarray(o, o + n));
+  if (u8.length < 90) throw new Error('File MOBI hỏng');
+  const kind = asc(u8, 60, 8);
+  if (kind !== 'BOOKMOBI' && kind !== 'TEXtREAd') throw new Error('Không phải file MOBI / AZW3');
+  const nrec = dv.getUint16(76), offs = []; for (let i = 0; i < nrec; i++) offs.push(dv.getUint32(78 + i * 8)); offs.push(u8.length);
+  const rec = i => i >= 0 && i < nrec ? u8.subarray(offs[i], offs[i + 1]) : new Uint8Array(0);
+  const header = i => {
+    const r = rec(i), h = new DataView(r.buffer, r.byteOffset, r.byteLength), H = { comp: h.getUint16(0), ntext: h.getUint16(8), crypt: h.getUint16(12), mobi: r.length > 24 && asc(r, 16, 4) === 'MOBI' };
+    if (!H.mobi) return H;
+    const len = h.getUint32(20), g = o => o + 4 <= r.length ? h.getUint32(o) : 0;
+    Object.assign(H, { len, enc: g(28), ver: g(36), tOff: g(84), tLen: g(88), res: g(108), huff: g(112), nhuff: g(116), exth: g(128), trail: len >= 0xE4 ? h.getUint16(242) : 0, fdst: g(192), nfdst: g(196) });
+    H.title = H.tLen && H.tOff + H.tLen <= r.length ? new TextDecoder(H.enc === 65001 ? 'utf-8' : 'windows-1252').decode(r.subarray(H.tOff, H.tOff + H.tLen)) : '';
+    H.ex = new Map();
+    if (H.exth & 0x40 && asc(r, 16 + len, 4) === 'EXTH') {
+      let p = 16 + len + 12; const cnt = h.getUint32(16 + len + 8);
+      for (let k = 0; k < cnt && p + 8 <= r.length; k++) { const t = h.getUint32(p), l = h.getUint32(p + 4); if (l < 8) break; if (!H.ex.has(t)) H.ex.set(t, r.subarray(p + 8, p + l)); p += l; }
+    }
+    return H;
+  };
+  const H0 = header(0);
+  if (H0.crypt) throw new Error('File Kindle này có khoá bản quyền (DRM) nên không mở được — app chỉ đọc file không khoá.');
+  const exU32 = (H, t) => { const b = H.ex?.get(t); return b && b.length >= 4 ? new DataView(b.buffer, b.byteOffset, 4).getUint32(0) : null; };
+  const exStr = (H, t, enc) => { const b = H.ex?.get(t); return b ? new TextDecoder(enc === 65001 ? 'utf-8' : 'windows-1252').decode(b).trim() : ''; };
+  const boundary = exU32(H0, 121);
+  let start = 0, H = H0;
+  if (H0.ver < 8 && boundary != null && boundary !== 0xFFFFFFFF && boundary < nrec) { const K = header(boundary); if (K.mobi && K.ver >= 8 && !K.crypt) { start = boundary; H = K; } }
+  const kf8 = H.ver >= 8;
+  // giải nén phần chữ
+  const trailing = r => {
+    let size = r.length, f = H.trail >> 1;
+    while (f) { if (f & 1) { let num = 0; for (const v of r.subarray(Math.max(0, size - 4), size)) { if (v & 0x80) num = 0; num = num * 128 + (v & 0x7F); } size -= num; } f >>= 1; }
+    if (H.trail & 1) size -= (r[size - 1] & 3) + 1;
+    return r.subarray(0, Math.max(0, size));
+  };
+  let unpack;
+  if (H.comp === 1) unpack = r => r;
+  else if (H.comp === 2) unpack = palmdocUnpack;
+  else if (H.comp === 17480) {
+    const pick = base => { const hs = []; for (let i = 0; i < H.nhuff; i++) hs.push(rec(base + i)); return hs; };
+    let hs = pick(start + H.huff); if (asc(hs[0] || new Uint8Array(4), 0, 4) !== 'HUFF') hs = pick(H.huff);
+    unpack = huffReader(hs);
+  } else throw new Error('Kiểu nén của file này chưa hỗ trợ');
+  const chunks = []; let total = 0;
+  for (let i = 1; i <= H.ntext; i++) { const c = unpack(trailing(rec(start + i))); chunks.push(c); total += c.length; }
+  let raw = new Uint8Array(total); { let o = 0; for (const c of chunks) { raw.set(c, o); o += c.length; } }
+  if (kf8 && H.fdst && H.fdst !== 0xFFFFFFFF) {        // luồng 0 là phần chữ; các luồng sau là CSS/SVG
+    const F = rec(start + H.fdst);
+    if (asc(F, 0, 4) === 'FDST') { const fv = new DataView(F.buffer, F.byteOffset, F.byteLength), a = fv.getUint32(12), z = fv.getUint32(16); if (z > a && z <= raw.length) raw = raw.subarray(a, z); }
+  }
+  const text = new TextDecoder(H.enc === 65001 ? 'utf-8' : 'windows-1252').decode(raw);
+  // ảnh: tìm vị trí bắt đầu kho ảnh cho đúng (file gộp MOBI+KF8 dùng chung kho)
+  const isImg = i => !!sniffImg(rec(i));
+  let res = H.res; if (!isImg(res) && isImg(start + H.res)) res = start + H.res;
+  const images = [], imgBy = new Map();
+  const getImg = idx => { if (idx < 0) return null; if (imgBy.has(idx)) return imgBy.get(idx); const r = rec(res + idx), t = sniffImg(r); let name = null;
+    if (t) { name = `img/${images.length}.${t[1]}`; images.push({ name, type: t[0], data: r.slice() }); } imgBy.set(idx, name); return name; };
+  const cvOff = exU32(H, 201) ?? exU32(H0, 201), cover = cvOff != null && cvOff !== 0xFFFFFFFF ? getImg(cvOff) : null;
+  const title = exStr(H, 503, H.enc) || exStr(H0, 503, H0.enc) || H.title || H0.title || '';
+  const author = exStr(H, 100, H.enc) || exStr(H0, 100, H0.enc), desc = (exStr(H, 103, H.enc) || exStr(H0, 103, H0.enc)).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  // tách thành các phần: KF8 theo từng file html, MOBI cũ theo dấu ngắt trang
+  const parts = kf8 ? text.split(/(?=<html[\s>])/i) : text.split(/<mbp:pagebreak\s*\/?>/i);
+  const nodes = [];
+  for (const p of parts) {
+    if (!p.replace(/<[^>]*>/g, '').trim() && !/<img|<image/i.test(p)) continue;
+    const doc = parseHtml(p), body = doc.body; if (!body) continue;
+    body.querySelectorAll('script,style,link,meta,head,title').forEach(e => e.remove());
+    body.querySelectorAll('img,image').forEach(e => {
+      let name = null; const ri = e.getAttribute('recindex'), src = e.getAttribute('src') || e.getAttribute('xlink:href') || e.getAttribute('href') || '';
+      if (ri) name = getImg(parseInt(ri, 10) - 1);
+      else { const m = /kindle:embed:([0-9A-V]{4})/i.exec(src); if (m) name = getImg(parseInt(m[1], 32) - 1); }
+      if (!name) { e.remove(); return; }
+      const im = doc.createElement('img'); im.setAttribute('src', name); im.setAttribute('alt', ''); e.replaceWith(im);
+    });
+    body.querySelectorAll('*').forEach(e => { for (const a of [...e.attributes]) if (!/^(src|alt|href|colspan|rowspan)$/i.test(a.name)) e.removeAttribute(a.name); if (/^mbp:/i.test(e.tagName)) e.replaceWith(...e.childNodes); });
+    body.querySelectorAll('a').forEach(a => a.replaceWith(...a.childNodes));
+    let top = body;                               // bỏ các lớp div bọc ngoài cùng để thấy được tiêu đề chương
+    for (;;) { const real = [...top.childNodes].filter(c => c.nodeType === 1 || (c.nodeType === 3 && c.nodeValue.trim())); if (real.length === 1 && real[0].nodeType === 1 && /^(DIV|SECTION|ARTICLE|MAIN|BLOCKQUOTE)$/.test(real[0].tagName)) top = real[0]; else break; }
+    nodes.push({ start: true }, ...[...top.childNodes]);
+  }
+  const chapters = splitByHeads(nodes, title);
+  if (!chapters.length) throw new Error('File không có nội dung chữ');
+  return mkEpub({ title: title || 'Truyện Kindle', author, desc, chapters, images, cover });
+}
+// chia danh sách node thành chương: theo tiêu đề (h1–h3 hoặc dòng "Chương 12…") nếu đủ nhiều, không thì theo từng phần của file
+function splitByHeads(nodes, bookTitle) {
+  const xs = new XMLSerializer(), txt = n => (n.textContent || '').replace(/\s+/g, ' ').trim();
+  const isChLine = n => n.nodeType === 1 && /^(P|DIV|B|STRONG|CENTER|H[1-6])$/.test(n.tagName) && txt(n).length < 120 && /^(chương|chuong|chapter|hồi|quyển|phần|tập|第)\s*[\dIVXLC一二三四五六七八九十百千]+/i.test(txt(n));
+  const lv = {}; for (const n of nodes) if (n.nodeType === 1 && /^H[1-3]$/.test(n.tagName) && txt(n)) { const k = n.tagName; lv[k] = lv[k] || { n: 0, ch: 0 }; lv[k].n++; if (CH_NUM.test(txt(n))) lv[k].ch++; }
+  const best = Object.entries(lv).filter(([, v]) => v.n >= 3).sort((a, b) => b[1].ch - a[1].ch || b[1].n - a[1].n)[0];
+  const lines = nodes.filter(isChLine).length;
+  const mode = best && (best[1].ch >= lines / 2 || best[1].n >= 3) ? 'h:' + best[0] : lines >= 3 ? 'line' : 'part';
+  const isHead = n => n.nodeType === 1 && (mode === 'line' ? isChLine(n) : mode.startsWith('h:') && n.tagName === mode.slice(2) && !!txt(n));
+  const out = []; let cur = null;
+  const flush = () => { if (!cur) return; const html = cur.nodes.map(n => n.nodeType === 3 ? XH(n.nodeValue) : xs.serializeToString(n)).join('').replace(/ xmlns="http:\/\/www\.w3\.org\/1999\/xhtml"/g, '');
+    const plain = cur.nodes.map(txt).join(' ').trim();
+    if (plain.length > 0 || /<img/.test(html)) { let t = cur.title; if (!t) { const h = cur.nodes.find(n => n.nodeType === 1 && (/^H[1-4]$/.test(n.tagName) || isChLine(n)) && txt(n)); t = h ? txt(h) : ''; }
+      out.push({ title: (t || (out.length ? `Phần ${out.length + 1}` : (plain.length < 300 ? bookTitle || 'Mở đầu' : 'Mở đầu'))).slice(0, 150), html }); }
+    cur = null; };
+  for (const n of nodes) {
+    if (n.start) { if (mode === 'part') { flush(); cur = { title: '', nodes: [] }; } continue; }
+    if (isHead(n)) { flush(); cur = { title: txt(n), nodes: [n] }; continue; }
+    (cur ||= { title: '', nodes: [] }).nodes.push(n);
+  }
+  flush();
+  return out;
+}
+async function convertBook(f) {
+  const n = f.name.toLowerCase();
+  if (/\.fb2$/.test(n)) return fb2ToEpub(f);
+  if (/\.fb2\.zip$/.test(n)) { const z = await openZip(f), inner = z.names.find(x => /\.fb2$/i.test(x)); if (!inner) throw new Error('Trong file zip không có FB2'); return fb2ToEpub(await z.blob(inner)); }
+  return mobiToEpub(await f.arrayBuffer());
+}
+
+/* ================= Thêm chương: xếp theo số chương, báo chương còn thiếu, nhận ra truyện đã có ================= */
+// Xếp chương theo số (và số quyển) khi đánh số rõ ràng; chương không có số (lời tựa, ngoại truyện…) bám theo chương đứng cạnh.
+function sortChapters(chs) {
+  chs.sort((a, b) => ncmp(a.src, b.src) || a.sub - b.sub);
+  const keys = chs.map(c => { const n = chNum(c.title); return n == null ? null : chVol(c.title) * 1e6 + n; });
+  const numd = keys.filter(k => k != null);
+  if (numd.length < 3 || numd.length < chs.length * .6) return chs;
+  const cnt = new Map(); for (const k of numd) cnt.set(k, (cnt.get(k) || 0) + 1);
+  if ([...cnt.values()].filter(v => v > 1).length > 3) return chs;         // số chương lặp nhiều (mỗi quyển đánh lại từ 1): giữ thứ tự file
+  const eff = keys.slice();
+  let last = null; for (let i = 0; i < chs.length; i++) { if (keys[i] != null) last = keys[i]; else if (last != null) eff[i] = last + .5; }
+  let next = null; for (let i = chs.length - 1; i >= 0; i--) { if (keys[i] != null) next = keys[i]; else if (eff[i] == null) eff[i] = next != null ? next - .5 : 0; }
+  const idx = new Map(chs.map((c, i) => [c, i]));
+  return chs.sort((a, b) => eff[idx.get(a)] - eff[idx.get(b)] || idx.get(a) - idx.get(b));
+}
+// Các đoạn số chương còn thiếu (chỉ khi truyện đánh số rõ ràng)
+function gapsOf(b) {
+  const vols = new Map();
+  for (const c of b.chapters) { const n = chNum(c.title); if (n == null) continue; const v = chVol(c.title); if (!vols.has(v)) vols.set(v, new Set()); vols.get(v).add(n); }
+  const out = [];
+  for (const [v, set] of vols) { const ns = [...set].sort((x, y) => x - y); for (let j = 0; j < ns.length - 1; j++) if (ns[j + 1] - ns[j] > 1) out.push({ v, a: ns[j] + 1, z: ns[j + 1] - 1 }); }
+  const total = out.reduce((s, g) => s + g.z - g.a + 1, 0);
+  return { gaps: out, total, multiVol: vols.size > 1 };
+}
+const gapText = (G, max = 4) => G.gaps.slice(0, max).map(g => (G.multiVol && g.v ? `Q${g.v} · ` : '') + (g.a === g.z ? `${g.a}` : `${g.a}–${g.z}`)).join(', ') + (G.gaps.length > max ? '…' : '');
+// Truyện đã có trên kệ có cùng tên (bỏ qua số chương, đuôi file…)
+function sameBook(books, title) {
+  const k = seriesKey(title); if (!k || k.replace(/\s/g, '').length < 3) return null;
+  return books.find(b => seriesKey(b.title) === k || b.files.some(f => seriesKey(f.name) === k)) || null;
+}
+// Bảng báo sau khi thêm chương: có chương thiếu thì nói rõ và gợi ý cách lấp
+function addReport(b, msg) {
+  const G = gapsOf(b);
+  if (!G.total) { toast(msg); return; }
+  // nút "Tải phần thiếu": khi chỗ thiếu nằm ngay sau phần đã tải lần gần nhất bằng công cụ
+  let lastN = b.srcLastN;                       // số chương cuối của lần tải gần nhất bằng công cụ
+  if (lastN == null) { const t = b.files.map(f => { const m = /\(Ch\.(\d+)-(\d+)\)/i.exec(f.name); return m ? { n: f.n, z: +m[2] } : null; }).filter(Boolean).sort((x, y) => y.n - x.n)[0]; lastN = t ? t.z : null; }
+  const gap = b.srcLast && lastN != null ? G.gaps.find(g => g.a === lastN + 1) : null;
+  openSheet('Đã thêm chương', body => {
+    body.classList.add('rv');
+    body.append(...[
+      el('p', { class: 'ui-note', text: msg }),
+      el('div', { class: 'gp-warn' },
+        el('span', { class: 'gp-warn-ic', 'aria-hidden': 'true', text: '!' }),
+        el('div', {}, el('b', { text: `Truyện đang thiếu ${G.total} chương` }), el('small', { text: `Chương ${gapText(G)}` }))),
+      gap ? el('button', { type: 'button', class: 'btn primary gp-go', text: `Tải ${gap.z - gap.a + 1} chương thiếu (${gap.a}–${gap.z}) trên web`, onclick: () => {
+        closeSheet(); const w = window.open(b.srcLast + '#kt-tai-tiep-' + (gap.z - gap.a + 1), '_blank'); if (!w) toast('Trình duyệt chặn mở tab mới. Hãy cho phép cửa sổ bật lên.'); } }) : null,
+      el('button', { type: 'button', class: 'btn ' + (gap ? 'ghost' : 'primary') + ' gp-go', text: 'Xem trong Kiểm tra chương', onclick: () => { closeSheet(); openAudit(b); } }),
+      el('p', { class: 'ui-note', text: gap ? 'Công cụ tải trên laptop sẽ mở đúng chương trước chỗ thiếu và chỉ tải phần còn thiếu.' : 'Bạn có thể thêm file chứa các chương này bất cứ lúc nào, chương trùng sẽ tự được bỏ qua.' }),
+    ].filter(Boolean));
+  }, 'Để sau');
+}
+// Chọn 1 truyện (1 file hoặc nhiều file cùng truyện) mà trên kệ đã có truyện cùng tên: hỏi nối vào hay thêm riêng
+async function askSame(files, fileList, gTitle) {
+  const books = privFilter(await Store.books().catch(() => []));
+  const t = gTitle || (files[0] ? (await peekTitle(files[0])) || prettyName(files[0].name) : '');
+  const hit = books.length && files.length ? sameBook(books, t) : null;
+  if (!hit) return importFiles(fileList, null, files.length > 1 && gTitle ? { title: gTitle } : {});
+  openSheet('Truyện này đã có trên kệ', body => {
+    body.classList.add('rv');
+    body.append(
+      el('div', { class: 'rv-card' },
+        el('span', { class: 'rv-ic', 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24"><path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h10"/></svg>' }),
+        el('div', {}, el('b', { text: hit.title }), el('small', { text: `Đang có ${hit.chapters.length} chương trên kệ` }))),
+      el('button', { type: 'button', class: 'rp-it', style: '--k:0', onclick: () => { closeSheet(); importFiles(files, hit); } },
+        el('span', { class: 'rp-ic', 'aria-hidden': 'true', text: '➕' }),
+        el('span', {}, el('b', { text: `Nối vào “${hit.title}”` }), el('small', { text: 'Chỉ thêm chương mới, chương đã có tự bỏ qua' })), el('em', { 'aria-hidden': 'true', text: '›' })),
+      el('button', { type: 'button', class: 'rp-it', style: '--k:1', onclick: () => { closeSheet(); importFiles(fileList, null); } },
+        el('span', { class: 'rp-ic', 'aria-hidden': 'true', text: '📚' }),
+        el('span', {}, el('b', { text: 'Thêm thành truyện riêng' }), el('small', { text: 'Giữ truyện cũ, tạo thêm một truyện mới' })), el('em', { 'aria-hidden': 'true', text: '›' })));
+  }, 'Huỷ');
+}
+
 /* Chống trùng khi thêm chương: so theo số chương (+ số quyển nếu có). Nếu chính truyện đang có nhiều số chương lặp
    (mỗi quyển đánh số lại từ 1 mà tên chương không ghi quyển) thì chỉ coi là trùng khi tên chương giống hệt. */
 function dupGuard(existing) {
@@ -4676,7 +5002,7 @@ async function parsePdf(f, key, step) {
    Trước đây mọi file chọn cùng lúc đều gộp thành MỘT truyện. Giờ: xem tên file + tên truyện ghi trong EPUB,
    các phần của cùng một truyện (Ch.001-100, Ch.101-200, Chương 1, Chương 2…) gộp lại; truyện khác nhau tách riêng. */
 const SER_RE = /[(\[{]?\s*\b(?:chuong|chapter|chap|ch|c|tap|quyen|q|vol(?:ume)?|phan|part|hoi|ep(?:isode)?)\.?\s*\d+(?:\s*[-~–]\s*\d+)?\s*[)\]}]?/g;
-const seriesKey = s => foldVi(String(s || '').replace(/\.(epub|cbz|zip|txt|pdf)$/i, '')).replace(SER_RE, ' ').replace(/\(\s*\d+\s*\)/g, ' ').replace(/\b\d+\b/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+const seriesKey = s => foldVi(String(s || '').replace(/(\.fb2)?\.(epub|cbz|zip|txt|pdf|fb2|mobi|azw3|azw|prc)$/i, '')).replace(SER_RE, ' ').replace(/\(\s*\d+\s*\)/g, ' ').replace(/\b\d+\b/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
 async function peekTitle(f) {
   if (!/\.epub$/i.test(f.name)) return '';
   try {
@@ -4700,24 +5026,26 @@ async function groupPicked(files) {
 }
 async function importPicked(fileList, target) {
   const files = [...fileList].filter(f => SUPPORTED.test(f.name));
-  if (target || files.length < 2) return importFiles(fileList, target);
+  if (target) return importFiles(fileList, target);
+  if (files.length < 2) return askSame(files, fileList);
   showOverlay('Đang xem các file…');
   let groups;
   try { groups = await groupPicked(files.sort((a, b) => ncmp(a.name, b.name))); } finally { hideOverlay(); }
-  if (groups.length < 2) return importFiles(fileList, null);
+  if (groups.length < 2) return askSame(files, fileList, groups[0]?.title);
+  { const bs = privFilter(await Store.books().catch(() => [])); for (const g of groups) g.into = sameBook(bs, g.title); }
   const skipped = fileList.length - files.length;
   const run = async merge => {
     closeSheet();
     if (merge) return importFiles(files, null);
     const books = await Store.books().catch(() => []), have = new Set(books.flatMap(b => b.files.map(f => f.name + '|' + f.size)));
     const todo = groups.filter(g => !g.files.every(f => have.has(f.name + '|' + f.size))), dup = groups.length - todo.length;
-    let ok = 0; const errors = [];
+    let ok = 0, merged = 0; const errors = [];
     for (let i = 0; i < todo.length; i++) {
-      const g = todo[i], r = await importFiles(g.files, null, { batch: true, title: g.files.length > 1 ? g.title : null, label: `Đang thêm truyện ${i + 1}/${todo.length}…` });
-      if (r && r.added) ok++; if (r) errors.push(...r.errors);
+      const g = todo[i], r = await importFiles(g.files, g.into || null, { batch: true, title: g.into ? undefined : g.files.length > 1 ? g.title : null, label: g.into ? `Đang nối vào “${g.into.title}”…` : `Đang thêm truyện ${i + 1}/${todo.length}…` });
+      if (r && r.added) { ok++; if (g.into) merged++; } if (r) errors.push(...r.errors);
     }
     await renderLibrary();
-    const msg = `Đã thêm ${ok} truyện` + (dup ? `, bỏ qua ${dup} truyện đã có trên kệ` : '') + (skipped ? `, bỏ qua ${skipped} file không hỗ trợ` : '') + '.';
+    const msg = `Đã thêm ${ok - merged} truyện` + (merged ? `, nối chương mới vào ${merged} truyện đã có` : '') + (dup ? `, bỏ qua ${dup} truyện đã có trên kệ` : '') + (skipped ? `, bỏ qua ${skipped} file không hỗ trợ` : '') + '.';
     if (errors.length) showErrors(errors, msg); else toast(msg);
   };
   openSheet(`Nhận ra ${groups.length} truyện`, body => {
@@ -4726,7 +5054,7 @@ async function importPicked(fileList, target) {
       el('p', { class: 'ui-note', text: `Bạn chọn ${files.length} file. Các phần của cùng một truyện đã được gộp lại; truyện khác nhau sẽ thành các truyện riêng trên kệ.` }),
       el('div', { class: 'gp-list' }, ...groups.map((g, i) => el('div', { class: 'gp-it', style: `--k:${i}` },
         el('span', { class: 'gp-n', 'aria-hidden': 'true', text: String(i + 1) }),
-        el('span', {}, el('b', { text: g.title }), el('small', { text: `${g.files.length} file · ${fmtBytes(g.size)}${g.files.length > 1 ? ' · gộp thành 1 truyện' : ''}` }))))),
+        el('span', {}, el('b', { text: g.title }), el('small', {}, `${g.files.length} file · ${fmtBytes(g.size)}${g.files.length > 1 && !g.into ? ' · gộp thành 1 truyện' : ''}`, g.into ? el('span', { class: 'gp-into', text: ' · nối vào truyện đã có' }) : ''))))),
       el('button', { type: 'button', class: 'btn primary gp-go', text: `Thêm thành ${groups.length} truyện`, onclick: () => run(false) }),
       el('button', { type: 'button', class: 'btn ghost gp-go', text: 'Gộp tất cả thành 1 truyện', onclick: () => run(true) }));
   }, 'Huỷ');
@@ -5396,7 +5724,7 @@ function fetchMore(b) {                                  // mở lại trang ngu
       if (!(d.buf instanceof ArrayBuffer) || d.buf.byteLength < 100 || d.buf.byteLength > 400e6 || !/\.epub$/i.test(String(d.name || ''))) { reply(false, 'Dữ liệu không hợp lệ'); return; }
       let from = ''; try { from = new URL(e.origin).hostname.replace(/^www\./, ''); } catch {}
       let books = []; try { books = await Store.books(); } catch {}
-      const same = books.find(b => b.srcKey && b.srcKey === d.key);
+      const same = books.find(b => b.srcKey && b.srcKey === d.key) || sameBook(privFilter(books), String(d.title || ''));
       const meta = { srcKey: String(d.key || '').slice(0, 500), srcLast: String(d.last || '').slice(0, 1000), srcAt: Date.now() };
       const file = new File([d.buf], String(d.name).slice(0, 180), { type: 'application/epub+zip' });
       const go = async target => {
